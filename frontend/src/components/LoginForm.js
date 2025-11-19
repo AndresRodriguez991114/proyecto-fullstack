@@ -87,10 +87,7 @@ const LoginForm = () => {
     <div className="login-container">
       {/* LADO IZQUIERDO */}
       <div className="left-section">
-        <h1 className="title">Tus finanzas en un solo lugar</h1>
-        <p className="subtitle">
-          Ingresa informes, crea presupuestos, sincroniza con tus bancos…
-        </p>
+        <h1 className="title">invantario al alcanxe de un click</h1>
 
         <img src="/images/mockup.png" className="mockup-img" alt="mockup" />
       </div>
