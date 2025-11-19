@@ -1,197 +1,128 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { InputText } from "primereact/inputtext";
+import { Button } from "primereact/button";
+import { InputSwitch } from "primereact/inputswitch";
+import { useForm } from "react-hook-form";
+import api from "../api"; 
+import 'primereact/resources/themes/lara-light-indigo/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
 
-const API = "https://proyecto-fullstack-nfai.onrender.com/api/usuarios"; 
+const LoginForm = () => {
+  const navigate = useNavigate();
+  const { register, handleSubmit, setValue, reset, formState: { errors, isDirty, isValid } } = useForm({ mode: "onChange" });
+  
+  const [rememberMe, setRememberMe] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-function App() {
-  const [usuarios, setUsuarios] = useState([]);
-  const [form, setForm] = useState({ nombre: "", correo: "", edad: "" });
-  const [editId, setEditId] = useState(null);
-
-  // Cargar usuarios
-  const cargarUsuarios = () => {
-    fetch(API)
-      .then(res => res.json())
-      .then(data => setUsuarios(data));
-  };
-
+  // Cargar email guardado
   useEffect(() => {
-    cargarUsuarios();
-  }, []);
+    const savedCheck = localStorage.getItem("isChecked");
+    const savedEmail = localStorage.getItem("email");
+    
+    if (savedCheck === "true" && savedEmail) {
+      setRememberMe(true);
+      setValue("email", savedEmail, { shouldDirty: true, shouldValidate: true });
+      setValue("isChecked", true);
+    }
+  }, [setValue]);
 
-  // Agregar o Editar Usuario
-  const manejarSubmit = (e) => {
-    e.preventDefault();
+  // Enviar formulario
+  const loginSubmit = async (formData) => {
+    const { email, password } = formData;
 
-    if (editId === null) {
-      // Crear
-      fetch(API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form)
-      }).then(() => {
-        setForm({ nombre: "", correo: "", edad: "" });
-        cargarUsuarios();
-      });
+    // Guardar o borrar email
+    if (rememberMe) {
+      localStorage.setItem("email", email);
+      localStorage.setItem("isChecked", "true");
     } else {
-      // Editar
-      fetch(`${API}/${editId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form)
-      }).then(() => {
-        setForm({ nombre: "", correo: "", edad: "" });
-        setEditId(null);
-        cargarUsuarios();
-      });
+      localStorage.removeItem("email");
+      localStorage.removeItem("isChecked");
+    }
+
+    try {
+      // Nuevo endpoint del backend REAL
+      const response = await api.post('/usuarios/login', { email, password });
+
+      if (response.status === 200) {
+        const userData = response.data; // { userId, nombre, rol }
+
+        // Guardamos usuario en localStorage
+        localStorage.setItem("user", JSON.stringify(userData));
+
+        // Redirección por rol
+        if (userData.rol === "administrador") {
+          navigate("/admin-dashboard");
+        } else {
+          navigate("/user-dashboard");
+        }
+
+        reset();
+      }
+
+    } catch (error) {
+      console.error("Error en login:", error);
+      setErrorMessage("Credenciales incorrectas o usuario no encontrado.");
     }
   };
 
-  // Eliminar usuario
-  const eliminarUsuario = (id) => {
-    fetch(`${API}/${id}`, { method: "DELETE" }).then(() => cargarUsuarios());
-  };
-
-  // Preparar edición
-  const editarUsuario = (usuario) => {
-    setForm({
-      nombre: usuario.nombre,
-      correo: usuario.correo,
-      edad: usuario.edad
-    });
-    setEditId(usuario.id);
+  const handleRememberMeChange = (e) => {
+    setRememberMe(e.value);
+    setValue("isChecked", e.value);
   };
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>Gestión de Usuarios</h1>
+    <div className="register-container"> 
+      <h2>Iniciar Sesión</h2>
 
-      {/* Formulario */}
-      <form onSubmit={manejarSubmit} style={styles.form}>
-        <input
-          style={styles.input}
-          type="text"
-          placeholder="Nombre"
-          value={form.nombre}
-          onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-          required
-        />
+      <form autoComplete="off" onSubmit={handleSubmit(loginSubmit)}>
+        
+        <div className="form-group">
+          <label>Email:</label>
+          <InputText
+            type="text"
+            placeholder="Introduzca su email"
+            className={errors?.email ? "p-invalid" : ""}
+            {...register("email", {
+              required: "El email es obligatorio",
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                message: "Formato de email inválido"
+              }
+            })}
+          />
+          {errors?.email && <small className="p-error">{errors.email.message}</small>}
+        </div>
 
-        <input
-          style={styles.input}
-          type="email"
-          placeholder="Correo"
-          value={form.correo}
-          onChange={(e) => setForm({ ...form, correo: e.target.value })}
-          required
-        />
+        <div className="form-group">
+          <label>Contraseña:</label>
+          <InputText
+            type="password"
+            placeholder="Introduzca su contraseña"
+            className={errors?.password ? "p-invalid" : ""}
+            {...register("password", {
+              required: "La contraseña es obligatoria",
+              minLength: { value: 6, message: "Mínimo 6 caracteres" }
+            })}
+          />
+          {errors?.password && <small className="p-error">{errors.password.message}</small>}
+        </div>
 
-        <input
-          style={styles.input}
-          type="number"
-          placeholder="Edad"
-          value={form.edad}
-          onChange={(e) => setForm({ ...form, edad: e.target.value })}
-          required
-        />
+        <div className="form-group remember-me">
+          <label style={{ marginRight: "10px" }}>Recuérdame</label>
+          <InputSwitch checked={rememberMe} onChange={handleRememberMeChange} />
+        </div>
 
-        <button style={styles.button}>
-          {editId === null ? "Agregar Usuario" : "Guardar Cambios"}
-        </button>
+        <div className="buttons">
+          <Button type="submit" label="Ingresar" disabled={!isValid || !isDirty} />
+          <Button type="button" label="Registrarse" onClick={() => navigate("/register")} />
+        </div>
+
+        {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
       </form>
-
-      {/* Tabla */}
-      <table style={styles.table}>
-        <thead>
-          <tr>
-            <th style={styles.th}>Nombre</th>
-            <th style={styles.th}>Correo</th>
-            <th style={styles.th}>Edad</th>
-            <th style={styles.th}>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {usuarios.map((u) => (
-            <tr key={u.id}>
-              <td style={styles.td}>{u.nombre}</td>
-              <td style={styles.td}>{u.correo}</td>
-              <td style={styles.td}>{u.edad}</td>
-              <td style={styles.td}>
-                <button style={styles.btnEdit} onClick={() => editarUsuario(u)}>
-                  Editar
-                </button>
-                <button style={styles.btnDelete} onClick={() => eliminarUsuario(u.id)}>
-                  Eliminar
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   );
-}
-
-const styles = {
-  container: {
-    maxWidth: 700,
-    margin: "0 auto",
-    padding: 20,
-    fontFamily: "Arial"
-  },
-  title: {
-    textAlign: "center",
-    marginBottom: 20
-  },
-  form: {
-    display: "grid",
-    gap: 10,
-    marginBottom: 20
-  },
-  input: {
-    padding: 10,
-    fontSize: 16,
-    borderRadius: 6,
-    border: "1px solid #ccc"
-  },
-  button: {
-    padding: 12,
-    fontSize: 16,
-    background: "#4CAF50",
-    color: "#fff",
-    border: "none",
-    borderRadius: 6,
-    cursor: "pointer"
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse"
-  },
-  th: {
-    background: "#f4f4f4",
-    padding: 10,
-    textAlign: "left"
-  },
-  td: {
-    padding: 10,
-    borderBottom: "1px solid #ddd"
-  },
-  btnEdit: {
-    marginRight: 10,
-    padding: "6px 10px",
-    background: "#2196F3",
-    color: "#fff",
-    border: "none",
-    borderRadius: 4,
-    cursor: "pointer"
-  },
-  btnDelete: {
-    padding: "6px 10px",
-    background: "#E53935",
-    color: "#fff",
-    border: "none",
-    borderRadius: 4,
-    cursor: "pointer"
-  }
 };
 
-export default App;
+export default LoginForm;
