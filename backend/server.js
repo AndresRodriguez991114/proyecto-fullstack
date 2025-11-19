@@ -70,7 +70,7 @@ app.post("/api/usuarios/login", async (req, res) => {
     res.json({
       userId: user.id,
       nombre: user.nombre,
-      correo: user.correo,
+      email: user.email,
       rol: user.rol
     });
 
@@ -84,13 +84,13 @@ app.post("/api/usuarios/login", async (req, res) => {
 // -------------------------------------------------------------
 app.post("/api/usuarios", async (req, res) => {
   try {
-    const { nombre, correo, password, rol } = req.body;
+    const { nombre, email, password, rol } = req.body;
 
     const hashed = await bcrypt.hash(password, 10);
 
     await pool.query(
       "INSERT INTO usuarios (nombre, email, password, rol) VALUES ($1,$2,$3,$4)",
-      [nombre, correo, hashed, rol || "usuario"]
+      [nombre, email, hashed, rol || "usuario"]
     );
 
     res.json({ msg: "Usuario creado" });

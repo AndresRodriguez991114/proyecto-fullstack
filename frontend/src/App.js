@@ -4,7 +4,7 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { InputSwitch } from "primereact/inputswitch";
 import { useForm } from "react-hook-form";
-import api from "../api"; 
+import api from "./api"; 
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
