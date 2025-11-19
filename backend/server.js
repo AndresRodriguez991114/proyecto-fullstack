@@ -49,7 +49,7 @@ app.post("/api/usuarios/login", async (req, res) => {
   try {
     // Buscar usuario por email
     const result = await pool.query(
-      "SELECT id, nombre, correo, rol, password FROM usuarios WHERE correo = $1",
+      "SELECT id, nombre, email, rol, password FROM usuarios WHERE email = $1",
       [email]
     );
 
@@ -89,7 +89,7 @@ app.post("/api/usuarios", async (req, res) => {
     const hashed = await bcrypt.hash(password, 10);
 
     await pool.query(
-      "INSERT INTO usuarios (nombre, correo, password, rol) VALUES ($1,$2,$3,$4)",
+      "INSERT INTO usuarios (nombre, email, password, rol) VALUES ($1,$2,$3,$4)",
       [nombre, correo, hashed, rol || "usuario"]
     );
 
@@ -106,7 +106,7 @@ app.post("/api/usuarios", async (req, res) => {
 app.get("/api/usuarios", async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, nombre, correo, rol FROM usuarios ORDER BY id ASC"
+      "SELECT id, nombre, email, rol FROM usuarios ORDER BY id ASC"
     );
     res.json(result.rows);
   } catch (err) {
