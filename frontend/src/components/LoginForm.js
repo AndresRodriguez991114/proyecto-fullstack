@@ -87,7 +87,7 @@ const LoginForm = () => {
     <div className="login-container">
       {/* LADO IZQUIERDO */}
       <div className="left-section">
-        <h1 className="title">invantario al alcanxe de un click</h1>
+        <h1 className="title">tu invantario al alcance de un click</h1>
 
         <img src="/images/mockup.png" className="mockup-img" alt="mockup" />
       </div>
