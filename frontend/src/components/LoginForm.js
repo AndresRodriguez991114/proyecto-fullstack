@@ -4,6 +4,8 @@ import { useForm } from "react-hook-form";
 import api from "../api";
 import "./LoginForm.css";
 import { FaEye,FaEyeSlash,FaEnvelope  } from "react-icons/fa";
+import Logo from "../images/Logo.png";
+
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -77,10 +79,12 @@ const LoginForm = () => {
   // -------------------------------
   return (
     <div className="login-container">
+
       {/* CARD GLASS */}
       <div className="login-card">
-        <div className="avatar-img"></div>
-
+        {/* Logo de la empresa */}
+        <div className="login-logo">
+        <img src={Logo} alt="Logo" /></div>
         <h2 className="login-title">Iniciar Sesión</h2>
 
         <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
