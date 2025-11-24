@@ -1,173 +1,116 @@
-/* CONTENEDOR GENERAL */
+/* ===== LOGIN PAGE BACKGROUND ===== */
 .login-container {
-  display: flex;
   width: 100%;
   height: 100vh;
-  background: #f3f3f3;
+  background: url("../images/Fondo.jpg") no-repeat center center/cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* ----------- IZQUIERDA ----------- */
-.left-section {
-  width: 50%;
-  background: #0095e5;
-  padding: 120px 80px;
-  color: #fff;
+/* ===== CARD GLASS EFFECT ===== */
+.login-card {
+  width: 380px;
+  padding: 40px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  color: white;
 }
 
-.title {
-  font-size: 45px;
-  font-weight: 800;
-  margin-bottom: 20px;
-}
-
-.subtitle {
-  font-size: 17px;
-  margin-bottom: 30px;
-}
-
-.mockup-img {
-  width: 420px;
-  margin-top: 30px;
-}
-
-/* ----------- DERECHA ----------- */
-.right-section {
-  width: 50%;
+/* Avatar circulito */
+.avatar-img {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 25px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
+  background-image: url("https://cdn-icons-png.flaticon.com/512/149/149071.png");
+  background-size: 60%;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
-.form-card {
-  background: #fff;
-  width: 450px;
-  padding: 45px;
-  border-radius: 22px;
-  box-shadow: 0px 10px 30px rgba(0,0,0,0.15);
-}
-
-.form-title {
-  text-align: center;
-  font-size: 26px;
+.login-title {
+  font-size: 24px;
+  font-weight: bold;
   margin-bottom: 25px;
-  font-weight: 600;
 }
 
-/* ----------- INPUTS ----------- */
+/* ===== INPUTS ===== */
+.form-group {
+  text-align: left;
+  margin-bottom: 20px;
+  position: relative;
+}
+
 .input {
   width: 100%;
-  padding: 12px;
-  border-radius: 6px;
-  border: 2px solid #d1d1d1;
-  margin-bottom: 10px;
+  padding: 12px 40px 12px 12px;
+  border: none;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: white;
   font-size: 15px;
-  transition: 0.3s;
 }
 
-/* Borde azul al hacer click */
 .input:focus {
-  border-color: #7a5cf0;
   outline: none;
-  box-shadow: 0 0 6px rgba(122, 92, 240, 0.3);
+  border-bottom: 2px solid #fff;
 }
 
-/* Input en error */
-.input.error {
-  border-color: #ff4d4d;
+/* íconos dentro del input */
+.icon-input {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  cursor: pointer;
+  color: white;
 }
 
-/* Texto de error */
-.error-text {
-  color: #ff4d4d;
-  font-size: 14px;
-  margin-top: -6px;
-  margin-bottom: 10px;
-}
-
-/* ----------- SWITCH ----------- */
-.remember-container {
+/* Remember me */
+.remember-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 25px;
+  align-items: center;
+  margin-top: 10px;
 }
 
-/* Switch estilo iOS */
-.switch {
-  position: relative;
-  width: 45px;
-  height: 25px;
-}
-
-.switch input {
-  display: none;
-}
-
-.slider {
-  position: absolute;
-  background: #ccc;
-  border-radius: 34px;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  transition: 0.4s;
-}
-
-.slider::before {
-  content: "";
-  height: 19px;
-  width: 19px;
-  background: #fff;
-  border-radius: 50%;
-  position: absolute;
-  left: 3px;
-  bottom: 3px;
-  transition: 0.4s;
-}
-
-input:checked + .slider {
-  background: #7a5cf0;
-}
-
-input:checked + .slider:before {
-  transform: translateX(20px);
-}
-
-/* ----------- BOTONES ----------- */
-.button-group {
+.remember-label {
   display: flex;
-  justify-content: space-between;
-  gap: 15px;
+  align-items: center;
+  gap: 6px;
 }
 
+/* ===== BUTTON ===== */
 .btn-login {
-  width: 50%;
+  width: 100%;
+  margin-top: 25px;
   padding: 12px;
-  background: linear-gradient(90deg, #7a5cf0, #a28aff);
-  border: none;
+  background: linear-gradient(90deg, #44126b, #8e3fba);
   color: white;
-  border-radius: 6px;
-  cursor: pointer;
+  border: none;
+  border-radius: 12px;
   font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
   transition: 0.3s;
 }
 
-.btn-login:hover {
-  opacity: 0.9;
+.btn-login:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
-.btn-register {
-  width: 50%;
-  padding: 12px;
-  background: #6c63ff;
-  border: none;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: 0.3s;
-}
-
-.btn-register:hover {
-  opacity: 0.9;
+.btn-login:hover:not(:disabled) {
+  transform: scale(1.03);
 }

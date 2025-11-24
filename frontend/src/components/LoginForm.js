@@ -1,139 +1,168 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import api from "../api";
 import "./LoginForm.css";
+import { FaEye,FaEyeSlash,FaEnvelope  } from "react-icons/fa";
 
 const LoginForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({
-    email: "",
-    password: "",
-  });
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    watch,
+    formState: { errors, isValid, isDirty },
+  } = useForm({ mode: "onChange" });
 
-  // Validación de los campos
-  const validate = () => {
-    let valid = true;
-    let newErrors = { email: "", password: "" };
+  const [rememberMe, setRememberMe] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-    // Validar email vacío
-    if (!email.trim()) {
-      newErrors.email = "El campo email es obligatorio";
-      valid = false;
-    } else {
-      // Validar formato
-      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!regex.test(email)) {
-        newErrors.email = "El formato del email es incorrecto";
-        valid = false;
-      }
+  // 👁 estado para mostrar/ocultar contraseña
+  const [showPassword, setShowPassword] = useState(false);
+
+  // 👀 observar campos en tiempo real
+  const email = watch("email");
+  const password = watch("password");
+
+  // ⚡ activar botón solo cuando ambos campos tengan texto
+  const formReady = email && password;
+
+  // -------------------------------
+  // Cargar datos de "Recuérdame"
+  // -------------------------------
+  useEffect(() => {
+    const savedCheck = localStorage.getItem("rememberMe");
+    const savedEmail = localStorage.getItem("rememberEmail");
+
+    if (savedCheck === "true" && savedEmail) {
+      setRememberMe(true);
+      setValue("email", savedEmail, { shouldDirty: true, shouldValidate: true });
     }
+  }, [setValue]);
 
-    // Validar contraseña
-    if (!password.trim()) {
-      newErrors.password = "El campo contraseña es obligatorio";
-      valid = false;
-    } else if (password.length < 6) {
-      newErrors.password = "La contraseña debe tener al menos 6 caracteres";
-      valid = false;
-    }
-
-    setErrors(newErrors);
-    return valid;
-  };
-
-  // Manejador de la lógica de inicio de sesión
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Validación del formulario
-    if (!validate()) return;
-
-    console.log("Iniciando sesión...");
+  // -------------------------------
+  // Login
+  // -------------------------------
+  const onSubmit = async (formData) => {
+    setErrorMessage("");
+    const { email, password } = formData;
 
     try {
-      // Enviar los datos al servidor usando fetch
-      const response = await fetch(
-        "https://proyecto-fullstack-nfai.onrender.com/api/usuarios/login",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      const response = await api.post("/usuarios/login", { email, password });
 
-      const data = await response.json();
-      console.log("Respuesta del servidor:", data);
-
-      // Verificar si la respuesta es correcta
-      if (!response.ok) {
-        alert(data.message || "Credenciales incorrectas");
-        return;
+      // Guardar email si RememberMe está activo
+      if (rememberMe) {
+        localStorage.setItem("rememberMe", "true");
+        localStorage.setItem("rememberEmail", email);
+      } else {
+        localStorage.removeItem("rememberMe");
+        localStorage.removeItem("rememberEmail");
       }
 
-      // Guardar los datos del usuario en localStorage
-      localStorage.setItem("user", JSON.stringify(data));
+      // Guardar datos del usuario
+      localStorage.setItem("user", JSON.stringify(response.data));
 
-      alert("Inicio de sesión exitoso");
-
-      // Redirigir a otra página (como el Dashboard)
-      window.location.href = "/dashboard"; // o usa React Router para una navegación más controlada
-
+      navigate("/dashboard");
+      reset();
     } catch (error) {
-      console.error("Error en el login:", error);
-      alert("Error de conexión con el servidor");
+      console.error("Error al iniciar sesión:", error);
+      setErrorMessage("Upss!! Credenciales incorrectas");
     }
   };
 
+  // -------------------------------
+  // Render
+  // -------------------------------
   return (
     <div className="login-container">
-      {/* LADO IZQUIERDO */}
-      <div className="left-section">
-        <h1 className="title">tu invantario al alcance de un click</h1>
+      {/* CARD GLASS */}
+      <div className="login-card">
+        <div className="avatar-img"></div>
 
-        <img src="/images/mockup.png" className="mockup-img" alt="mockup" />
-      </div>
+        <h2 className="login-title">Iniciar Sesión</h2>
 
-      {/* FORM */}
-      <div className="right-section">
-        <div className="form-card">
-          <h2 className="form-title">Iniciar Sesión</h2>
+        <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
 
-          <label>Email:</label>
-          <input
-            className={errors.email ? "input error" : "input"}
-            type="email"
-            placeholder="Correo@correo.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          {errors.email && <p className="error-text">{errors.email}</p>}
+          {/* EMAIL */}
+          <div className="form-group">
+            <input
+              type="text"
+              placeholder="Email ID"
+              className={errors.email ? "input error" : "input"}
+              {...register("email", {
+                required: "El email es obligatorio",
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Formato de email inválido",
+                },
+              })}
+            />
+           <FaEnvelope className="icon-input" />
+            {errors.email && (
+              <small className="error-text">{errors.email.message}</small>
+            )}
+          </div>
 
-          <label>Contraseña:</label>
-          <input
-            className={errors.password ? "input error" : "input"}
-            type="password"
-            placeholder="introduzca su contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          {errors.password && <p className="error-text">{errors.password}</p>}
+          {/* PASSWORD con ojo 👁 */}
+          <div className="form-group">
+            <div className="password-wrapper">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                className={errors.password ? "input error" : "input"}
+                {...register("password", {
+                  required: "La contraseña es obligatoria",
+                  minLength: {
+                    value: 8,
+                    message: "Debe tener mínimo 8 caracteres",
+                  },
+                })}
+              />
+              {/* 👁 Ícono para mostrar/ocultar */}
+            {showPassword ? (
+              <FaEyeSlash
+                className="icon-input"
+                onClick={() => setShowPassword(false)}
+              />
+            ) : (
+              <FaEye
+                className="icon-input"
+                onClick={() => setShowPassword(true)}
+              />
+            )}
+            </div>
 
-          <div className="remember-container">
-            <span>Recuérdame</span>
+            {errors.password && (
+              <small className="error-text">{errors.password.message}</small>
+            )}
+          </div>
 
-            <label className="switch">
-              <input type="checkbox" />
-              <span className="slider round"></span>
+          {/* REMEMBER ME */}
+          <div className="remember-row">
+            <label className="remember-label">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              Recuérdame
             </label>
           </div>
 
-          <div className="button-group">
-            {/* Usamos el onSubmit en el form en lugar de onClick */}
-            <button className="btn-login" onClick={handleSubmit}>
-              Ingresar
-            </button>
-            <button className="btn-register">Registrarse</button>
-          </div>
-        </div>
+          {/* BOTÓN – activado solo cuando ambos campos tengan texto Y validación correcta */}
+          <button
+            type="submit"
+            className={`btn-login ${formReady ? "active" : "disabled"}`}
+            disabled={!formReady || !isValid || !isDirty}
+          >
+            Login
+          </button>
+
+          {/* ERROR DEL SERVIDOR */}
+          {errorMessage && <p className="server-error">{errorMessage}</p>}
+        </form>
       </div>
     </div>
   );
