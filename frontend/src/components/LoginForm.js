@@ -167,6 +167,9 @@ const LoginForm = () => {
           {/* ERROR DEL SERVIDOR */}
           {errorMessage && <p className="server-error">{errorMessage}</p>}
         </form>
+                <p className="legal-text">
+          © 2025 Cloud + Inventory. Todos los derechos reservados.
+        </p>
       </div>
     </div>
   );
