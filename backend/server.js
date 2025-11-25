@@ -31,6 +31,11 @@ app.use(express.json());
 // -------------------------------------------------------------
 //              🟢        ENDPOINT TEST CONEXIÓN
 // -------------------------------------------------------------
+
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
+});
+
 app.get("/api/db-check", async (req, res) => {
   try {
     const r = await pool.query("SELECT NOW()");
