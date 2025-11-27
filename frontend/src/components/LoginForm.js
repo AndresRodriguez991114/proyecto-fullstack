@@ -66,7 +66,9 @@ const LoginForm = () => {
       // Guardar datos del usuario
       localStorage.setItem("user", JSON.stringify(response.data));
 
-      navigate("/dashboard");
+      if (response.data.rol === "administrador") navigate("/admin");
+      else navigate("/Dashboard");
+      
       reset();
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
