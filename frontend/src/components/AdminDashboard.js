@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import UsersPanel from "./UsersPanel";
 import "./AdminDashboard.css";
 import { useNavigate } from "react-router-dom";
-import Logo from "../images/Logo.png";
+import Logo from "../images/Logo2.png";
 
 // Aplicar tema ANTES de renderizar
 const savedTheme = localStorage.getItem("theme") || "light";
