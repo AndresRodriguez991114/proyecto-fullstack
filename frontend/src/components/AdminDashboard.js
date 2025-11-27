@@ -1,6 +1,6 @@
 import React from "react";
 import UsersPanel from "./UsersPanel";
-import "./admin.css";
+import "./AdminDashboard.css";
 import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
