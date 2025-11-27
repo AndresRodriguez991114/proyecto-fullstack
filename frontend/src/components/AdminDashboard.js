@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import UsersPanel from "./UsersPanel";
 import "./AdminDashboard.css";
 import { useNavigate } from "react-router-dom";
@@ -8,13 +8,33 @@ const AdminDashboard = () => {
   const raw = localStorage.getItem("user");
   const user = raw ? JSON.parse(raw) : null;
 
+  // -----------------------------
+  // 🔥 TOGGLE MODO OSCURO / CLARO
+  // -----------------------------
+  const [theme, setTheme] = useState("light");
+
+  useEffect(() => {
+    const stored = localStorage.getItem("theme");
+    if (stored) setTheme(stored);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === "light" ? "dark" : "light"));
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/");
   };
 
   return (
-    <div className="admin-root">
+    <div className={`admin-root ${theme}`}>
+      
       <aside className="admin-sidebar">
         <div className="brand">
           <img src="/images/Logo.png" alt="Logo" />
@@ -34,12 +54,24 @@ const AdminDashboard = () => {
       </aside>
 
       <main className="admin-main">
-        <header className="admin-header">
-          <h1>Panel de Administrador</h1>
-          <div className="header-meta">
-            <span>Bienvenido, <strong>{user?.nombre || user?.email}</strong></span>
+        
+        {/* ----------------------  
+              HEADER + TOGGLE  
+        ---------------------- */}
+      <header className="admin-header">
+        <h1>Panel de Administrador</h1>
+
+        {/* 🔥 TOGGLE COMPLETO CON TOOLTIP DINÁMICO */}
+        <div className="theme-toggle-wrapper">
+          <div className="theme-tooltip">
+            {theme === "light" ? "Modo oscuro" : "Modo claro"}
           </div>
-        </header>
+
+          <div className="theme-toggle" onClick={toggleTheme}>
+            <span className="icon">{theme === "dark" ? "🌙" : "☀️"}</span>
+          </div>
+        </div>
+      </header>
 
         <section className="cards-row">
           <div className="card">
