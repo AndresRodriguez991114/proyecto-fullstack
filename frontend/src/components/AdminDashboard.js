@@ -2,6 +2,12 @@ import React, { useState, useEffect } from "react";
 import UsersPanel from "./UsersPanel";
 import "./AdminDashboard.css";
 import { useNavigate } from "react-router-dom";
+import Logo from "../images/Logo.png";
+
+// Aplicar tema ANTES de renderizar
+const savedTheme = localStorage.getItem("theme") || "light";
+document.documentElement.setAttribute("data-theme", savedTheme);
+
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -11,7 +17,7 @@ const AdminDashboard = () => {
   // -----------------------------
   // 🔥 TOGGLE MODO OSCURO / CLARO
   // -----------------------------
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState(savedTheme);
 
   useEffect(() => {
     const stored = localStorage.getItem("theme");
@@ -37,7 +43,7 @@ const AdminDashboard = () => {
       
       <aside className="admin-sidebar">
         <div className="brand">
-          <img src="/images/Logo.png" alt="Logo" />
+          <img src={Logo} alt="Logo" />
           <h3>Cloud + Inventory</h3>
         </div>
 
