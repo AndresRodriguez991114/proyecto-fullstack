@@ -275,3 +275,101 @@
   opacity: 1;
   top: -42px;
 }
+/* =========================================================
+   📱 MODO MÓVIL (sidebar vertical, compacto y limpio)
+   ========================================================= */
+@media (max-width: 900px) {
+
+  /* Evita scroll lateral */
+  html, body {
+    overflow-x: hidden;
+  }
+
+  .admin-root {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  /* --- SIDEBAR VERTICAL Y COMPACTO --- */
+  .admin-sidebar {
+    width: 100%;
+    flex-direction: column;   /* ← SIEMPRE VERTICAL */
+    align-items: center;
+    padding: 14px;
+    gap: 12px;
+    border-right: none;
+    border-bottom: 1px solid var(--card-border);
+    box-shadow: none;         /* Menos agresivo en móvil */
+  }
+
+  .brand img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .brand h3 {
+    font-size: 18px;
+  }
+
+  /* --- NAV MÁS PEQUEÑO --- */
+  .admin-nav {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .admin-nav button {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  /* --- CERRAR SESIÓN --- */
+  .sidebar-footer {
+    width: 100%;
+    align-items: center;
+  }
+
+  .btn-logout {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  /* --- MAIN CONTENT --- */
+  .admin-main {
+    padding: 16px;
+  }
+
+  .admin-header h1 {
+    font-size: 20px;
+  }
+
+  /* --- TOGGLE THEME --- */
+  .theme-toggle-wrapper {
+    transform: scale(0.9);
+  }
+
+  /* --- CARDS RESPONSIVE --- */
+  .cards-row {
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .card {
+    width: 100%;
+  }
+
+  /* --- TABLAS RESPONSIVE --- */
+  .users-grid {
+    flex-direction: column;
+  }
+
+  .users-table {
+    width: 100%;
+    overflow-x: auto;
+    display: block;
+  }
+}
