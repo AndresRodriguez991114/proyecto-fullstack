@@ -275,3 +275,17 @@
   opacity: 1;
   top: -42px;
 }
+@media (max-width: 900px) {
+  .admin-root {
+    min-height: auto !important;
+  }
+
+  .admin-main {
+    min-height: auto !important;
+  }
+
+  body, html {
+    height: auto !important;
+    overflow-x: hidden;
+  }
+}
