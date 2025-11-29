@@ -276,16 +276,11 @@
   top: -42px;
 }
 @media (max-width: 900px) {
-  .admin-root {
-    min-height: auto !important;
-  }
-
   .admin-main {
-    min-height: auto !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 10px !important;
   }
-
-  body, html {
-    height: auto !important;
-    overflow-x: hidden;
+  .admin-legal {
+    margin-bottom: 0 !important;
   }
 }
