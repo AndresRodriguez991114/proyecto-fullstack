@@ -236,16 +236,16 @@
 }
 
 @media(max-width:900px){
-  .admin-root { flex-direction:column; }
+  .admin-root { flex-direction:row; }
   .admin-sidebar { 
     width:100%; 
     display:flex; 
-    flex-direction:row; 
-    gap:8px; 
+    flex-direction:column; 
+    gap:18px; 
     align-items:center; 
-    padding:12px; 
+    padding:16px; 
   }
-  .admin-main { padding:12px; }
+  .admin-main { padding:16px; }
   .users-grid { flex-direction:column; }
 }
 .theme-toggle-wrapper {
