@@ -275,76 +275,96 @@
   opacity: 1;
   top: -42px;
 }
-/* =======================================
-   📱 FIX COMPLETO PARA CELULARES
-   ======================================= */
-
-/* Elimina scroll horizontal */
-body, html, .admin-root {
-  overflow-x: hidden;
-}
-
-/* Ajustar ancho de todo para móviles */
+/* ============================================
+   📱 FIX REAL PARA MÓVIL Y TABLET
+   ============================================ */
 @media (max-width: 900px) {
 
-  /* Sidebar horizontal */
+  /* Elimina scroll lateral */
+  html, body {
+    overflow-x: hidden !important;
+  }
+
+  .admin-root {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  /* --- SIDEBAR MÓVIL --- */
   .admin-sidebar {
     width: 100%;
+    height: auto;
     flex-direction: row;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
     padding: 12px 15px;
     gap: 12px;
+    background: var(--sidebar-bg);
+    border-right: none;
+    border-bottom: 1px solid var(--card-border);
   }
 
-  /* Marca + menú deben ocupar mismo eje */
-  .brand {
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
+  .brand h3 {
+    font-size: 18px;
+    white-space: nowrap;
   }
 
-  /* Menú horizontal */
   .admin-nav {
     display: flex;
     flex-direction: row;
     gap: 10px;
-    flex-wrap: wrap;
   }
 
   .admin-nav button {
-    white-space: nowrap;
     padding: 8px 10px;
     font-size: 14px;
+    white-space: nowrap;
   }
 
-  /* Footer dentro del sidebar (Cerrar sesión) */
+  /* --- CERRAR SESIÓN --- */
   .sidebar-footer {
-    margin-top: 0;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    margin: 0;
   }
 
   .btn-logout {
-    margin-top: 3px;
-    padding: 6px 10px;
     font-size: 14px;
+    padding: 6px 10px;
+    margin-top: -3px;
   }
 
-  /* Cards que no se desborden */
+  /* --- HEADER --- */
+  .admin-header {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+
+  .admin-header h1 {
+    font-size: 22px;
+  }
+
+  /* --- THEME TOGGLE --- */
+  .theme-toggle-wrapper {
+    transform: scale(.9);
+  }
+
+  /* --- CARDS --- */
   .cards-row {
     flex-direction: column;
     width: 100%;
+    gap: 16px;
   }
 
   .card {
     width: 100% !important;
     max-width: 100%;
-    margin: 0 auto;
+    margin: 0;
   }
 
-  /* Usuarios responsivo */
+  /* --- USUARIOS RESPONSIVE --- */
   .users-grid {
     flex-direction: column;
     width: 100%;
@@ -354,19 +374,5 @@ body, html, .admin-root {
     display: block;
     overflow-x: auto;
     width: 100%;
-  }
-
-  /* Ajuste de header */
-  .admin-header {
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .admin-header h1 {
-    font-size: 22px;
-  }
-
-  .theme-toggle-wrapper {
-    transform: scale(0.9);
   }
 }
