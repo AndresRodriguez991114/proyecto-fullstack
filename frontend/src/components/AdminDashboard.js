@@ -85,15 +85,6 @@ const AdminDashboard = () => {
             <p id="total-users">—</p>
           </div>
 
-          <div className="card">
-            <h4>Servicios</h4>
-            <p>En línea</p>
-          </div>
-
-          <div className="card">
-            <h4>Base</h4>
-            <p>Postgres</p>
-          </div>
         </section>
 
         <section id="users-panel" className="panel">
