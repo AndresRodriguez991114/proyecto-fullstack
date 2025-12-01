@@ -5,30 +5,29 @@ const api = axios.create({
   timeout: 10000,
 });
 
-// Añadir token automáticamente a cada request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-
   return config;
 });
 
-// Manejo global de errores
 api.interceptors.response.use(
   (response) => response,
-
   (error) => {
-    // Token vencido o inválido
-    if (error.response?.status === 401) {
+    // SOLO redirigir si 401 y NO es login
+    const originalRequest = error.config;
+
+    if (
+      error.response?.status === 401 &&
+      originalRequest.url !== "/usuarios/login"
+    ) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
 
-      // Redirige al login si estamos en un navegador
       if (typeof window !== "undefined") {
-        window.location.href = "/login";
+        window.location.href = "/";
       }
     }
 

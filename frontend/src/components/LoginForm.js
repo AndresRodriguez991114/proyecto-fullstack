@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import api from "../api";
 import "./LoginForm.css";
-import { FaEye,FaEyeSlash,FaEnvelope  } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaEnvelope } from "react-icons/fa";
 import Logo from "../images/Logo.png";
-
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -21,14 +20,14 @@ const LoginForm = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // 👁 estado para mostrar/ocultar contraseña
+    // 👁 estado para mostrar/ocultar contraseña
   const [showPassword, setShowPassword] = useState(false);
 
-  // 👀 observar campos en tiempo real
+    // 👀 observar campos en tiempo real
   const email = watch("email");
   const password = watch("password");
 
-  // ⚡ activar botón solo cuando ambos campos tengan texto
+   // ⚡ activar botón solo cuando ambos campos tengan texto
   const formReady = email && password;
 
   // -------------------------------
@@ -49,49 +48,65 @@ const LoginForm = () => {
   // -------------------------------
   const onSubmit = async (formData) => {
     setErrorMessage("");
-    const { email, password } = formData;
+
+    // Normalizar email antes de enviar (nuevo)
+    const emailNormalized = formData.email.trim().toLowerCase();
+    const passwordToSend = formData.password;
 
     try {
-      const response = await api.post("/usuarios/login", { email, password });
+      // Nota: si tu api.js tiene baseURL = "/api" entonces este endpoint está bien.
+      // Si no, usa "/api/usuarios/login" o ajusta baseURL.
+      const response = await api.post("/usuarios/login", {
+        email: emailNormalized,
+        password: passwordToSend,
+      });
+
+      // Guardar token en localStorage (nuevo)
+      if (response.data?.token) {
+        localStorage.setItem("token", response.data.token);
+      }
 
       // Guardar email si RememberMe está activo
       if (rememberMe) {
         localStorage.setItem("rememberMe", "true");
-        localStorage.setItem("rememberEmail", email);
+        localStorage.setItem("rememberEmail", emailNormalized);
       } else {
         localStorage.removeItem("rememberMe");
         localStorage.removeItem("rememberEmail");
       }
 
-      // Guardar datos del usuario
-      localStorage.setItem("user", JSON.stringify(response.data));
+      // Guardar datos del usuario (sin password)
+      // response.data.user viene del backend (según tu server.js)
+      if (response.data?.user) {
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+      }
 
-      if (response.data.rol === "administrador") navigate("/admin");
+      // Redirección según rol
+      if (response.data?.user?.rol === "administrador") navigate("/admin");
       else navigate("/Dashboard");
-      
+
       reset();
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
-      setErrorMessage("Upss!! Credenciales incorrectas");
+
+      // Mostrar mensaje amigable; si el backend envía 401 lo mostramos
+      if (error.response?.status === 401) {
+        setErrorMessage(error.response.data?.message || "Upss!! Credenciales incorrectas");
+      } else {
+        setErrorMessage("Error de conexión con el servidor");
+      }
     }
   };
 
-  // -------------------------------
-  // Render
-  // -------------------------------
   return (
     <div className="login-container">
-
-      {/* CARD GLASS */}
       <div className="login-card">
-        {/* Logo de la empresa */}
         <div className="login-logo">
-        <img src={Logo} alt="Logo" /></div>
+          <img src={Logo} alt="Logo" />
+        </div>
         <h2 className="login-title">Iniciar Sesión</h2>
 
         <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-
-          {/* EMAIL */}
           <div className="form-group">
             <input
               type="text"
@@ -105,10 +120,8 @@ const LoginForm = () => {
                 },
               })}
             />
-           <FaEnvelope className="icon-input" />
-            {errors.email && (
-              <small className="error-text">{errors.email.message}</small>
-            )}
+            <FaEnvelope className="icon-input" />
+            {errors.email && <small className="error-text">{errors.email.message}</small>}
           </div>
 
           {/* PASSWORD con ojo 👁 */}
@@ -127,25 +140,16 @@ const LoginForm = () => {
                 })}
               />
               {/* 👁 Ícono para mostrar/ocultar */}
-            {showPassword ? (
-              <FaEyeSlash
-                className="icon-input"
-                onClick={() => setShowPassword(false)}
-              />
-            ) : (
-              <FaEye
-                className="icon-input"
-                onClick={() => setShowPassword(true)}
-              />
-            )}
+              {showPassword ? (
+                <FaEyeSlash className="icon-input" onClick={() => setShowPassword(false)} />
+              ) : (
+                <FaEye className="icon-input" onClick={() => setShowPassword(true)} />
+              )}
             </div>
 
-            {errors.password && (
-              <small className="error-text">{errors.password.message}</small>
-            )}
+            {errors.password && <small className="error-text">{errors.password.message}</small>}
           </div>
 
-          {/* REMEMBER ME */}
           <div className="remember-row">
             <label className="remember-label">
               <input
@@ -157,7 +161,6 @@ const LoginForm = () => {
             </label>
           </div>
 
-          {/* BOTÓN – activado solo cuando ambos campos tengan texto Y validación correcta */}
           <button
             type="submit"
             className={`btn-login ${formReady ? "active" : "disabled"}`}
@@ -166,12 +169,10 @@ const LoginForm = () => {
             Login
           </button>
 
-          {/* ERROR DEL SERVIDOR */}
           {errorMessage && <p className="server-error">{errorMessage}</p>}
         </form>
-                <p className="legal-text">
-          © 2025 Cloud + Inventory. Todos los derechos reservados.
-        </p>
+
+        <p className="legal-text">© 2025 Cloud + Inventory. Todos los derechos reservados.</p>
       </div>
     </div>
   );

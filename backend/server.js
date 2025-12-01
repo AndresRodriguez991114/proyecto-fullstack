@@ -62,14 +62,14 @@ app.post("/api/usuarios/login", async (req, res) => {
     );
 
     if (result.rows.length === 0) {
-      return res.status(401).json({ message: "Usuario no encontrado" });
+      return res.status(401).json({ message: "Upss!! Credenciales incorrectas" });
     }
 
     const user = result.rows[0];
 
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) {
-      return res.status(401).json({ message: "Contraseña incorrecta" });
+      return res.status(401).json({ message: "Upss!! Credenciales incorrectas" });
     }
 
     // 🟢 GENERAR TOKEN JWT
