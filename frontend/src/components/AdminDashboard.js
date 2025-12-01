@@ -8,7 +8,6 @@ import Logo from "../images/Logo2.png";
 const savedTheme = localStorage.getItem("theme") || "light";
 document.documentElement.setAttribute("data-theme", savedTheme);
 
-
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const raw = localStorage.getItem("user");
@@ -33,6 +32,13 @@ const AdminDashboard = () => {
     setTheme(prev => (prev === "light" ? "dark" : "light"));
   };
 
+  // -----------------------------
+  // 📱 CONTROL DEL MENÚ MÓVIL
+  // -----------------------------
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const toggleMenu = () => setMenuOpen(prev => !prev);
+
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/");
@@ -40,58 +46,84 @@ const AdminDashboard = () => {
 
   return (
     <div className={`admin-root ${theme}`}>
-      
-      <aside className="admin-sidebar">
+
+      {/* ===== SIDEBAR ===== */}
+      <aside className={`admin-sidebar ${menuOpen ? "open" : ""}`}>
         <div className="brand">
           <img src={Logo} alt="Logo" />
           <h3>Cloud + Inventory</h3>
         </div>
 
         <nav className="admin-nav">
-          <button onClick={() => window.scrollTo(0, 0)}>Dashboard</button>
-          <button onClick={() => document.getElementById("users-panel")?.scrollIntoView({ behavior: "smooth" })}>Usuarios</button>
-          <button onClick={() => navigate("/admin/reports")}>Reportes</button>
+          <button onClick={() => {
+          window.scrollTo(0, 0);
+          setMenuOpen(false);
+        }}>Dashboard</button>
+
+          <button onClick={() => {
+          document.getElementById("users-panel")?.scrollIntoView({ behavior: "smooth" });
+          setMenuOpen(false);
+        }}>Usuarios</button>
+
+          <button onClick={() => {
+          navigate("/admin/reports");
+          setMenuOpen(false);
+        }}>Reportes</button>
+        
         </nav>
 
         <div className="sidebar-footer">
           <small>{user?.nombre || user?.email}</small>
-          <button className="btn-logout" onClick={handleLogout}>Cerrar sesión</button>
+          <button className="btn-logout" onClick={handleLogout}>Sign out</button>
         </div>
       </aside>
 
+       {/* 🔥 OVERLAY para cerrar menú al tocar afuera */}
+      <div 
+        className={`sidebar-overlay ${menuOpen ? "show" : ""}`} 
+        onClick={() => setMenuOpen(false)}
+      ></div>
+
+      {/* ===== CONTENIDO PRINCIPAL ===== */}
       <main className="admin-main">
-        
-        {/* ----------------------  
-              HEADER + TOGGLE  
+
+        {/* ----------------------
+              HEADER + TOGGLE
         ---------------------- */}
-      <header className="admin-header">
-        <h1>Panel de Administrador</h1>
+        <header className="admin-header">
 
-        {/* 🔥 TOGGLE COMPLETO CON TOOLTIP DINÁMICO */}
-        <div className="theme-toggle-wrapper">
-          <div className="theme-tooltip">
-            {theme === "light" ? "Modo oscuro" : "Modo claro"}
-          </div>
+          {/* 📱 Botón hamburguesa */}
+          <span className="hamburger" onClick={toggleMenu}>
+            ☰
+          </span>
 
-          <div className="theme-toggle" onClick={toggleTheme}>
-            <span className="icon">{theme === "dark" ? "🌙" : "☀️"}</span>
+          <h1>Panel de Administrador</h1>
+
+          <div className="theme-toggle-wrapper">
+            <div className="theme-tooltip">
+              {theme === "light" ? "Modo oscuro" : "Modo claro"}
+            </div>
+
+            <div className="theme-toggle" onClick={toggleTheme}>
+              <span className="icon">{theme === "dark" ? "🌙" : "☀️"}</span>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
         <section className="cards-row">
           <div className="card">
             <h4>Usuarios</h4>
             <p id="total-users">—</p>
           </div>
-
         </section>
 
         <section id="users-panel" className="panel">
-          <UsersPanel onTotalChange={(n) => {
-            const el = document.getElementById("total-users");
-            if (el) el.innerText = String(n);
-          }} />
+          <UsersPanel
+            onTotalChange={(n) => {
+              const el = document.getElementById("total-users");
+              if (el) el.innerText = String(n);
+            }}
+          />
         </section>
 
         <footer className="admin-legal">
