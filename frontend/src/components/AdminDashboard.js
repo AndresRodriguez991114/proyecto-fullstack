@@ -13,9 +13,6 @@ const AdminDashboard = () => {
   const raw = localStorage.getItem("user");
   const user = raw ? JSON.parse(raw) : null;
 
-  // -----------------------------
-  // 🔥 TOGGLE MODO OSCURO / CLARO
-  // -----------------------------
   const [theme, setTheme] = useState(savedTheme);
 
   useEffect(() => {
