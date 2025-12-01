@@ -12,8 +12,13 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const raw = localStorage.getItem("user");
   const user = raw ? JSON.parse(raw) : null;
-
   const [theme, setTheme] = useState(savedTheme);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [openUserModal, setOpenUserModal] = useState(false);
+
+  // -----------------------------
+  // 🔥 TOGGLE MODO OSCURO / CLARO
+  // -----------------------------
 
   useEffect(() => {
     const stored = localStorage.getItem("theme");
@@ -32,7 +37,6 @@ const AdminDashboard = () => {
   // -----------------------------
   // 📱 CONTROL DEL MENÚ MÓVIL
   // -----------------------------
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => setMenuOpen(prev => !prev);
 
@@ -71,29 +75,24 @@ const AdminDashboard = () => {
 
         <div className="sidebar-footer">
           <small>{user?.nombre || user?.email}</small>
-          <button className="btn-logout" onClick={handleLogout}>Sign out</button>
+          <button className="btn-logout" onClick={handleLogout}>
+            Sign out
+          </button>
         </div>
       </aside>
 
-       {/* 🔥 OVERLAY para cerrar menú al tocar afuera */}
-      <div 
-        className={`sidebar-overlay ${menuOpen ? "show" : ""}`} 
+      {/* 🔥 Overlay para cerrar menú al tocar afuera */}
+      <div
+        className={`sidebar-overlay ${menuOpen ? "show" : ""}`}
         onClick={() => setMenuOpen(false)}
       ></div>
 
       {/* ===== CONTENIDO PRINCIPAL ===== */}
       <main className="admin-main">
 
-        {/* ----------------------
-              HEADER + TOGGLE
-        ---------------------- */}
+        {/* Header */}
         <header className="admin-header">
-
-          {/* 📱 Botón hamburguesa */}
-          <span className="hamburger" onClick={toggleMenu}>
-            ☰
-          </span>
-
+          <span className="hamburger" onClick={toggleMenu}>☰</span>
           <h1>Panel de Administrador</h1>
 
           <div className="theme-toggle-wrapper">
@@ -114,12 +113,25 @@ const AdminDashboard = () => {
           </div>
         </section>
 
+        {/* 🔥 BOTÓN + PANEL */}
         <section id="users-panel" className="panel">
+
+          {/* BOTÓN PARA ABRIR MODAL */}
+          <button
+            className="btn-agregar-usuario"
+            style={{ marginBottom: "20px" }}
+            onClick={() => setOpenUserModal(true)}
+          >
+            + Crear Usuario
+          </button>
+
           <UsersPanel
             onTotalChange={(n) => {
               const el = document.getElementById("total-users");
               if (el) el.innerText = String(n);
             }}
+            openUserModal={openUserModal}
+            setOpenUserModal={setOpenUserModal}
           />
         </section>
 
