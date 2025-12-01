@@ -10,6 +10,7 @@ dotenv.config();
 // --- FORZAR IPv4 ---
 dns.setDefaultResultOrder("ipv4first");
 
+
 const { Pool } = pg;
 
 // --- CONEXIÓN A POSTGRES ---
@@ -49,9 +50,11 @@ app.get("/api/db-check", async (req, res) => {
 //                🟢      LOGIN DE USUARIO
 // -------------------------------------------------------------
 app.post("/api/usuarios/login", async (req, res) => {
-  const { email, password } = req.body;
 
   try {
+    const email = req.body.email.trim().toLowerCase();
+    const password = req.body.password;
+
     // Buscar usuario por email
     const result = await pool.query(
       "SELECT id, nombre, email, rol, password FROM usuarios WHERE email = $1",
@@ -89,7 +92,10 @@ app.post("/api/usuarios/login", async (req, res) => {
 // -------------------------------------------------------------
 app.post("/api/usuarios", async (req, res) => {
   try {
-    const { nombre, email, password, rol } = req.body;
+    const nombre = req.body.nombre;
+    const email = req.body.email.trim().toLowerCase();
+    const password = req.body.password;
+    const rol = req.body.rol || "usuario";
 
     const hashed = await bcrypt.hash(password, 10);
 
