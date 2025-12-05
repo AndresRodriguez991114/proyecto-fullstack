@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
 import UsersPanel from "./UsersPanel";
 import "./AdminDashboard.css";
-import { useNavigate } from "react-router-dom";
-import Logo from "../images/Logo2.png";
+import Sidebar from "../módulos/Sidebar"
+import ThemeToggle from "../módulos/ThemeToggle";
 
 // Aplicar tema ANTES de renderizar
 const savedTheme = localStorage.getItem("theme") || "light";
 document.documentElement.setAttribute("data-theme", savedTheme);
 
-const AdminDashboard = () => {
-  const navigate = useNavigate();
+const UsuariosPage = () => {
   const raw = localStorage.getItem("user");
   const user = raw ? JSON.parse(raw) : null;
   const [theme, setTheme] = useState(savedTheme);
@@ -30,9 +29,6 @@ const AdminDashboard = () => {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  const toggleTheme = () => {
-    setTheme(prev => (prev === "light" ? "dark" : "light"));
-  };
 
   // -----------------------------
   // 📱 CONTROL DEL MENÚ MÓVIL
@@ -40,47 +36,13 @@ const AdminDashboard = () => {
 
   const toggleMenu = () => setMenuOpen(prev => !prev);
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    navigate("/");
-  };
 
   return (
     <div className={`admin-root ${theme}`}>
 
-      {/* ===== SIDEBAR ===== */}
-      <aside className={`admin-sidebar ${menuOpen ? "open" : ""}`}>
-        <div className="brand">
-          <img src={Logo} alt="Logo" />
-          <h3>Cloud + Inventory</h3>
-        </div>
-
-        <nav className="admin-nav">
-          <button onClick={() => {
-          window.scrollTo(0, 0);
-          setMenuOpen(false);
-        }}>Dashboard</button>
-
-          <button onClick={() => {
-          document.getElementById("users-panel")?.scrollIntoView({ behavior: "smooth" });
-          setMenuOpen(false);
-        }}>Usuarios</button>
-
-          <button onClick={() => {
-          navigate("/admin/reports");
-          setMenuOpen(false);
-        }}>Reportes</button>
-        
-        </nav>
-
-        <div className="sidebar-footer">
-          <small>{user?.nombre || user?.email}</small>
-          <button className="btn-logout" onClick={handleLogout}>
-            Sign out
-          </button>
-        </div>
-      </aside>
-
+       {/*===== SIDEBAR =====*/}
+         <Sidebar user={user} menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+         
       {/* 🔥 Overlay para cerrar menú al tocar afuera */}
       <div
         className={`sidebar-overlay ${menuOpen ? "show" : ""}`}
@@ -93,17 +55,8 @@ const AdminDashboard = () => {
         {/* Header */}
         <header className="admin-header">
           <span className="hamburger" onClick={toggleMenu}>☰</span>
-          <h1>Panel de Administrador</h1>
-
-          <div className="theme-toggle-wrapper">
-            <div className="theme-tooltip">
-              {theme === "light" ? "Modo oscuro" : "Modo claro"}
-            </div>
-
-            <div className="theme-toggle" onClick={toggleTheme}>
-              <span className="icon">{theme === "dark" ? "🌙" : "☀️"}</span>
-            </div>
-          </div>
+          <h1>Usuarios</h1>
+          <ThemeToggle />
         </header>
 
         <section className="cards-row">
@@ -143,4 +96,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default UsuariosPage;

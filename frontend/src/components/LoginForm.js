@@ -82,7 +82,7 @@ const LoginForm = () => {
       }
 
       // Redirección según rol
-      if (response.data?.user?.rol === "administrador") navigate("/admin");
+      if (response.data?.user?.rol === "administrador") navigate("/inicio");
       else navigate("/Dashboard");
 
       reset();

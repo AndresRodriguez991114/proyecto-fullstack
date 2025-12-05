@@ -490,3 +490,97 @@
   background: var(--primary);
   color: white;
 }
+
+
+
+
+/* ============================
+   🌟 INICIO PAGE - ESTILO PREMIUM
+   ============================ */
+
+.inicio-hero {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  text-align: left;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.6s ease;
+}
+
+.inicio-hero h1 {
+  font-size: 28px;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.inicio-hero .sub {
+  opacity: 0.8;
+  margin-top: 4px;
+}
+
+/* TARJETAS DE ESTADÍSTICAS */
+.inicio-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 18px;
+  text-align: center;
+  backdrop-filter: blur(8px);
+  transition: 0.25s ease;
+  animation: cardPop 0.4s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+}
+
+/* ACCESOS RÁPIDOS */
+.inicio-atajos h2 {
+  margin: 20px 0 10px;
+}
+
+.atajos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.atajo-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.25s;
+  font-size: 18px;
+}
+
+.atajo-card span {
+  font-size: 34px;
+}
+
+.atajo-card:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cardPop {
+  from { transform: scale(0.9); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
