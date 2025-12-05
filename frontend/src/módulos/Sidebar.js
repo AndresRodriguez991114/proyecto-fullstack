@@ -73,7 +73,7 @@ const Sidebar = ({ user, menuOpen, setMenuOpen }) => {
         <small>{user?.nombre || user?.email || "Usuario"}</small>
 
         <button className="btn-logout" onClick={() => { localStorage.removeItem("user"); navigate("/"); }}>
-          <LogOut size={16} /> Cerrar sesión
+          <LogOut size={16} /> Sign out
         </button>
       </div>
     </aside>
