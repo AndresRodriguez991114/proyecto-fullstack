@@ -142,6 +142,7 @@
    ========================================================= */
 .theme-toggle-wrapper {
   position: relative;
+  transform: translateX(-18px);
 }
 
 .theme-tooltip {
@@ -161,13 +162,13 @@
   position: relative;
   display:flex;
   align-items:center;
-  transition: 0.25s ease;
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .theme-toggle .icon {
   position:absolute;
   font-size:17px;
-  transition:0.25s ease;
+  transition: transform 0.3s ease;
 }
 
 [data-theme="light"] .theme-toggle .icon { right:4px; }

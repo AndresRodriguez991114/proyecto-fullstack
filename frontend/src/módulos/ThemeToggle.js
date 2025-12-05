@@ -16,7 +16,7 @@ const ThemeToggle = () => {
   return (
     <div className="theme-toggle-wrapper">
       <div className="theme-tooltip">
-        {theme === "light" ? "Modo oscuro" : "Modo claro"}
+        {theme === "light" ? "Modo claro" : "Modo oscuro"}
       </div>
 
       <div className="theme-toggle" onClick={toggleTheme}>
