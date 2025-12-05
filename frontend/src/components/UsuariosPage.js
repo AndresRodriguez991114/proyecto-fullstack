@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import UsersPanel from "./UsersPanel";
-import "./AdminDashboard.css";
+import "./styles.css";
 import Sidebar from "../módulos/Sidebar"
 import ThemeToggle from "../módulos/ThemeToggle";
 
