@@ -53,7 +53,7 @@ useEffect(() => {
         {/* HERO */}
         <section className="inicio-hero">
           <h1>¡Hola {user?.nombre || "Usuario"}! 👋</h1>
-          <p>Bienvenido a tu panel de Cloud + Inventory.</p>
+          <p>Bienvenido al  panel de Cloud + Inventory.</p>
         </section>
 
         {/* TARJETAS DE ESTADÍSTICAS */}
