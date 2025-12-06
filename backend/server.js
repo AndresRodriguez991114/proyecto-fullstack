@@ -26,6 +26,10 @@ const pool = new Pool({
   keepAlive: true
 });
 
+const app = express();
+app.use(cors());
+app.use(express.json());
+
 // -------------------------------------------------------------
 //              🟢 HEALTH CHECK (SIN AUTENTICACIÓN)
 // -------------------------------------------------------------
@@ -41,10 +45,6 @@ app.get("/api/db-check", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-const app = express();
-app.use(cors());
-app.use(express.json());
 
 // -------------------------------------------------------------
 //                🟢      LOGIN (LIBRE)
