@@ -26,19 +26,14 @@ const pool = new Pool({
   keepAlive: true
 });
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-
 // -------------------------------------------------------------
-//              🟢        HEALTH CHECK (PROTEGIDO)
+//              🟢 HEALTH CHECK (SIN AUTENTICACIÓN)
 // -------------------------------------------------------------
-app.get("/health", auth, (req, res) => {
+app.get("/health", (req, res) => {
   res.status(200).send("OK");
 });
 
-app.get("/api/db-check", auth, async (req, res) => {
+app.get("/api/db-check", async (req, res) => {
   try {
     const r = await pool.query("SELECT NOW()");
     res.json({ status: "ok", time: r.rows[0] });
@@ -47,6 +42,9 @@ app.get("/api/db-check", auth, async (req, res) => {
   }
 });
 
+const app = express();
+app.use(cors());
+app.use(express.json());
 
 // -------------------------------------------------------------
 //                🟢      LOGIN (LIBRE)
