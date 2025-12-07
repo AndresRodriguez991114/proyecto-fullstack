@@ -123,6 +123,47 @@ app.post("/api/usuarios", async (req, res) => {
   }
 });
 
+// -------------------------------------------------------------
+//     🟢 LISTAR EQUIPOS (PROTEGIDO)
+// -------------------------------------------------------------
+app.get("/api/equipos", auth, async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        e.id,
+        e.nombre,
+        e.serial,
+        e.estado,
+        e.fecha_ingreso,
+        
+        -- Relaciones
+        t.nombre AS tipo,
+        m.nombre AS marca,
+        mo.nombre AS modelo,
+        d.nombre AS departamento,
+
+        -- Usuario asignado
+        u.id AS usuario_id,
+        u.nombre AS usuario_nombre,
+        u.email AS usuario_email
+
+      FROM equipos e
+      LEFT JOIN tipos_de_equipos t ON e.tipo_id = t.id
+      LEFT JOIN marcas m ON e.marca_id = m.id
+      LEFT JOIN modelos mo ON e.modelo_id = mo.id
+      LEFT JOIN departamentos d ON e.departamento_id = d.id
+      LEFT JOIN usuarios u ON e.usuario_asignado = u.id
+      
+      ORDER BY e.id ASC;
+    `;
+
+    const result = await pool.query(query);
+    res.json(result.rows);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // -------------------------------------------------------------
 //     🟢 LISTAR USUARIOS (PROTEGIDO)
