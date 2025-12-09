@@ -2,8 +2,10 @@ import express from "express";
 import pg from "pg";
 import cors from "cors";
 import dotenv from "dotenv";
-import dns from "dns"; 
+import dns from "dns";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { auth } from "./middleware/auth.js";
 
 dotenv.config();
 
@@ -29,9 +31,8 @@ app.use(cors());
 app.use(express.json());
 
 // -------------------------------------------------------------
-//              🟢        ENDPOINT TEST CONEXIÓN
+//              🟢 HEALTH CHECK (SIN AUTENTICACIÓN)
 // -------------------------------------------------------------
-
 app.get("/health", (req, res) => {
   res.status(200).send("OK");
 });
@@ -46,37 +47,50 @@ app.get("/api/db-check", async (req, res) => {
 });
 
 // -------------------------------------------------------------
-//                🟢      LOGIN DE USUARIO
+//                🟢      LOGIN (LIBRE)
 // -------------------------------------------------------------
 app.post("/api/usuarios/login", async (req, res) => {
-  const { email, password } = req.body;
-
   try {
-    // Buscar usuario por email
+    const email = req.body.email.trim().toLowerCase();
+    const password = req.body.password;
+
     const result = await pool.query(
       "SELECT id, nombre, email, rol, password FROM usuarios WHERE email = $1",
       [email]
     );
 
     if (result.rows.length === 0) {
-      return res.status(401).json({ message: "Usuario no encontrado" });
+      return res.status(401).json({ message: "Upss!! Credenciales incorrectas" });
     }
 
     const user = result.rows[0];
 
-    // Comparar contraseña encriptada
     const valid = await bcrypt.compare(password, user.password);
-
     if (!valid) {
-      return res.status(401).json({ message: "Contraseña incorrecta" });
+      return res.status(401).json({ message: "Upss!! Credenciales incorrectas" });
     }
 
-    // Retornar datos sin password
+    // 🟢 GENERAR TOKEN JWT
+    const token = jwt.sign(
+      {
+        id: user.id,
+        nombre: user.nombre,
+        email: user.email,
+        rol: user.rol
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES }
+    );
+
     res.json({
-      userId: user.id,
-      nombre: user.nombre,
-      email: user.email,
-      rol: user.rol
+      message: "Login exitoso",
+      token,
+      user: {
+        id: user.id,
+        nombre: user.nombre,
+        email: user.email,
+        rol: user.rol
+      }
     });
 
   } catch (err) {
@@ -84,18 +98,22 @@ app.post("/api/usuarios/login", async (req, res) => {
   }
 });
 
+
 // -------------------------------------------------------------
-//                🟢      CREAR USUARIO
+//                🟢      CREAR USUARIO (LIBRE)
 // -------------------------------------------------------------
 app.post("/api/usuarios", async (req, res) => {
   try {
-    const { nombre, email, password, rol } = req.body;
+    const nombre = req.body.nombre;
+    const email = req.body.email.trim().toLowerCase();
+    const password = req.body.password;
+    const rol = req.body.rol || "usuario";
 
     const hashed = await bcrypt.hash(password, 10);
 
     await pool.query(
       "INSERT INTO usuarios (nombre, email, password, rol) VALUES ($1,$2,$3,$4)",
-      [nombre, email, hashed, rol || "usuario"]
+      [nombre, email, hashed, rol]
     );
 
     res.json({ msg: "Usuario creado" });
@@ -106,9 +124,56 @@ app.post("/api/usuarios", async (req, res) => {
 });
 
 // -------------------------------------------------------------
-//             🟢     LISTAR TODOS LOS USUARIOS
+//     🟢 LISTAR EQUIPOS (PROTEGIDO)
 // -------------------------------------------------------------
-app.get("/api/usuarios", async (req, res) => {
+app.get("/api/equipos", auth, async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        e.id,
+        e.serial,
+        e.sn,
+        e.estado,
+        e.fecha_ingreso,
+        
+        -- Relaciones
+        t.nombre  AS tipo,
+        m.nombre  AS marca,
+        mo.nombre  AS modelo,
+        d.nombre  AS departamento,
+
+        -- Usuario asignado
+        u.id AS usuario_id,
+        u.nombre AS usuario_nombre,
+        u.email AS usuario_email
+
+      FROM equipos e
+      LEFT JOIN tipos_de_equipos t ON e.tipo_id = t.id
+      LEFT JOIN marcas m ON e.marca_id = m.id
+      LEFT JOIN modelos mo ON e.modelo_id = mo.id
+      LEFT JOIN departamentos d ON e.departamento_id = d.id
+      LEFT JOIN usuarios u ON e.usuario_asignado = u.id
+      
+      ORDER BY e.id ASC;
+    `;
+
+    const result = await pool.query(query);
+    res.json(result.rows);
+
+  } catch (err) {
+  console.error("❌ ERROR SQL:", err); 
+  res.status(500).json({ 
+    error: err.message,
+    detail: err.detail,
+    hint: err.hint 
+  });
+}
+});
+
+// -------------------------------------------------------------
+//     🟢 LISTAR USUARIOS (PROTEGIDO)
+// -------------------------------------------------------------
+app.get("/api/usuarios", auth, async (req, res) => {
   try {
     const result = await pool.query(
       "SELECT id, nombre, email, rol FROM usuarios ORDER BY id ASC"
@@ -120,8 +185,56 @@ app.get("/api/usuarios", async (req, res) => {
 });
 
 // -------------------------------------------------------------
+//     🟢 LISTAR TIPOS
+// -------------------------------------------------------------
+app.get("/api/tipos", auth, async (req, res) => {
+  try {
+    const r = await pool.query("SELECT id, nombre FROM tipos_de_equipos ORDER BY id ASC");
+    res.json(r.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------------
+//     🟢 LISTAR MARCAS
+// -------------------------------------------------------------
+app.get("/api/marcas", auth, async (req, res) => {
+  try {
+    const r = await pool.query("SELECT id, nombre FROM marcas ORDER BY id ASC");
+    res.json(r.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------------
+//     🟢 LISTAR MODELOS
+// -------------------------------------------------------------
+app.get("/api/modelos", auth, async (req, res) => {
+  try {
+    const r = await pool.query("SELECT id, nombre FROM modelos ORDER BY id ASC");
+    res.json(r.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------------
+//     🟢 LISTAR DEPARTAMENTOS
+// -------------------------------------------------------------
+app.get("/api/departamentos", auth, async (req, res) => {
+  try {
+    const r = await pool.query("SELECT id, nombre FROM departamentos ORDER BY id ASC");
+    res.json(r.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+    
+
+// -------------------------------------------------------------
 //                     🟢    PUERTO
 // -------------------------------------------------------------
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => console.log(`API iniciada en puerto ${PORT}`));
