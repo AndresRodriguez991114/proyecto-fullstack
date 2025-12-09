@@ -1,0 +1,42 @@
+/* =========================================================
+   📱 AJUSTES PARA EVITAR SOBRE-EXPOSICIÓN EN MÓVIL
+   ========================================================= */
+@media (max-width: 768px) {
+
+  /* Fondo menos brillante */
+  :root {
+    --main-bg: linear-gradient(180deg, #eef2ff, #cdd6ff);
+    --card-bg: rgba(255, 255, 255, 0.92);
+  }
+
+  [data-theme="dark"] {
+    --main-bg: linear-gradient(180deg,#10061e,#130720);
+    --card-bg: rgba(255,255,255,0.06); /* ligeramente más opaco */
+  }
+
+  /* Reduce intensidad del blur */
+  .card,
+  .inicio-hero,
+  .stat-card,
+  .atajo-card,
+  .tabla-contenedor {
+    backdrop-filter: blur(4px);
+  }
+
+  /* Evita tarjetas gigantes en móvil */
+  .stat-card {
+    width: 100%;
+    padding: 14px;
+  }
+
+  /* Hero más compacto */
+  .inicio-hero {
+    padding: 16px;
+  }
+
+  /* Botones menos brillantes */
+  .atajo-card:hover {
+    background: var(--card-bg);
+    transform: none;
+  }
+}

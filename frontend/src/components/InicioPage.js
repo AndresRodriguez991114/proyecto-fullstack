@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../módulos/Sidebar";
 import Header from "../módulos/Header";
-import api from "../api"; // si ya tienes este archivo, si no te lo creo
+import "../Styles/InicioPage.css";
+import api from "../api"; 
 
 const InicioPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);

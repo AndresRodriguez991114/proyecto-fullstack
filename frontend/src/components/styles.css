@@ -611,10 +611,5 @@
   border-bottom: 1px solid var(--card-border);
 
 }
-  .inicio-stats {
-  display: flex;
-  gap: 16px;
-  margin: 20px 0;
-}
 
 
