@@ -4,15 +4,18 @@ import Header from "../módulos/Header";
 import api from "../api";
 import "../Styles/EquiposPage.css";
 
-
 const EquiposPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const raw = localStorage.getItem("user");
   const user = raw ? JSON.parse(raw) : null;
 
   const [equipos, setEquipos] = useState([]);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+
+  // 🔥 NUEVO: Modal de detalle
+  const [showDetalle, setShowDetalle] = useState(false);
+  const [equipoDetalle, setEquipoDetalle] = useState(null);
 
   // Formulario real
   const [nuevoEquipo, setNuevoEquipo] = useState({
@@ -30,20 +33,24 @@ const EquiposPage = () => {
   const [marcas, setMarcas] = useState([]);
   const [modelos, setModelos] = useState([]);
 
+  const [usuarios, setUsuarios] = useState([]);
+  const [departamentos, setDepartamentos] = useState([]);
+
+
   useEffect(() => {
     fetchEquipos();
     fetchListas();
   }, []);
 
   const fetchEquipos = async () => {
-    setLoading(true); // mostrar cargando
+    setLoading(true);
     try {
       const res = await api.get("/equipos");
       setEquipos(res.data);
     } catch (err) {
       console.error("Error cargando equipos:", err);
     } finally {
-      setLoading(false); // ocultar cargando
+      setLoading(false);
     }
   };
 
@@ -52,10 +59,14 @@ const EquiposPage = () => {
       const t = await api.get("/tipos");
       const m = await api.get("/marcas");
       const mo = await api.get("/modelos");
+      const u = await api.get("/usuarios"); 
+      const d = await api.get("/departamentos"); 
 
       setTipos(t.data);
       setMarcas(m.data);
       setModelos(mo.data);
+      setUsuarios(u.data);
+      setDepartamentos(d.data);
     } catch (err) {
       console.error("Error listas:", err);
     }
@@ -85,13 +96,34 @@ const EquiposPage = () => {
     }
   };
 
+  // 🚀 NUEVO: Abrir modal de detalle
+  const abrirDetalle = (equipo) => {
+    setEquipoDetalle(equipo);
+    setShowDetalle(true);
+  };
+
+  const editarEquipo = (equipo) => {
+  alert("Editar equipo ID: " + equipo.id);
+};
+
+const eliminarEquipo = async (id) => {
+  if (!window.confirm("¿Seguro que deseas eliminar este equipo?")) return;
+
+  try {
+    await api.delete(`/equipos/${id}`);
+    fetchEquipos();
+  } catch (err) {
+    console.error("Error eliminando equipo:", err);
+    alert("No se pudo eliminar.");
+  }
+};
+
+
   return (
     <div className="admin-root">
-
       <Sidebar user={user} menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
 
       <main className="admin-main">
-
         <Header title="Equipos" menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
 
         <section className="inicio-stats">
@@ -102,9 +134,13 @@ const EquiposPage = () => {
         </section>
 
         <div className="btn-wrap">
-          <button className="btn-crear" onClick={() => setShowModal(true)}>
+          <button
+            className="btn-crear"
+            onClick={() => { console.log("CLICK: Registrar Equipo"); setShowModal(true); }}
+          >
             + Registrar Equipo
           </button>
+
         </div>
 
         {/* ========================= */}
@@ -113,7 +149,6 @@ const EquiposPage = () => {
         <section className="tabla-contenedor panel-slide">
           <h2>Equipos Registrados</h2>
 
-          {/* LOADING */}
           {loading ? (
             <p className="cargando">Cargando equipos...</p>
           ) : (
@@ -142,12 +177,44 @@ const EquiposPage = () => {
                     <td>{e.modelo}</td>
                     <td>{e.estado}</td>
                     <td>
-                      <button className="btn-small btn-edit">
-                        <i><svg width="16" height="16" fill="currentColor"><path d="M12.854.854a.5.5 0 0 0-.708 0L10.5 2.5l2 2L14.146 2.854a.5.5 0 0 0 0-.708l-1.292-1.292zM10 3l-8 8V13h2l8-8-2-2z"/></svg></i>
+                      {/* 👁️ VER DETALLE */}
+                      <button
+                        className="btn-small btn-view"
+                        onClick={() => { console.log("CLICK: Ver detalle", e.id); abrirDetalle(e); }}
+                      >
+                        <i>
+                          <svg width="16" height="16" fill="currentColor">
+                            <path d="M8 3.5c-4 0-7 4-7 4s3 4 7 4 7-4 7-4-3-4-7-4zm0 6.5a2.5 2.5 0 1 1 0-5 
+                            2.5 2.5 0 0 1 0 5z" />
+                          </svg>
+                        </i>
                       </button>
 
-                      <button className="btn-small btn-delete">
-                        <i><svg width="16" height="16" fill="currentColor"><path d="M5.5 5.5a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0v-6a.5.5 0 0 1 .5-.5zm5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0v-6a.5.5 0 0 1 .5-.5z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1 0-2h3.1a2 2 0 0 1 1.9-1.5h2a2 2 0 0 1 1.9 1.5h3.1a1 1 0 0 1 1 1z"/></svg></i>
+                      <button className="btn-small btn-edit" onClick={() => editarEquipo(e)}>
+                        <i>
+                          <svg width="16" height="16" fill="currentColor">
+                            <path d="M12.854.854a.5.5 0 0 0-.708 0L10.5 2.5l2 2L14.146 
+                            2.854a.5.5 0 0 0 0-.708l-1.292-1.292zM10 3l-8 
+                            8V13h2l8-8-2-2z" />
+                          </svg>
+                        </i>
+                      </button>
+
+                      <button className="btn-small btn-delete" onClick={() => eliminarEquipo(e.id)}>
+                        <i>
+                          <svg width="16" height="16" fill="currentColor">
+                            <path d="M5.5 5.5a.5.5 0 0 1 .5.5v6a.5.5 
+                            0 0 1-1 0v-6a.5.5 0 0 1 .5-.5zm5 
+                            0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 
+                            0v-6a.5.5 0 0 1 .5-.5z" />
+                            <path d="M14.5 3a1 1 0 0 1-1 
+                            1H13v9a2 2 0 0 1-2 
+                            2H5a2 2 0 0 1-2-2V4h-.5a1 1 
+                            0 0 1 0-2h3.1a2 2 0 0 1 
+                            1.9-1.5h2a2 2 0 0 1 1.9 
+                            1.5h3.1a1 1 0 0 1 1 1z" />
+                          </svg>
+                        </i>
                       </button>
                     </td>
                   </tr>
@@ -158,96 +225,157 @@ const EquiposPage = () => {
         </section>
 
         {/* ========================= */}
-        {/* MODAL MEJORADO           */}
+        {/* MODAL CREAR EQUIPO       */}
         {/* ========================= */}
         {showModal && (
-          <div className="modal-overlay" onClick={() => setShowModal(false)}>
-            <div className="modal modal-anim" onClick={(e) => e.stopPropagation()}>
-
+          <div className="equipos-overlay" onClick={() => setShowModal(false)}>
+            <div className="equipos-modal" onClick={(e) => e.stopPropagation()}>
+              
               <h2>Registrar Equipo</h2>
 
+              {/* Serial */}
               <input
                 type="text"
-                placeholder="Serial del equipo"
+                placeholder="Serial"
                 value={nuevoEquipo.serial}
-                onChange={(e) =>
-                  setNuevoEquipo({ ...nuevoEquipo, serial: e.target.value })
-                }
+                onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, serial: e.target.value })}
               />
 
+              {/* S/N */}
               <input
                 type="text"
                 placeholder="S/N"
                 value={nuevoEquipo.sn}
-                onChange={(e) =>
-                  setNuevoEquipo({ ...nuevoEquipo, sn: e.target.value })
-                }
+                onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, sn: e.target.value })}
               />
 
-              {/* SELECTS */}
+              {/* Tipo */}
               <select
                 value={nuevoEquipo.tipo_id}
-                onChange={(e) =>
-                  setNuevoEquipo({ ...nuevoEquipo, tipo_id: e.target.value })
-                }
+                onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, tipo_id: e.target.value })}
               >
-                <option value="">Seleccione tipo</option>
-                {tipos.map((t) => (
+                <option value="">Seleccione Tipo</option>
+                {tipos.map(t => (
                   <option key={t.id} value={t.id}>{t.nombre}</option>
                 ))}
               </select>
 
+              {/* Marca */}
               <select
                 value={nuevoEquipo.marca_id}
-                onChange={(e) =>
-                  setNuevoEquipo({ ...nuevoEquipo, marca_id: e.target.value })
-                }
+                onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, marca_id: e.target.value })}
               >
-                <option value="">Seleccione marca</option>
-                {marcas.map((m) => (
+                <option value="">Seleccione Marca</option>
+                {marcas.map(m => (
                   <option key={m.id} value={m.id}>{m.nombre}</option>
                 ))}
               </select>
 
+              {/* Modelo */}
               <select
                 value={nuevoEquipo.modelo_id}
-                onChange={(e) =>
-                  setNuevoEquipo({ ...nuevoEquipo, modelo_id: e.target.value })
-                }
+                onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, modelo_id: e.target.value })}
               >
-                <option value="">Seleccione modelo</option>
-                {modelos.map((mo) => (
+                <option value="">Seleccione Modelo</option>
+                {modelos.map(mo => (
                   <option key={mo.id} value={mo.id}>{mo.nombre}</option>
                 ))}
               </select>
 
+              {/* Fecha ingreso */}
+              <input
+                type="date"
+                value={nuevoEquipo.fecha_ingreso || ""}
+                onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, fecha_ingreso: e.target.value })}
+              />
+
+              {/* Usuario asignado */}
+              <select
+                value={nuevoEquipo.usuario_asignado}
+                onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, usuario_asignado: e.target.value })}
+              >
+                <option value="">Usuario Asignado</option>
+                {usuarios.map(u => (
+                  <option key={u.id} value={u.id}>
+                    {u.nombre} — {u.email}
+                  </option>
+                ))}
+              </select>
+
+              {/* Departamento */}
+              <select
+                value={nuevoEquipo.departamento_id}
+                onChange={(e) =>
+                  setNuevoEquipo({ ...nuevoEquipo, departamento_id: e.target.value })
+                }
+              >
+                <option value="">Seleccione Departamento</option>
+                {departamentos.map(d => (
+                  <option key={d.id} value={d.id}>{d.nombre}</option>
+                ))}
+              </select>
+
+              {/* Estado */}
               <select
                 value={nuevoEquipo.estado}
-                onChange={(e) =>
-                  setNuevoEquipo({ ...nuevoEquipo, estado: e.target.value })
-                }
+                onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, estado: e.target.value })}
               >
                 <option value="activo">Activo</option>
                 <option value="mantenimiento">Mantenimiento</option>
                 <option value="retirado">Retirado</option>
               </select>
 
-              <button className="btn-crear" onClick={crearEquipo}>
-                Guardar
-              </button>
-
-              <button className="btn-cerrar" onClick={() => setShowModal(false)}>
-                Cancelar
-              </button>
+              {/* Botones */}
+              <button className="equipos-btn-save" onClick={crearEquipo}>Guardar</button>
+              <button className="equipos-btn-close" onClick={() => setShowModal(false)}>Cancelar</button>
 
             </div>
           </div>
         )}
+        {/* ========================= */}
+        {/* MODAL DETALLE EQUIPO     */}
+        {/* ========================= */}
+        {showDetalle && equipoDetalle && (
+          <div className="equipos-overlay" onClick={() => setShowDetalle(false)}>
+            <div className="equipos-modal" onClick={(e) => e.stopPropagation()}>
+              
+              <h2>Detalle del Equipo</h2>
 
+              <div className="detalle-box">
+
+                <p><strong>ID:</strong> {equipoDetalle.id}</p>
+                <p><strong>Serial:</strong> {equipoDetalle.serial}</p>
+                <p><strong>S/N:</strong> {equipoDetalle.sn}</p>
+
+                <p><strong>Estado:</strong> {equipoDetalle.estado}</p>
+                <p><strong>Fecha Ingreso:</strong> 
+                  {new Date(equipoDetalle.fecha_ingreso).toLocaleDateString()}
+                </p>
+
+                {/* RELACIONES */}
+                <p><strong>Tipo:</strong> {equipoDetalle.tipo || "—"}</p>
+                <p><strong>Marca:</strong> {equipoDetalle.marca || "—"}</p>
+                <p><strong>Modelo:</strong> {equipoDetalle.modelo || "—"}</p>
+                <p><strong>Departamento:</strong> {equipoDetalle.departamento || "—"}</p>
+
+                {/* Usuario asignado */}
+                <p><strong>Usuario Asignado:</strong> 
+                  {equipoDetalle.usuario_nombre 
+                    ? `${equipoDetalle.usuario_nombre} (${equipoDetalle.usuario_email})` 
+                    : "No asignado"}
+                </p>
+
+              </div>
+
+              <button className="equipos-btn-close" onClick={() => setShowDetalle(false)}>
+                Cerrar
+              </button>
+            </div>
+          </div>
+        )}
         <footer className="admin-legal">
           © 2025 Cloud + Inventory. Todos los derechos reservados.
         </footer>
-
       </main>
     </div>
   );
