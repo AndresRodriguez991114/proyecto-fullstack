@@ -13,30 +13,30 @@
     --main-bg: linear-gradient(180deg,#10061e,#130720);
     --card-bg: rgba(255,255,255,0.06); /* ligeramente más opaco */
   }
+  
+}
+/* TARJETAS DE ESTADÍSTICAS */
+.inicio-stats {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 22px;
+  margin-top: 25px;
+  margin-bottom: 35px;
+}
 
-  /* Reduce intensidad del blur */
-  .card,
-  .inicio-hero,
-  .stat-card,
-  .atajo-card,
-  .tabla-contenedor {
-    backdrop-filter: blur(4px);
-  }
 
-  /* Evita tarjetas gigantes en móvil */
-  .stat-card {
-    width: 100%;
-    padding: 14px;
-  }
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 18px;
+  text-align: center;
+  backdrop-filter: blur(8px);
+  transition: 0.25s ease;
+  animation: cardPop 0.4s ease;
+  width: 180px;
+}
 
-  /* Hero más compacto */
-  .inicio-hero {
-    padding: 16px;
-  }
-
-  /* Botones menos brillantes */
-  .atajo-card:hover {
-    background: var(--card-bg);
-    transform: none;
-  }
+.stat-card:hover {
+  transform: translateY(-4px);
 }

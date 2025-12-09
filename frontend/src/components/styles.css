@@ -525,29 +525,6 @@
   margin-top: 4px;
 }
 
-/* TARJETAS DE ESTADÍSTICAS */
-.inicio-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 16px;
-  margin: 20px 0;
-}
-
-.stat-card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-  padding: 18px;
-  text-align: center;
-  backdrop-filter: blur(8px);
-  transition: 0.25s ease;
-  animation: cardPop 0.4s ease;
-  width: 180px;
-}
-
-.stat-card:hover {
-  transform: translateY(-4px);
-}
 
 /* ACCESOS RÁPIDOS */
 .inicio-atajos h2 {
