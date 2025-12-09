@@ -29,6 +29,15 @@ useEffect(() => {
         ...prev,
         usuarios: usuariosTotal
       }));
+      
+      // 🔹 Obtener equipos existentes
+      const resEquipos = await api.get("/equipos"); // O "/api/equipos" según tu configuración
+      const equiposTotal = Array.isArray(resEquipos.data) ? resEquipos.data.length : 0;
+
+      setStats(prev => ({
+        ...prev,
+        equipos: equiposTotal
+      }));
 
       // 🔹 En cuanto me confirmes las rutas reales de equipos, clientes y reparaciones,
       //     también las conecto igual de fácil.

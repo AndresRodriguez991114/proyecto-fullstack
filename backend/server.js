@@ -131,16 +131,16 @@ app.get("/api/equipos", auth, async (req, res) => {
     const query = `
       SELECT 
         e.id,
-        e.nombre,
         e.serial,
+        e.sn,
         e.estado,
         e.fecha_ingreso,
         
         -- Relaciones
-        t.nombre AS tipo,
-        m.nombre AS marca,
-        mo.nombre AS modelo,
-        d.nombre AS departamento,
+        t.nombre  AS tipo,
+        m.nombre  AS marca,
+        mo.nombre  AS modelo,
+        d.nombre  AS departamento,
 
         -- Usuario asignado
         u.id AS usuario_id,
@@ -161,8 +161,13 @@ app.get("/api/equipos", auth, async (req, res) => {
     res.json(result.rows);
 
   } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  console.error("❌ ERROR SQL:", err); 
+  res.status(500).json({ 
+    error: err.message,
+    detail: err.detail,
+    hint: err.hint 
+  });
+}
 });
 
 // -------------------------------------------------------------
@@ -179,6 +184,54 @@ app.get("/api/usuarios", auth, async (req, res) => {
   }
 });
 
+// -------------------------------------------------------------
+//     🟢 LISTAR TIPOS
+// -------------------------------------------------------------
+app.get("/api/tipos", auth, async (req, res) => {
+  try {
+    const r = await pool.query("SELECT id, nombre FROM tipos_de_equipos ORDER BY id ASC");
+    res.json(r.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------------
+//     🟢 LISTAR MARCAS
+// -------------------------------------------------------------
+app.get("/api/marcas", auth, async (req, res) => {
+  try {
+    const r = await pool.query("SELECT id, nombre FROM marcas ORDER BY id ASC");
+    res.json(r.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------------
+//     🟢 LISTAR MODELOS
+// -------------------------------------------------------------
+app.get("/api/modelos", auth, async (req, res) => {
+  try {
+    const r = await pool.query("SELECT id, nombre FROM modelos ORDER BY id ASC");
+    res.json(r.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------------
+//     🟢 LISTAR DEPARTAMENTOS
+// -------------------------------------------------------------
+app.get("/api/departamentos", auth, async (req, res) => {
+  try {
+    const r = await pool.query("SELECT id, nombre FROM departamentos ORDER BY id ASC");
+    res.json(r.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+    
 
 // -------------------------------------------------------------
 //                     🟢    PUERTO

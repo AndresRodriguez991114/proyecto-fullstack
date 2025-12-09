@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "../módulos/Sidebar";
 import Header from "../módulos/Header";
 import api from "../api";
+import "../Styles/EquiposPage.css";
+
 
 const EquiposPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -9,12 +11,13 @@ const EquiposPage = () => {
   const user = raw ? JSON.parse(raw) : null;
 
   const [equipos, setEquipos] = useState([]);
+  const [loading, setLoading] = useState(true); 
   const [showModal, setShowModal] = useState(false);
 
-  // Formulario acorde a la tabla real
+  // Formulario real
   const [nuevoEquipo, setNuevoEquipo] = useState({
-    nombre: "",
     serial: "",
+    sn: "",
     tipo_id: "",
     marca_id: "",
     modelo_id: "",
@@ -23,7 +26,6 @@ const EquiposPage = () => {
     departamento_id: null,
   });
 
-  // Listas para selects
   const [tipos, setTipos] = useState([]);
   const [marcas, setMarcas] = useState([]);
   const [modelos, setModelos] = useState([]);
@@ -34,11 +36,14 @@ const EquiposPage = () => {
   }, []);
 
   const fetchEquipos = async () => {
+    setLoading(true); // mostrar cargando
     try {
       const res = await api.get("/equipos");
       setEquipos(res.data);
     } catch (err) {
       console.error("Error cargando equipos:", err);
+    } finally {
+      setLoading(false); // ocultar cargando
     }
   };
 
@@ -63,8 +68,8 @@ const EquiposPage = () => {
       setShowModal(false);
 
       setNuevoEquipo({
-        nombre: "",
         serial: "",
+        sn: "",
         tipo_id: "",
         marca_id: "",
         modelo_id: "",
@@ -74,7 +79,6 @@ const EquiposPage = () => {
       });
 
       fetchEquipos();
-
     } catch (err) {
       console.error("Error creando equipo:", err);
       alert("Error creando equipo: " + err.response?.data?.message);
@@ -103,65 +107,80 @@ const EquiposPage = () => {
           </button>
         </div>
 
-        {/* TABLA */}
-        <section className="tabla-contenedor">
+        {/* ========================= */}
+        {/* PANEL EQUIPOS ANIMADO     */}
+        {/* ========================= */}
+        <section className="tabla-contenedor panel-slide">
           <h2>Equipos Registrados</h2>
 
-          <table className="tabla-admin">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Serial</th>
-                <th>Tipo</th>
-                <th>Marca</th>
-                <th>Modelo</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {equipos.map((e) => (
-                <tr key={e.id}>
-                  <td>{e.id}</td>
-                  <td>{e.nombre}</td>
-                  <td>{e.serial}</td>
-                  <td>{e.tipo}</td>
-                  <td>{e.marca}</td>
-                  <td>{e.modelo}</td>
-                  <td>{e.estado}</td>
-                  <td>
-                    <button className="btn-small">Editar</button>
-                    <button className="btn-small btn-danger">Eliminar</button>
-                  </td>
+          {/* LOADING */}
+          {loading ? (
+            <p className="cargando">Cargando equipos...</p>
+          ) : (
+            <table className="tabla-admin">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Serial</th>
+                  <th>S/N</th>
+                  <th>Tipo</th>
+                  <th>Marca</th>
+                  <th>Modelo</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {equipos.map((e) => (
+                  <tr key={e.id}>
+                    <td>{e.id}</td>
+                    <td>{e.serial}</td>
+                    <td>{e.sn}</td>
+                    <td>{e.tipo}</td>
+                    <td>{e.marca}</td>
+                    <td>{e.modelo}</td>
+                    <td>{e.estado}</td>
+                    <td>
+                      <button className="btn-small btn-edit">
+                        <i><svg width="16" height="16" fill="currentColor"><path d="M12.854.854a.5.5 0 0 0-.708 0L10.5 2.5l2 2L14.146 2.854a.5.5 0 0 0 0-.708l-1.292-1.292zM10 3l-8 8V13h2l8-8-2-2z"/></svg></i>
+                      </button>
+
+                      <button className="btn-small btn-delete">
+                        <i><svg width="16" height="16" fill="currentColor"><path d="M5.5 5.5a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0v-6a.5.5 0 0 1 .5-.5zm5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0v-6a.5.5 0 0 1 .5-.5z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1 0-2h3.1a2 2 0 0 1 1.9-1.5h2a2 2 0 0 1 1.9 1.5h3.1a1 1 0 0 1 1 1z"/></svg></i>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </section>
 
-        {/* MODAL */}
+        {/* ========================= */}
+        {/* MODAL MEJORADO           */}
+        {/* ========================= */}
         {showModal && (
           <div className="modal-overlay" onClick={() => setShowModal(false)}>
-            <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal modal-anim" onClick={(e) => e.stopPropagation()}>
+
               <h2>Registrar Equipo</h2>
 
               <input
                 type="text"
-                placeholder="Nombre del equipo"
-                value={nuevoEquipo.nombre}
+                placeholder="Serial del equipo"
+                value={nuevoEquipo.serial}
                 onChange={(e) =>
-                  setNuevoEquipo({ ...nuevoEquipo, nombre: e.target.value })
+                  setNuevoEquipo({ ...nuevoEquipo, serial: e.target.value })
                 }
               />
 
               <input
                 type="text"
-                placeholder="Serial"
-                value={nuevoEquipo.serial}
+                placeholder="S/N"
+                value={nuevoEquipo.sn}
                 onChange={(e) =>
-                  setNuevoEquipo({ ...nuevoEquipo, serial: e.target.value })
+                  setNuevoEquipo({ ...nuevoEquipo, sn: e.target.value })
                 }
               />
 
@@ -202,7 +221,6 @@ const EquiposPage = () => {
                 ))}
               </select>
 
-              {/* ESTADO */}
               <select
                 value={nuevoEquipo.estado}
                 onChange={(e) =>
@@ -221,6 +239,7 @@ const EquiposPage = () => {
               <button className="btn-cerrar" onClick={() => setShowModal(false)}>
                 Cancelar
               </button>
+
             </div>
           </div>
         )}
