@@ -69,7 +69,7 @@ const UsersPanel = ({ onTotalChange, openUserModal, setOpenUserModal }) => {
     setValue("nombre", usuario.nombre);
     setValue("email", usuario.email);
     setValue("rol", usuario.rol);
-    setValue("password", ""); // opcional en edición
+    setValue("password", "");
 
     setOpenUserModal(true);
   };

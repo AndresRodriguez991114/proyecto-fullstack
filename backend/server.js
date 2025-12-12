@@ -225,6 +225,41 @@ app.put("/api/usuarios/:id", auth, async (req, res) => {
   }
 });
 
+// -------------------------------------------------------------
+//     🔴 ELIMINAR USUARIO (PROTEGIDO)
+// -------------------------------------------------------------
+app.delete("/api/usuarios/:id", auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // 1️⃣ Verificar si el usuario existe
+    const check = await pool.query(
+      "SELECT id, rol FROM usuarios WHERE id = $1",
+      [id]
+    );
+
+    if (check.rows.length === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    const user = check.rows[0];
+
+    // 2️⃣ Prohibir borrar administradores
+    if (user.rol === "administrador") {
+      return res.status(403).json({ error: "No puedes eliminar un administrador" });
+    }
+
+    // 3️⃣ Eliminar
+    await pool.query("DELETE FROM usuarios WHERE id = $1", [id]);
+
+    res.json({ msg: "Usuario eliminado correctamente" });
+
+  } catch (err) {
+    console.error("❌ Error eliminando usuario:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 // -------------------------------------------------------------
 //     🟢 LISTAR TIPOS
