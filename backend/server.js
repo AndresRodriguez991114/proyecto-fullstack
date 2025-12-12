@@ -185,6 +185,48 @@ app.get("/api/usuarios", auth, async (req, res) => {
 });
 
 // -------------------------------------------------------------
+//     🟢 ACTUALIZAR USUARIO (PROTEGIDO)
+// -------------------------------------------------------------
+app.put("/api/usuarios/:id", auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre, email, rol, password } = req.body;
+
+    let query = "";
+    let values = [];
+
+    // Si viene contraseña → se actualiza con hash
+    if (password && password.trim() !== "") {
+      const hashed = await bcrypt.hash(password, 10);
+
+      query = `
+        UPDATE usuarios 
+        SET nombre = $1, email = $2, rol = $3, password = $4
+        WHERE id = $5
+      `;
+      values = [nombre, email.toLowerCase(), rol, hashed, id];
+    } else {
+      // Si NO viene contraseña → no se toca la password
+      query = `
+        UPDATE usuarios 
+        SET nombre = $1, email = $2, rol = $3
+        WHERE id = $4
+      `;
+      values = [nombre, email.toLowerCase(), rol, id];
+    }
+
+    await pool.query(query, values);
+
+    res.json({ msg: "Usuario actualizado correctamente" });
+
+  } catch (err) {
+    console.error("❌ Error actualizando usuario:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// -------------------------------------------------------------
 //     🟢 LISTAR TIPOS
 // -------------------------------------------------------------
 app.get("/api/tipos", auth, async (req, res) => {
