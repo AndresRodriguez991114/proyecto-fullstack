@@ -4,6 +4,7 @@ import "./styles.css";
 import Sidebar from "../módulos/Sidebar"
 import ThemeToggle from "../módulos/ThemeToggle";
 
+
 // Aplicar tema ANTES de renderizar
 const savedTheme = localStorage.getItem("theme") || "light";
 document.documentElement.setAttribute("data-theme", savedTheme);
@@ -77,7 +78,7 @@ const UsuariosPage = () => {
           >
             + Crear Usuario
           </button>
-
+          
           <UsersPanel
             onTotalChange={(n) => {
               const el = document.getElementById("total-users");
