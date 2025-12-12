@@ -240,6 +240,92 @@ app.post("/api/equipos", auth, async (req, res) => {
   }
 });
 
+// -------------------------------------------------------------
+//     🟢 ACTUALIZAR EQUIPO (PROTEGIDO)
+// -------------------------------------------------------------
+
+app.put("/api/equipos/:id", auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      serial,
+      sn,
+      estado,
+      fecha_ingreso,
+      tipo_id,
+      marca_id,
+      modelo_id,
+      departamento_id,
+      usuario_asignado
+    } = req.body;
+
+    const query = `
+      UPDATE equipos
+      SET serial = $1,
+          sn = $2,
+          estado = $3,
+          fecha_ingreso = $4,
+          tipo_id = $5,
+          marca_id = $6,
+          modelo_id = $7,
+          departamento_id = $8,
+          usuario_asignado = $9
+      WHERE id = $10
+      RETURNING *;
+    `;
+
+    const values = [
+      serial,
+      sn,
+      estado,
+      fecha_ingreso || null,
+      tipo_id || null,
+      marca_id || null,
+      modelo_id || null,
+      departamento_id || null,
+      usuario_asignado || null,
+      id
+    ];
+
+    const result = await pool.query(query, values);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Equipo no encontrado" });
+    }
+
+    res.json({
+      msg: "Equipo actualizado correctamente",
+      equipo: result.rows[0]
+    });
+
+  } catch (err) {
+    console.error("❌ ERROR SQL AL ACTUALIZAR EQUIPO:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------------
+//     🟢 ELIMINAR EQUIPO (PROTEGIDO)
+// -------------------------------------------------------------
+
+app.delete("/api/equipos/:id", auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query("DELETE FROM equipos WHERE id = $1 RETURNING *", [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Equipo no encontrado" });
+    }
+
+    res.json({ msg: "Equipo eliminado correctamente" });
+
+  } catch (err) {
+    console.error("❌ ERROR SQL AL ELIMINAR EQUIPO:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 // -------------------------------------------------------------
 //     🟢 LISTAR USUARIOS (PROTEGIDO)
