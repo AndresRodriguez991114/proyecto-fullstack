@@ -171,6 +171,77 @@ app.get("/api/equipos", auth, async (req, res) => {
 });
 
 // -------------------------------------------------------------
+//     🟢 CREAR EQUIPO (PROTEGIDO)
+// -------------------------------------------------------------
+app.post("/api/equipos", auth, async (req, res) => {
+  try {
+    const {
+      serial,
+      sn,
+      estado,
+      fecha_ingreso,      // opcional (si no viene, Postgres usa CURRENT_DATE)
+      tipo_id,
+      marca_id,
+      modelo_id,
+      departamento_id,
+      usuario_asignado    // puede ser null
+    } = req.body;
+
+    // VALIDACIONES BÁSICAS
+    if (!serial || !sn || !estado) {
+      return res.status(400).json({
+        error: "serial, sn y estado son obligatorios"
+      });
+    }
+
+    // Insertar en base de datos
+    const query = `
+      INSERT INTO equipos 
+        (serial, sn, estado, fecha_ingreso, tipo_id, marca_id, modelo_id, departamento_id, usuario_asignado)
+      VALUES 
+        ($1,$2,$3,COALESCE($4, CURRENT_DATE),$5,$6,$7,$8,$9)
+      RETURNING *;
+    `;
+
+    const values = [
+      serial,
+      sn,
+      estado,
+      fecha_ingreso || null,
+      tipo_id || null,
+      marca_id || null,
+      modelo_id || null,
+      departamento_id || null,
+      usuario_asignado || null
+    ];
+
+    const result = await pool.query(query, values);
+
+    res.json({
+      msg: "Equipo creado correctamente",
+      equipo: result.rows[0]
+    });
+
+  } catch (err) {
+    console.error("❌ ERROR SQL AL CREAR EQUIPO:", err.message, err.detail, err.hint);
+
+    // Manejo de errores comunes (duplicado de SN)
+    if (err.code === "23505") {
+      return res.status(409).json({
+        error: "El SN ya está registrado (constraint equipos_serial_key)"
+      });
+    }
+
+    res.status(500).json({
+      error: err.message,
+      detail: err.detail,
+      hint: err.hint
+    });
+  }
+});
+
+
+// -------------------------------------------------------------
 //     🟢 LISTAR USUARIOS (PROTEGIDO)
 // -------------------------------------------------------------
 app.get("/api/usuarios", auth, async (req, res) => {
