@@ -255,8 +255,12 @@ app.delete("/api/usuarios/:id", auth, async (req, res) => {
     res.json({ msg: "Usuario eliminado correctamente" });
 
   } catch (err) {
-    console.error("❌ Error eliminando usuario:", err);
-    res.status(500).json({ error: err.message });
+    console.error("❌ ERROR SQL AL ELIMINAR:", err.message, err.detail, err.hint);
+    res.status(500).json({
+      error: err.message,
+      detail: err.detail,
+      hint: err.hint
+    });
   }
 });
 
