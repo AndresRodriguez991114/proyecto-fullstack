@@ -156,8 +156,8 @@ const eliminarEquipo = async (id) => {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>S/N</th>
                   <th>Serial</th>
+                  <th>S/N</th>
                   <th>Tipo</th>
                   <th>Marca</th>
                   <th>Modelo</th>
