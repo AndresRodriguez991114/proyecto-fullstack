@@ -135,17 +135,24 @@ app.get("/api/equipos", auth, async (req, res) => {
         e.sn,
         e.estado,
         e.fecha_ingreso,
-        
-        -- Relaciones
+        e.proveedor,
+        e.observaciones,
+
+        -- IDs (IMPORTANTES PARA EDITAR)
+        e.tipo_id,
+        e.marca_id,
+        e.modelo_id,
+        e.departamento_id,
+        e.usuario_asignado AS usuario_id,
+
+        -- Nombres para mostrar
         t.nombre  AS tipo,
         m.nombre  AS marca,
-        mo.nombre  AS modelo,
+        mo.nombre AS modelo,
         d.nombre  AS departamento,
 
-        -- Usuario asignado
-        u.id AS usuario_id,
         u.nombre AS usuario_nombre,
-        u.email AS usuario_email
+        u.email  AS usuario_email
 
       FROM equipos e
       LEFT JOIN tipos_de_equipos t ON e.tipo_id = t.id
@@ -153,7 +160,6 @@ app.get("/api/equipos", auth, async (req, res) => {
       LEFT JOIN modelos mo ON e.modelo_id = mo.id
       LEFT JOIN departamentos d ON e.departamento_id = d.id
       LEFT JOIN usuarios u ON e.usuario_asignado = u.id
-      
       ORDER BY e.id ASC;
     `;
 
@@ -184,7 +190,9 @@ app.post("/api/equipos", auth, async (req, res) => {
       marca_id,
       modelo_id,
       departamento_id,
-      usuario_asignado    // puede ser null
+      usuario_asignado,
+      proveedor,
+      observaciones  
     } = req.body;
 
     // VALIDACIONES BÁSICAS
@@ -197,9 +205,9 @@ app.post("/api/equipos", auth, async (req, res) => {
     // Insertar en base de datos
     const query = `
       INSERT INTO equipos 
-        (serial, sn, estado, fecha_ingreso, tipo_id, marca_id, modelo_id, departamento_id, usuario_asignado)
+        (serial, sn, estado, fecha_ingreso, tipo_id, marca_id, modelo_id, departamento_id, usuario_asignado, proveedor , observaciones)
       VALUES 
-        ($1,$2,$3,COALESCE($4, CURRENT_DATE),$5,$6,$7,$8,$9)
+        ($1,$2,$3,COALESCE($4, CURRENT_DATE),$5,$6,$7,$8,$9,$10,$11)
       RETURNING *;
     `;
 
@@ -212,7 +220,9 @@ app.post("/api/equipos", auth, async (req, res) => {
       marca_id || null,
       modelo_id || null,
       departamento_id || null,
-      usuario_asignado || null
+      usuario_asignado || null,
+      proveedor || null,
+      observaciones || null
     ];
 
     const result = await pool.query(query, values);
@@ -256,7 +266,9 @@ app.put("/api/equipos/:id", auth, async (req, res) => {
       marca_id,
       modelo_id,
       departamento_id,
-      usuario_asignado
+      usuario_asignado,
+      proveedor,
+      observaciones
     } = req.body;
 
     const query = `
@@ -269,8 +281,10 @@ app.put("/api/equipos/:id", auth, async (req, res) => {
           marca_id = $6,
           modelo_id = $7,
           departamento_id = $8,
-          usuario_asignado = $9
-      WHERE id = $10
+          usuario_asignado = $9,
+          proveedor = $10,
+          observaciones = $11
+      WHERE id = $12
       RETURNING *;
     `;
 
@@ -284,6 +298,8 @@ app.put("/api/equipos/:id", auth, async (req, res) => {
       modelo_id || null,
       departamento_id || null,
       usuario_asignado || null,
+      proveedor || null,
+      observaciones || null,
       id
     ];
 

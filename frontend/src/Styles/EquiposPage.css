@@ -257,3 +257,41 @@
   margin: 4px 0;
   font-size: 15px;
 }
+
+/* doble columna */
+.form-row {
+  display: flex;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.form-row.full {
+  grid-template-columns: 1fr;
+}
+
+.form-row > * {
+  flex: 1;
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+  width: 100%;
+}
+.form-error-box {
+  background: rgba(255, 91, 107, 0.12);
+  border: 1px solid #ff5b6b;
+  color: #ffb6b6;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-top: 10px;
+}
+.equipos-modal textarea {
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 12px;
+}
