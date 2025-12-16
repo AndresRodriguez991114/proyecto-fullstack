@@ -283,7 +283,7 @@ const validarFormulario = () => {
                         </i>
                       </button>
 
-                      <button className="btn-small btn-delete" onClick={() => confirmarEliminarEquipo(e.id)}>
+                      <button className="btn-small btn-delete" onClick={() => confirmarEliminarEquipo(e)}>
                         <i>
                           <svg width="16" height="16" fill="currentColor">
                             <path d="M5.5 5.5a.5.5 0 0 1 .5.5v6a.5.5 
