@@ -14,9 +14,11 @@ const EquiposPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [equipoEditando, setEquipoEditando] = useState(null);
-  // 🔥 NUEVO: Modal de detalle
   const [showDetalle, setShowDetalle] = useState(false);
   const [equipoDetalle, setEquipoDetalle] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [equipoToDelete, setEquipoToDelete] = useState(null);
+
 
   // Formulario real
   const [nuevoEquipo, setNuevoEquipo] = useState({
@@ -156,15 +158,27 @@ const EquiposPage = () => {
   setShowModal(true);
 };
 
-const eliminarEquipo = async (id) => {
-  if (!window.confirm("¿Seguro que deseas eliminar este equipo?")) return;
+const confirmarEliminarEquipo = (equipo) => {
+  setEquipoToDelete(equipo);
+  setShowDeleteModal(true);
+};
+
+const eliminarEquipo = async () => {
+  if (!equipoToDelete) return;
 
   try {
-    await api.delete(`/equipos/${id}`);
-    fetchEquipos();
+    await api.delete(`/equipos/${equipoToDelete.id}`);
+
+    setShowDeleteModal(false);
+    setEquipoToDelete(null);
+
+    fetchEquipos(); // refresca la tabla
   } catch (err) {
     console.error("Error eliminando equipo:", err);
-    alert("No se pudo eliminar.");
+    alert(
+      err.response?.data?.error ||
+      "No se pudo eliminar el equipo"
+    );
   }
 };
 
@@ -269,7 +283,7 @@ const validarFormulario = () => {
                         </i>
                       </button>
 
-                      <button className="btn-small btn-delete" onClick={() => eliminarEquipo(e.id)}>
+                      <button className="btn-small btn-delete" onClick={() => confirmarEliminarEquipo(e.id)}>
                         <i>
                           <svg width="16" height="16" fill="currentColor">
                             <path d="M5.5 5.5a.5.5 0 0 1 .5.5v6a.5.5 
@@ -470,6 +484,68 @@ const validarFormulario = () => {
             </div>
           </div>
         )}
+
+        {showDeleteModal && (
+          <div className="modal-overlay show">
+            <div className="modal-box" style={{ padding: "28px" }}>
+
+              {/* ICONO */}
+              <div style={{ textAlign: "center", marginBottom: "20px" }}>
+                <svg width="85" height="85" viewBox="0 0 16 16" fill="#ff4a4a">
+                  <path d="M5.5 5.5a.5.5 0 0 1 .5.5v6a.5.5 
+                  0 0 1-1 0v-6a.5.5 0 0 1 .5-.5zm5 
+                  0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 
+                  0v-6a.5.5 0 0 1 .5-.5z" />
+                  <path d="M14.5 3a1 1 0 0 1-1 
+                  1H13v9a2 2 0 0 1-2 
+                  2H5a2 2 0 0 1-2-2V4h-.5a1 1 
+                  0 0 1 0-2h3.1a2 2 0 0 1 
+                  1.9-1.5h2a2 2 0 0 1 1.9 
+                  1.5h3.1a1 1 0 0 1 1 1z" />
+                </svg>
+              </div>
+
+              <h2 style={{ textAlign: "center", fontSize: "22px" }}>
+                Eliminar equipo
+              </h2>
+
+              <p style={{ textAlign: "center", marginTop: "10px" }}>
+                ¿Estás seguro que deseas eliminar el equipo?
+                <br />
+                <b>{equipoToDelete?.serial} / {equipoToDelete?.sn}</b>
+                <br /><br />
+                <span style={{ opacity: 0.8 }}>
+                  Esta acción no se puede deshacer.
+                </span>
+              </p>
+
+              <div style={{ display: "flex", gap: "12px", marginTop: "26px" }}>
+                <button
+                  className="modal-save"
+                  onClick={eliminarEquipo}
+                  style={{ background: "#ff4a4a", fontWeight: "600" }}
+                >
+                  Eliminar
+                </button>
+
+                <button
+                  className="modal-save"
+                  onClick={() => setShowDeleteModal(false)}
+                  style={{
+                    background: "var(--input-bg)",
+                    color: "var(--text)",
+                    border: "1px solid var(--input-border)",
+                    fontWeight: "600"
+                  }}
+                >
+                  Cancelar
+                </button>
+              </div>
+
+            </div>
+          </div>
+        )}
+
         <footer className="admin-legal">
           © 2025 Cloud + Inventory. Todos los derechos reservados.
         </footer>
