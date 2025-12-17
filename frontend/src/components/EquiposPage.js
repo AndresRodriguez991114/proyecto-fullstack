@@ -458,11 +458,6 @@ const validarFormulario = () => {
                   <strong>Proveedor:</strong>{" "}
                   {equipoDetalle.proveedor || "—"}
                 </p>
-                <p>
-                  <strong>Observaciones:</strong><br />
-                  {equipoDetalle.observaciones || "Sin observaciones"}
-                </p>
-
                 {/* RELACIONES */}
                 <p><strong>Tipo:</strong> {equipoDetalle.tipo || "—"}</p>
                 <p><strong>Marca:</strong> {equipoDetalle.marca || "—"}</p>
@@ -476,6 +471,10 @@ const validarFormulario = () => {
                     : "No asignado"}
                 </p>
 
+                <p>
+                  <strong>Observaciones:</strong><br />
+                  {equipoDetalle.observaciones || "Sin observaciones"}
+                </p>
               </div>
 
               <button className="equipos-btn-close" onClick={() => setShowDetalle(false)}>
