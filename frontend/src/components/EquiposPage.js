@@ -8,14 +8,17 @@ const EquiposPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const raw = localStorage.getItem("user");
   const user = raw ? JSON.parse(raw) : null;
-
+  const [formError, setFormError] = useState("");
   const [equipos, setEquipos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-
-  // 🔥 NUEVO: Modal de detalle
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [equipoEditando, setEquipoEditando] = useState(null);
   const [showDetalle, setShowDetalle] = useState(false);
   const [equipoDetalle, setEquipoDetalle] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [equipoToDelete, setEquipoToDelete] = useState(null);
+
 
   // Formulario real
   const [nuevoEquipo, setNuevoEquipo] = useState({
@@ -27,6 +30,8 @@ const EquiposPage = () => {
     estado: "activo",
     usuario_asignado: null,
     departamento_id: null,
+    proveedor: "",
+    observaciones: "",
   });
 
   const [tipos, setTipos] = useState([]);
@@ -72,12 +77,28 @@ const EquiposPage = () => {
     }
   };
 
-  const crearEquipo = async () => {
+  const guardarEquipo = async () => {
+    setFormError("");
+
+    // 🛑 Validación visual / lógica antes de enviar
+    if (!validarFormulario()) return;
+
     try {
-      await api.post("/equipos", nuevoEquipo);
+      // ✏️ EDITAR
+      if (modoEdicion && equipoEditando) {
+        await api.put(`/equipos/${equipoEditando.id}`, nuevoEquipo);
+      } 
+      // ➕ CREAR
+      else {
+        await api.post("/equipos", nuevoEquipo);
+      }
 
+      // ✅ Cerrar modal y limpiar estados
       setShowModal(false);
+      setModoEdicion(false);
+      setEquipoEditando(null);
 
+      // 🧼 Reset del formulario
       setNuevoEquipo({
         serial: "",
         sn: "",
@@ -87,12 +108,23 @@ const EquiposPage = () => {
         estado: "activo",
         usuario_asignado: null,
         departamento_id: null,
+        proveedor: "",
+        observaciones: ""
       });
 
+      // 🔄 Refrescar listado
       fetchEquipos();
+
     } catch (err) {
-      console.error("Error creando equipo:", err);
-      alert("Error creando equipo: " + err.response?.data?.message);
+      console.error("❌ Error guardando equipo:", err);
+
+      // 📩 Mostrar mensaje real del backend
+      const msg =
+        err.response?.data?.error ||
+        err.response?.data?.detail ||
+        "Error inesperado al guardar el equipo";
+
+      setFormError(msg);
     }
   };
 
@@ -102,20 +134,71 @@ const EquiposPage = () => {
     setShowDetalle(true);
   };
 
-  const editarEquipo = (equipo) => {
-  alert("Editar equipo ID: " + equipo.id);
+ const editarEquipo = (equipo) => {
+  setModoEdicion(true);
+  setEquipoEditando(equipo);
+
+  setNuevoEquipo({
+    serial: equipo.serial ?? "",
+    sn: equipo.sn ?? "",
+    tipo_id: equipo.tipo_id ?? "",
+    marca_id: equipo.marca_id ?? "",
+    modelo_id: equipo.modelo_id ?? "",
+    estado: equipo.estado ?? "activo",
+    fecha_ingreso: equipo.fecha_ingreso
+      ? equipo.fecha_ingreso.slice(0, 10)
+      : "",
+    usuario_asignado: equipo.usuario_id ?? null,
+    departamento_id: equipo.departamento_id ?? null,
+    proveedor: equipo.proveedor ?? "",
+    observaciones: equipo.observaciones ?? ""
+  });
+
+  setFormError("");
+  setShowModal(true);
 };
 
-const eliminarEquipo = async (id) => {
-  if (!window.confirm("¿Seguro que deseas eliminar este equipo?")) return;
+const confirmarEliminarEquipo = (equipo) => {
+  setEquipoToDelete(equipo);
+  setShowDeleteModal(true);
+};
+
+const eliminarEquipo = async () => {
+  if (!equipoToDelete) return;
 
   try {
-    await api.delete(`/equipos/${id}`);
-    fetchEquipos();
+    await api.delete(`/equipos/${equipoToDelete.id}`);
+
+    setShowDeleteModal(false);
+    setEquipoToDelete(null);
+
+    fetchEquipos(); // refresca la tabla
   } catch (err) {
     console.error("Error eliminando equipo:", err);
-    alert("No se pudo eliminar.");
+    alert(
+      err.response?.data?.error ||
+      "No se pudo eliminar el equipo"
+    );
   }
+};
+
+const validarFormulario = () => {
+  if (!nuevoEquipo.serial.trim()) {
+    setFormError("El serial es obligatorio");
+    return false;
+  }
+
+  if (!nuevoEquipo.sn.trim()) {
+    setFormError("El S/N es obligatorio");
+    return false;
+  }
+
+  if (!nuevoEquipo.estado) {
+    setFormError("Debe seleccionar un estado");
+    return false;
+  }
+
+  return true;
 };
 
 
@@ -200,7 +283,7 @@ const eliminarEquipo = async (id) => {
                         </i>
                       </button>
 
-                      <button className="btn-small btn-delete" onClick={() => eliminarEquipo(e.id)}>
+                      <button className="btn-small btn-delete" onClick={() => confirmarEliminarEquipo(e)}>
                         <i>
                           <svg width="16" height="16" fill="currentColor">
                             <path d="M5.5 5.5a.5.5 0 0 1 .5.5v6a.5.5 
@@ -233,100 +316,120 @@ const eliminarEquipo = async (id) => {
               
               <h2>Registrar Equipo</h2>
 
-              {/* Serial */}
-              <input
-                type="text"
-                placeholder="Serial"
-                value={nuevoEquipo.serial}
-                onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, serial: e.target.value })}
-              />
+              <div className="form-row">
+                <input
+                  type="text"
+                  placeholder="Serial"
+                  value={nuevoEquipo.serial}
+                  onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, serial: e.target.value })}
+                />
 
-              {/* S/N */}
-              <input
-                type="text"
-                placeholder="S/N"
-                value={nuevoEquipo.sn}
-                onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, sn: e.target.value })}
-              />
+                <input
+                  type="text"
+                  placeholder="S/N"
+                  value={nuevoEquipo.sn}
+                  onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, sn: e.target.value })}
+                />
+              </div>
 
-              {/* Tipo */}
-              <select
-                value={nuevoEquipo.tipo_id}
-                onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, tipo_id: e.target.value })}
-              >
-                <option value="">Seleccione Tipo</option>
-                {tipos.map(t => (
-                  <option key={t.id} value={t.id}>{t.nombre}</option>
-                ))}
-              </select>
+              <div className="form-row">
+                <select
+                  value={nuevoEquipo.tipo_id}
+                  onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, tipo_id: e.target.value })}
+                >
+                  <option value="">Seleccione Tipo</option>
+                  {tipos.map(t => (
+                    <option key={t.id} value={t.id}>{t.nombre}</option>
+                  ))}
+                </select>
 
-              {/* Marca */}
-              <select
-                value={nuevoEquipo.marca_id}
-                onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, marca_id: e.target.value })}
-              >
-                <option value="">Seleccione Marca</option>
-                {marcas.map(m => (
-                  <option key={m.id} value={m.id}>{m.nombre}</option>
-                ))}
-              </select>
+                <select
+                  value={nuevoEquipo.marca_id}
+                  onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, marca_id: e.target.value })}
+                >
+                  <option value="">Seleccione Marca</option>
+                  {marcas.map(m => (
+                    <option key={m.id} value={m.id}>{m.nombre}</option>
+                  ))}
+                </select>
+              </div>
 
-              {/* Modelo */}
-              <select
-                value={nuevoEquipo.modelo_id}
-                onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, modelo_id: e.target.value })}
-              >
-                <option value="">Seleccione Modelo</option>
-                {modelos.map(mo => (
-                  <option key={mo.id} value={mo.id}>{mo.nombre}</option>
-                ))}
-              </select>
+              <div className="form-row">
+                <select
+                  value={nuevoEquipo.modelo_id}
+                  onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, modelo_id: e.target.value })}
+                >
+                  <option value="">Seleccione Modelo</option>
+                  {modelos.map(mo => (
+                    <option key={mo.id} value={mo.id}>{mo.nombre}</option>
+                  ))}
+                </select>
 
-              {/* Fecha ingreso */}
-              <input
-                type="date"
-                value={nuevoEquipo.fecha_ingreso || ""}
-                onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, fecha_ingreso: e.target.value })}
-              />
+                <input
+                  type="text"
+                  placeholder="Proveedor (donde se compró)"
+                  value={nuevoEquipo.proveedor || ""}
+                  onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, proveedor: e.target.value })}
+                />
+              </div>
 
-              {/* Usuario asignado */}
-              <select
-                value={nuevoEquipo.usuario_asignado}
-                onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, usuario_asignado: e.target.value })}
-              >
-                <option value="">Usuario Asignado</option>
-                {usuarios.map(u => (
-                  <option key={u.id} value={u.id}>
-                    {u.nombre} — {u.email}
-                  </option>
-                ))}
-              </select>
+              <div className="form-row">
+                <input
+                  type="date"
+                  value={nuevoEquipo.fecha_ingreso || ""}
+                  onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, fecha_ingreso: e.target.value })}
+                />
 
-              {/* Departamento */}
-              <select
-                value={nuevoEquipo.departamento_id}
-                onChange={(e) =>
-                  setNuevoEquipo({ ...nuevoEquipo, departamento_id: e.target.value })
-                }
-              >
-                <option value="">Seleccione Departamento</option>
-                {departamentos.map(d => (
-                  <option key={d.id} value={d.id}>{d.nombre}</option>
-                ))}
-              </select>
+                <select
+                  value={nuevoEquipo.estado}
+                  onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, estado: e.target.value })}
+                >
+                  <option value="activo">Activo</option>
+                  <option value="mantenimiento">Mantenimiento</option>
+                  <option value="retirado">Retirado</option>
+                </select>
+              </div>
 
-              {/* Estado */}
-              <select
-                value={nuevoEquipo.estado}
-                onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, estado: e.target.value })}
-              >
-                <option value="activo">Activo</option>
-                <option value="mantenimiento">Mantenimiento</option>
-                <option value="retirado">Retirado</option>
-              </select>
+              <div className="form-row">
+                <select
+                  value={nuevoEquipo.usuario_asignado || ""}
+                  onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, usuario_asignado: e.target.value })}
+                >
+                  <option value="">Usuario Asignado</option>
+                  {usuarios.map(u => (
+                    <option key={u.id} value={u.id}>
+                      {u.nombre} — {u.email}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={nuevoEquipo.departamento_id || ""}
+                  onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, departamento_id: e.target.value })}
+                >
+                  <option value="">Seleccione Departamento</option>
+                  {departamentos.map(d => (
+                    <option key={d.id} value={d.id}>{d.nombre}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-row full">
+                <textarea
+                  placeholder="Observaciones del equipo"
+                  value={nuevoEquipo.observaciones || ""}
+                  onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, observaciones: e.target.value })}
+                />
+              </div>
+
+                {formError && (
+                  <div className="form-error-box">
+                    {formError}
+                  </div>
+                )}
 
               {/* Botones */}
-              <button className="equipos-btn-save" onClick={crearEquipo}>Guardar</button>
+              <button className="equipos-btn-save" onClick={guardarEquipo}>Guardar</button>
               <button className="equipos-btn-close" onClick={() => setShowModal(false)}>Cancelar</button>
 
             </div>
@@ -351,6 +454,14 @@ const eliminarEquipo = async (id) => {
                 <p><strong>Fecha Ingreso:</strong> 
                   {new Date(equipoDetalle.fecha_ingreso).toLocaleDateString()}
                 </p>
+                <p>
+                  <strong>Proveedor:</strong>{" "}
+                  {equipoDetalle.proveedor || "—"}
+                </p>
+                <p>
+                  <strong>Observaciones:</strong><br />
+                  {equipoDetalle.observaciones || "Sin observaciones"}
+                </p>
 
                 {/* RELACIONES */}
                 <p><strong>Tipo:</strong> {equipoDetalle.tipo || "—"}</p>
@@ -373,6 +484,68 @@ const eliminarEquipo = async (id) => {
             </div>
           </div>
         )}
+
+        {showDeleteModal && (
+          <div className="modal-overlay show">
+            <div className="modal-box" style={{ padding: "28px" }}>
+
+              {/* ICONO */}
+              <div style={{ textAlign: "center", marginBottom: "20px" }}>
+                <svg width="85" height="85" viewBox="0 0 16 16" fill="#ff4a4a">
+                  <path d="M5.5 5.5a.5.5 0 0 1 .5.5v6a.5.5 
+                  0 0 1-1 0v-6a.5.5 0 0 1 .5-.5zm5 
+                  0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 
+                  0v-6a.5.5 0 0 1 .5-.5z" />
+                  <path d="M14.5 3a1 1 0 0 1-1 
+                  1H13v9a2 2 0 0 1-2 
+                  2H5a2 2 0 0 1-2-2V4h-.5a1 1 
+                  0 0 1 0-2h3.1a2 2 0 0 1 
+                  1.9-1.5h2a2 2 0 0 1 1.9 
+                  1.5h3.1a1 1 0 0 1 1 1z" />
+                </svg>
+              </div>
+
+              <h2 style={{ textAlign: "center", fontSize: "22px" }}>
+                Eliminar equipo
+              </h2>
+
+              <p style={{ textAlign: "center", marginTop: "10px" }}>
+                ¿Estás seguro que deseas eliminar el equipo?
+                <br />
+                <b>{equipoToDelete?.serial} / {equipoToDelete?.sn}</b>
+                <br /><br />
+                <span style={{ opacity: 0.8 }}>
+                  Esta acción no se puede deshacer.
+                </span>
+              </p>
+
+              <div style={{ display: "flex", gap: "12px", marginTop: "26px" }}>
+                <button
+                  className="modal-save"
+                  onClick={eliminarEquipo}
+                  style={{ background: "#ff4a4a", fontWeight: "600" }}
+                >
+                  Eliminar
+                </button>
+
+                <button
+                  className="modal-save"
+                  onClick={() => setShowDeleteModal(false)}
+                  style={{
+                    background: "var(--input-bg)",
+                    color: "var(--text)",
+                    border: "1px solid var(--input-border)",
+                    fontWeight: "600"
+                  }}
+                >
+                  Cancelar
+                </button>
+              </div>
+
+            </div>
+          </div>
+        )}
+
         <footer className="admin-legal">
           © 2025 Cloud + Inventory. Todos los derechos reservados.
         </footer>

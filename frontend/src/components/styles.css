@@ -55,12 +55,15 @@
    SIDEBAR
    ========================================================= */
 .admin-sidebar {
-  width: 150px;
+  width: 150px; 
+  height: 95vh;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0; 
   background: var(--sidebar-bg);
   color: var(--sidebar-text);
   padding: clamp(12px, 4vw, 28px);
-  display: flex;
-  flex-direction: column;
   gap: 18px;
   box-shadow: 4px 0 20px rgba(0,0,0,0.3);
   transition: 0.25s ease;
@@ -93,6 +96,7 @@
   text-align:left;
   cursor:pointer;
   transition: 0.25s ease;
+  flex: 1;
 }
 
 .admin-nav button:hover { 
@@ -226,7 +230,7 @@
 
 .users-table { 
   width:100%; 
-  border-collapse:collapse; 
+  border-collapse:collapse;
 }
 
 .users-table th, 
@@ -588,5 +592,3 @@
   border-bottom: 1px solid var(--card-border);
 
 }
-
-
