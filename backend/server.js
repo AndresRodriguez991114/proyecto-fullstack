@@ -177,6 +177,64 @@ app.get("/api/equipos", auth, async (req, res) => {
 });
 
 // -------------------------------------------------------------
+// 🟢 BUSCAR EQUIPO POR SERIAL O SN (PROTEGIDO)
+// -------------------------------------------------------------
+app.get("/api/equipos/buscar/:valor", auth, async (req, res) => {
+  try {
+    const { valor } = req.params;
+
+    const query = `
+      SELECT 
+        e.id,
+        e.serial,
+        e.sn,
+        e.estado,
+        e.fecha_ingreso,
+        e.proveedor,
+        e.observaciones,
+
+        -- IDs
+        e.tipo_id,
+        e.marca_id,
+        e.modelo_id,
+        e.departamento_id,
+        e.usuario_asignado AS usuario_id,
+
+        -- Nombres
+        t.nombre AS tipo,
+        m.nombre AS marca,
+        mo.nombre AS modelo,
+        d.nombre AS departamento,
+
+        u.nombre AS usuario_nombre,
+        u.email AS usuario_email
+
+      FROM equipos e
+      LEFT JOIN tipos_de_equipos t ON e.tipo_id = t.id
+      LEFT JOIN marcas m ON e.marca_id = m.id
+      LEFT JOIN modelos mo ON e.modelo_id = mo.id
+      LEFT JOIN departamentos d ON e.departamento_id = d.id
+      LEFT JOIN usuarios u ON e.usuario_asignado = u.id
+      WHERE e.serial ILIKE $1 OR e.sn ILIKE $1
+      LIMIT 1;
+    `;
+
+    const result = await pool.query(query, [`%${valor}%`]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Equipo no encontrado" });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    console.error("❌ Error buscando equipo:", err);
+    res.status(500).json({ error: "Error buscando equipo" });
+  }
+});
+
+
+// -------------------------------------------------------------
 //     🟢 CREAR EQUIPO (PROTEGIDO)
 // -------------------------------------------------------------
 app.post("/api/equipos", auth, async (req, res) => {
