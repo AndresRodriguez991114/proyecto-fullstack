@@ -6,10 +6,10 @@ import Logo from "../images/Logo2.png";
 // ICONOS BONITOS 😎
 import {
   Home,
-  Package,
+  Laptop,
   BarChart2,
   Users,
-  Inbox,
+  Headphones,
   Wrench,
   UserCircle,
   Settings,
@@ -40,7 +40,7 @@ const Sidebar = ({ user, menuOpen, setMenuOpen }) => {
         </button>
 
         <button onClick={() => go("/equipos")}>
-          <Package size={18} /> <span>Equipos</span>
+          <Laptop size={18} /> <span>Equipos</span>
         </button>
 
         <button onClick={() => go("/reportes")}>
@@ -52,7 +52,7 @@ const Sidebar = ({ user, menuOpen, setMenuOpen }) => {
         </button>
 
         <button onClick={() => go("/diademas")}>
-          <Inbox size={18} /> <span>Diademas</span>
+          <Headphones size={18} /> <span>Diademas</span>
         </button>
 
         <button onClick={() => go("/reparacion")}>
