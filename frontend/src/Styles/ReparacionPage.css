@@ -1,0 +1,53 @@
+/* PANEL */
+.panel-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* BUSCADOR */
+.search-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* INFO EQUIPO */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* FORMULARIO */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.form-grid textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+/* BOTÓN GUARDAR */
+.form-grid .full {
+  grid-column: span 2;
+  width: auto;
+  padding: 12px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  justify-self: flex-start;
+}
+
+/* MENSAJES */
+.form-msg {
+  margin-top: 10px;
+  opacity: 0.75;
+}
