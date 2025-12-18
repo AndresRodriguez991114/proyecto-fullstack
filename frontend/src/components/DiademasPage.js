@@ -4,7 +4,7 @@ import Header from "../módulos/Header";
 
 
 
-const RecepcionPage = () => {
+const DiademasPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -14,8 +14,8 @@ const RecepcionPage = () => {
 
       <main className="admin-main">
           {/* HEADER con overlay incluido */}
-         <Header title="Recepción" menuOpen={menuOpen} setMenuOpen={setMenuOpen} /> 
-        <p>Registro de equipos recibidos.</p>
+         <Header title="Recepción de Diademas" menuOpen={menuOpen} setMenuOpen={setMenuOpen} /> 
+        <p>Registro de Diademas recibidas.</p>
         <footer className="admin-legal">
           © 2025 Cloud + Inventory. Todos los derechos reservados.
         </footer>
@@ -24,4 +24,4 @@ const RecepcionPage = () => {
   );
 };
 
-export default RecepcionPage;
+export default DiademasPage;

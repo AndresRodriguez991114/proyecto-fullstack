@@ -51,8 +51,8 @@ const Sidebar = ({ user, menuOpen, setMenuOpen }) => {
           <Users size={18} /> <span>Usuarios</span>
         </button>
 
-        <button onClick={() => go("/recepcion")}>
-          <Inbox size={18} /> <span>Recepción</span>
+        <button onClick={() => go("/diademas")}>
+          <Inbox size={18} /> <span>Diademas</span>
         </button>
 
         <button onClick={() => go("/reparacion")}>
