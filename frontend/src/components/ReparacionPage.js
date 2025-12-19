@@ -4,24 +4,27 @@ import Header from "../módulos/Header";
 import api from "../api";
 import "../Styles/ReparacionPage.css";
 
-
-
 const ReparacionPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  // =============================
-  // BÚSQUEDA DE EQUIPO
-  // =============================
   const [busqueda, setBusqueda] = useState("");
   const [equipo, setEquipo] = useState(null);
-  const [buscando, setBuscando] = useState(false);
   const [mensaje, setMensaje] = useState("");
+  const [buscando, setBuscando] = useState(false);
+
+  const [form, setForm] = useState({
+    tipo: "Reparación",
+    tecnico: "",
+    diagnostico: "",
+    acciones: "",
+    fecha: new Date().toISOString().slice(0, 10),
+    estadoFinal: "Operativo",
+  });
 
   const buscarEquipo = async (e) => {
     e.preventDefault();
-
-    if (!busqueda) return;
+    if (!busqueda.trim()) return;
 
     setBuscando(true);
     setMensaje("");
@@ -32,60 +35,38 @@ const ReparacionPage = () => {
       setEquipo(res.data);
     } catch (err) {
       if (err.response?.status === 404) {
-        setMensaje("No se encontró el equipo");
+        setMensaje("❌ Equipo no encontrado. Puedes registrarlo antes de continuar.");
       } else {
-        setMensaje("Error al buscar el equipo");
+        setMensaje("⚠️ Error al buscar el equipo");
       }
     } finally {
       setBuscando(false);
     }
   };
 
-  // =============================
-  // FORMULARIO REPARACIÓN
-  // =============================
-  const [reparacion, setReparacion] = useState({
-    tipo: "reparacion",
-    diagnostico: "",
-    acciones: "",
-    tecnico: "",
-    fecha: new Date().toISOString().slice(0, 10),
-    estado_final: "operativo",
-  });
-
-  const guardarReparacion = async () => {
-    if (!reparacion.tecnico || !reparacion.diagnostico) {
-      alert("Completa los campos obligatorios");
-      return;
-    }
+  const guardarReparacion = async (e) => {
+    e.preventDefault();
+    if (!equipo) return alert("Primero debes seleccionar un equipo");
 
     try {
       await api.post("/reparaciones", {
-        ...reparacion,
-        equipo_id: equipo.id,
+        equipoId: equipo.id,
+        ...form,
       });
 
-      alert("Reparación registrada correctamente");
-
-      // reset
-      setReparacion({
-        tipo: "reparacion",
+      alert("✅ Reparación / mantenimiento registrado");
+      setForm({
+        tipo: "Reparación",
+        tecnico: "",
         diagnostico: "",
         acciones: "",
-        tecnico: "",
         fecha: new Date().toISOString().slice(0, 10),
-        estado_final: "operativo",
+        estadoFinal: "Operativo",
       });
-
-      setEquipo(null);
-      setBusqueda("");
-
     } catch (err) {
-      console.error(err);
-      alert("Error guardando la reparación");
+      alert("❌ Error al guardar");
     }
   };
-
 
   return (
     <div className="admin-root">
@@ -98,119 +79,94 @@ const ReparacionPage = () => {
           setMenuOpen={setMenuOpen}
         />
 
-        {/* ============================= */}
         {/* BUSCAR EQUIPO */}
-        {/* ============================= */}
-        <section className="panel-card">
-          <h2>Buscar equipo</h2>
+        <form className="card search-card" onSubmit={buscarEquipo}>
+          <h3>Buscar equipo</h3>
 
-          <form className="search-row" onSubmit={buscarEquipo}>
+          <div className="search-row">
             <input
               type="text"
-              placeholder="Serial o S/N del equipo"
+              placeholder="Código, serial o nombre"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
             />
-
-            <button
-              type="submit"
-              className="btn-crear"
-              disabled={!busqueda || buscando}
-            >
+            <button type="submit" disabled={buscando}>
               {buscando ? "Buscando..." : "Buscar"}
             </button>
-          </form>
+          </div>
 
-          {mensaje && <p className="form-msg">{mensaje}</p>}
-        </section>
+          {mensaje && <div className="alert error">{mensaje}</div>}
+        </form>
 
-        {/* ============================= */}
         {/* EQUIPO ENCONTRADO */}
-        {/* ============================= */}
         {equipo && (
-          <section className="panel-card">
+          <div className="card equipo-card success">
             <h3>Equipo encontrado</h3>
 
-            <div className="info-grid">
-              <p><strong>Serial:</strong> {equipo.serial}</p>
-              <p><strong>S/N:</strong> {equipo.sn}</p>
-              <p><strong>Marca:</strong> {equipo.marca || "—"}</p>
-              <p><strong>Modelo:</strong> {equipo.modelo || "—"}</p>
-              <p><strong>Estado actual:</strong> {equipo.estado}</p>
+            <div className="equipo-grid">
+              <span><b>Serial:</b> {equipo.serial}</span>
+              <span><b>S/N:</b> {equipo.sn}</span>
+              <span><b>Marca:</b> {equipo.marca}</span>
+              <span><b>Modelo:</b> {equipo.modelo}</span>
+              <span><b>Estado:</b> {equipo.estado}</span>
             </div>
-          </section>
+          </div>
         )}
 
-        {/* ============================= */}
-        {/* REGISTRAR REPARACIÓN */}
-        {/* ============================= */}
+        {/* FORMULARIO */}
         {equipo && (
-          <section className="panel-card">
+          <form className="card form-card" onSubmit={guardarReparacion}>
             <h3>Registrar reparación / mantenimiento</h3>
 
             <div className="form-grid">
               <select
-                value={reparacion.tipo}
-                onChange={(e) =>
-                  setReparacion({ ...reparacion, tipo: e.target.value })
-                }
+                value={form.tipo}
+                onChange={(e) => setForm({ ...form, tipo: e.target.value })}
               >
-                <option value="reparacion">Reparación</option>
-                <option value="mantenimiento">Mantenimiento</option>
+                <option>Reparación</option>
+                <option>Mantenimiento</option>
               </select>
 
               <input
-                type="text"
                 placeholder="Técnico responsable"
-                value={reparacion.tecnico}
-                onChange={(e) =>
-                  setReparacion({ ...reparacion, tecnico: e.target.value })
-                }
+                value={form.tecnico}
+                onChange={(e) => setForm({ ...form, tecnico: e.target.value })}
               />
 
               <textarea
                 placeholder="Diagnóstico"
-                value={reparacion.diagnostico}
-                onChange={(e) =>
-                  setReparacion({ ...reparacion, diagnostico: e.target.value })
-                }
+                value={form.diagnostico}
+                onChange={(e) => setForm({ ...form, diagnostico: e.target.value })}
               />
 
               <textarea
                 placeholder="Acciones realizadas"
-                value={reparacion.acciones}
-                onChange={(e) =>
-                  setReparacion({ ...reparacion, acciones: e.target.value })
-                }
+                value={form.acciones}
+                onChange={(e) => setForm({ ...form, acciones: e.target.value })}
               />
 
               <input
                 type="date"
-                value={reparacion.fecha}
-                onChange={(e) =>
-                  setReparacion({ ...reparacion, fecha: e.target.value })
-                }
+                value={form.fecha}
+                onChange={(e) => setForm({ ...form, fecha: e.target.value })}
               />
 
               <select
-                value={reparacion.estado_final}
+                value={form.estadoFinal}
                 onChange={(e) =>
-                  setReparacion({ ...reparacion, estado_final: e.target.value })
+                  setForm({ ...form, estadoFinal: e.target.value })
                 }
               >
-                <option value="operativo">Operativo</option>
-                <option value="en_reparacion">En reparación</option>
-                <option value="baja">Baja</option>
+                <option>Operativo</option>
+                <option>En reparación</option>
+                <option>Fuera de servicio</option>
               </select>
-
-              <button
-                className="btn-crear full"
-                onClick={guardarReparacion}
-              >
-                Guardar reparación
-              </button>
             </div>
-          </section>
+
+            <button className="btn-primary" type="submit">
+              Guardar reparación
+            </button>
+          </form>
         )}
 
         <footer className="admin-legal">
