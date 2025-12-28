@@ -630,7 +630,7 @@ app.get("/api/equipos/en-proceso", auth, async (req, res) => {
 });
 
 // -------------------------------------------------------------
-//                     🟢    LISTAR RESUMEN-ESTADOS
+//                     🟢    LISTAR ESTADOS
 // -------------------------------------------------------------
 
 app.get("/api/equipos/resumen-estados", auth, async (req, res) => {
@@ -639,6 +639,7 @@ app.get("/api/equipos/resumen-estados", auth, async (req, res) => {
       SELECT es.nombre, COUNT(*) AS total
       FROM equipos e
       JOIN estados es ON e.estado_id = es.id
+      WHERE es.nombre IN ('Reparación','Mantenimiento')
       GROUP BY es.nombre
     `);
 
