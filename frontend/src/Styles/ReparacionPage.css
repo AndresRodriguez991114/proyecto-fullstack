@@ -24,6 +24,7 @@
   border-radius: 10px;
   border: 1px solid #d0d5dd;
   font-size: 14px;
+  font-family: inherit;
 }
 
 .search-row button {
@@ -84,6 +85,7 @@
   border-radius: 10px;
   border: 1px solid #d0d5dd;
   font-size: 14px;
+  font-family: inherit;
 }
 
 .form-grid textarea {

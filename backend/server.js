@@ -177,7 +177,7 @@ app.get("/api/equipos", auth, async (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 🟢 BUSCAR EQUIPO POR SERIAL O SN (PROTEGIDO)
+// 🟢 BUSCAR EQUIPO POR SERIAL O S/N (PROTEGIDO)
 // -------------------------------------------------------------
 app.get("/api/equipos/buscar/:valor", auth, async (req, res) => {
   try {
@@ -453,13 +453,13 @@ app.put("/api/usuarios/:id", auth, async (req, res) => {
 });
 
 // -------------------------------------------------------------
-//     🔴 ELIMINAR USUARIO (PROTEGIDO)
+//     🟢 ELIMINAR USUARIO (PROTEGIDO)
 // -------------------------------------------------------------
 app.delete("/api/usuarios/:id", auth, async (req, res) => {
   try {
     const { id } = req.params;
 
-    // 1️⃣ Verificar si el usuario existe
+    // Verificar si el usuario existe
     const check = await pool.query(
       "SELECT id, rol FROM usuarios WHERE id = $1",
       [id]
@@ -471,12 +471,12 @@ app.delete("/api/usuarios/:id", auth, async (req, res) => {
 
     const user = check.rows[0];
 
-    // 2️⃣ Prohibir borrar administradores
+    // Prohibir borrar administradores
     if (user.rol === "administrador") {
       return res.status(403).json({ error: "No puedes eliminar un administrador" });
     }
 
-    // 3️⃣ Eliminar
+    // Eliminar
     await pool.query("DELETE FROM usuarios WHERE id = $1", [id]);
 
     res.json({ msg: "Usuario eliminado correctamente" });
@@ -539,7 +539,60 @@ app.get("/api/departamentos", auth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-    
+
+// -------------------------------------------------------------
+// 🟢 REGISTRAR REPARACIÓN / MANTENIMIENTO (HISTORIAL)
+// -------------------------------------------------------------
+app.post("/api/reparaciones", auth, async (req, res) => {
+  try {
+    const {
+      equipoId,
+      tipo,
+      diagnostico,
+      acciones,
+      fecha,
+      estadoFinal
+    } = req.body;
+
+    if (!equipoId || !tipo) {
+      return res.status(400).json({ error: "Datos incompletos" });
+    }
+
+    const comentario = `
+Diagnóstico: ${diagnostico || "N/A"}
+Acciones: ${acciones || "N/A"}
+Estado final: ${estadoFinal || "N/A"}
+    `.trim();
+
+    // 1️⃣ Insertar en historial
+    await pool.query(
+      `INSERT INTO historial (equipo_id, usuario_id, accion, fecha, comentario)
+       VALUES ($1,$2,$3,$4,$5)`,
+      [
+        equipoId,
+        req.user.id,      // 👈 del token
+        tipo,
+        fecha || new Date(),
+        comentario
+      ]
+    );
+
+    // 2️⃣ Actualizar estado del equipo
+    if (estadoFinal) {
+      await pool.query(
+        `UPDATE equipos SET estado = $1 WHERE id = $2`,
+        [estadoFinal.toLowerCase(), equipoId]
+      );
+    }
+
+    res.status(201).json({ msg: "Reparación registrada correctamente" });
+
+  } catch (err) {
+    console.error("❌ Error guardando reparación:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 // -------------------------------------------------------------
 //                     🟢    PUERTO
