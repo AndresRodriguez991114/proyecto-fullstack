@@ -643,11 +643,6 @@ app.get("/api/equipos/resumen-estados", auth, async (req, res) => {
       GROUP BY es.nombre
     `);
 
-    res.json(r.rows.map(row => ({
-      nombre: row.nombre,
-      total: parseInt(row.total, 10) 
-    })));
-
     res.json(r.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
