@@ -148,7 +148,6 @@ app.get("/api/equipos", auth, async (req, res) => {
         e.id,
         e.serial,
         e.sn,
-        e.estado,
         e.fecha_ingreso,
         e.proveedor,
         e.observaciones,
@@ -159,12 +158,14 @@ app.get("/api/equipos", auth, async (req, res) => {
         e.modelo_id,
         e.departamento_id,
         e.usuario_asignado AS usuario_id,
+        e.estado_id,
 
         -- Nombres para mostrar
         t.nombre  AS tipo,
         m.nombre  AS marca,
         mo.nombre AS modelo,
         d.nombre  AS departamento,
+        es.nombre AS estado,
 
         u.nombre AS usuario_nombre,
         u.email  AS usuario_email
@@ -175,6 +176,7 @@ app.get("/api/equipos", auth, async (req, res) => {
       LEFT JOIN modelos mo ON e.modelo_id = mo.id
       LEFT JOIN departamentos d ON e.departamento_id = d.id
       LEFT JOIN usuarios u ON e.usuario_asignado = u.id
+      LEFT JOIN estados es ON e.estado_id = es.id
       ORDER BY e.id ASC;
     `;
 
@@ -203,7 +205,8 @@ app.get("/api/equipos/buscar/:valor", auth, async (req, res) => {
         e.id,
         e.serial,
         e.sn,
-        e.estado,
+        e.estado_id,
+        es.nombre AS estado
         e.fecha_ingreso,
         e.proveedor,
         e.observaciones,
@@ -228,6 +231,7 @@ app.get("/api/equipos/buscar/:valor", auth, async (req, res) => {
       LEFT JOIN tipos_de_equipos t ON e.tipo_id = t.id
       LEFT JOIN marcas m ON e.marca_id = m.id
       LEFT JOIN modelos mo ON e.modelo_id = mo.id
+      LEFT JOIN estados es ON e.estado_id = es.id
       LEFT JOIN departamentos d ON e.departamento_id = d.id
       LEFT JOIN usuarios u ON e.usuario_asignado = u.id
       WHERE e.serial ILIKE $1 OR e.sn ILIKE $1
