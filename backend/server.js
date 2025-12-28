@@ -580,9 +580,9 @@ app.post("/api/reparaciones", auth, async (req, res) => {
     // 1️⃣ Guardar en historial
     await pool.query(
       `INSERT INTO historial 
-        (equipo_id, accion, comentario, estado_final_id, acciones, diagnostico)
-       VALUES ($1, 'REPARACION', NULL, $2, $3, $4)`,
-      [equipoId, estadoFinalId, acciones, diagnostico]
+        (equipo_id, usuario_id, accion, comentario, estado_final_id, acciones, diagnostico)
+       VALUES ($1, $2, 'REPARACION', NULL, $3, $4, $5)`,
+      [equipoId, req.user.id, estadoFinalId, acciones, diagnostico]
     );
 
     // 2️⃣ Actualizar estado actual del equipo
