@@ -273,7 +273,7 @@ app.post("/api/equipos", auth, async (req, res) => {
     } = req.body;
 
     // VALIDACIONES BÁSICAS
-    if (!serial || !sn ) {
+    if (!serial || !sn || !estado_id) {
       return res.status(400).json({
         error: "serial, sn y estado son obligatorios"
       });

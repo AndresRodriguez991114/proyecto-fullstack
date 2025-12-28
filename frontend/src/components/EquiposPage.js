@@ -18,7 +18,7 @@ const EquiposPage = () => {
   const [equipoDetalle, setEquipoDetalle] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [equipoToDelete, setEquipoToDelete] = useState(null);
-
+  const [estados, setEstados] = useState([]);
 
   // Formulario real
   const [nuevoEquipo, setNuevoEquipo] = useState({
@@ -27,7 +27,7 @@ const EquiposPage = () => {
     tipo_id: "",
     marca_id: "",
     modelo_id: "",
-    estado: "activo",
+    estado_id: "",
     usuario_asignado: null,
     departamento_id: null,
     proveedor: "",
@@ -46,6 +46,20 @@ const EquiposPage = () => {
     fetchEquipos();
     fetchListas();
   }, []);
+
+  useEffect(() => {
+    const cargarEstados = async () => {
+      try {
+        const res = await api.get("/estados");
+        setEstados(res.data);
+      } catch (err) {
+        console.error("❌ Error cargando estados", err);
+      }
+    };
+
+    cargarEstados();
+  }, []);
+
 
   const fetchEquipos = async () => {
     setLoading(true);
@@ -105,7 +119,7 @@ const EquiposPage = () => {
         tipo_id: "",
         marca_id: "",
         modelo_id: "",
-        estado: "activo",
+        estado_id: "",
         usuario_asignado: null,
         departamento_id: null,
         proveedor: "",
@@ -144,7 +158,7 @@ const EquiposPage = () => {
     tipo_id: equipo.tipo_id ?? "",
     marca_id: equipo.marca_id ?? "",
     modelo_id: equipo.modelo_id ?? "",
-    estado: equipo.estado ?? "activo",
+    estado_id: equipo.estado_id ?? "",
     fecha_ingreso: equipo.fecha_ingreso
       ? equipo.fecha_ingreso.slice(0, 10)
       : "",
@@ -193,7 +207,7 @@ const validarFormulario = () => {
     return false;
   }
 
-  if (!nuevoEquipo.estado) {
+  if (!nuevoEquipo.estado_id) {
     setFormError("Debe seleccionar un estado");
     return false;
   }
@@ -381,12 +395,15 @@ const validarFormulario = () => {
                 />
 
                 <select
-                  value={nuevoEquipo.estado}
-                  onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, estado: e.target.value })}
+                  value={nuevoEquipo.estado_id}
+                  onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, estado_id: e.target.value })}
                 >
-                  <option value="activo">Activo</option>
-                  <option value="mantenimiento">Mantenimiento</option>
-                  <option value="retirado">Retirado</option>
+                  <option value="">Seleccione estado</option>
+                  {estados.map((e) => (
+                    <option key={e.id} value={e.id}>
+                      {e.nombre}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -451,7 +468,7 @@ const validarFormulario = () => {
                 <p><strong>S/N:</strong> {equipoDetalle.sn}</p>
 
                 <p><strong>Estado:</strong> {equipoDetalle.estado}</p>
-                <p><strong>Fecha Ingreso:</strong> 
+                <p><strong>Fecha Ingreso: </strong> 
                   {new Date(equipoDetalle.fecha_ingreso).toLocaleDateString()}
                 </p>
                 <p>
@@ -552,5 +569,4 @@ const validarFormulario = () => {
     </div>
   );
 };
-
 export default EquiposPage;
