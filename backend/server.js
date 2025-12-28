@@ -639,7 +639,7 @@ app.get("/api/equipos/resumen-estados", auth, async (req, res) => {
       SELECT es.nombre, COUNT(*) AS total
       FROM equipos e
       JOIN estados es ON e.estado_id = es.id
-      WHERE es.nombre IN ('Reparación','Mantenimiento')
+      WHERE es.nombre IN ('Reparacion','Mantenimiento')
       GROUP BY es.nombre
     `);
 
