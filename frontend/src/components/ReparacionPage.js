@@ -22,7 +22,7 @@ const ReparacionPage = () => {
 
   const verHistorial = async (equipo) => {
     try {
-      const res = await api.get(`/historial/${equipo.id}`); // Asegúrate que el endpoint exista
+      const res = await api.get(`/historial/${equipo.id}`);
       setEquipoHistorial(res.data);
       setModalHistorialOpen(true);
     } catch (err) {
@@ -259,6 +259,54 @@ const ReparacionPage = () => {
               </tbody>
             </table>
          </section>
+        )}
+
+        {modalHistorialOpen && (
+          <div className="equipos-overlay">
+            <div className="equipos-modal">
+              <h2>Historial del equipo</h2>
+
+              <div style={{ maxHeight: "300px", overflowY: "auto" }}>
+                {equipoHistorial.length === 0 ? (
+                  <p>No hay historial disponible.</p>
+                ) : (
+                  <table className="tabla-admin">
+                    <thead>
+                      <tr>
+                        <th>Fecha</th>
+                        <th>Acción</th>
+                        <th>Usuario</th>
+                        <th>Diagnóstico</th>
+                        <th>Acciones</th>
+                        <th>Estado final</th>
+                        <th>Comentario</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {equipoHistorial.map((h) => (
+                        <tr key={h.id}>
+                          <td>{new Date(h.fecha).toLocaleString()}</td>
+                          <td>{h.accion}</td>
+                          <td>{h.usuario || h.usuario_id}</td>
+                          <td>{h.diagnostico}</td>
+                          <td>{h.acciones}</td>
+                          <td>{h.estado_final}</td>
+                          <td>{h.comentario}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+
+              <button
+                className="equipos-btn-close"
+                onClick={() => setModalHistorialOpen(false)}
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
         )}
 
         {/* EQUIPO ENCONTRADO */}

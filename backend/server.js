@@ -618,7 +618,7 @@ app.get("/api/equipos/en-proceso", auth, async (req, res) => {
       LEFT JOIN tipos_de_equipos te ON e.tipo_id = te.id
       LEFT JOIN marcas ma ON e.marca_id = ma.id
       LEFT JOIN modelos mo ON e.modelo_id = mo.id
-      WHERE es.nombre IN ('Reparación', 'Mantenimiento')
+      WHERE es.nombre IN ('Reparacion', 'Mantenimiento')
       ORDER BY e.id DESC
     `);
 
