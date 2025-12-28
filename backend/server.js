@@ -206,7 +206,7 @@ app.get("/api/equipos/buscar/:valor", auth, async (req, res) => {
         e.serial,
         e.sn,
         e.estado_id,
-        es.nombre AS estado
+        es.nombre AS estado,
         e.fecha_ingreso,
         e.proveedor,
         e.observaciones,
