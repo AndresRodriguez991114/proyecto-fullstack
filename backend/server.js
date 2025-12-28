@@ -648,6 +648,37 @@ app.get("/api/equipos/resumen-estados", auth, async (req, res) => {
   }
 });
 
+// -------------------------------------------------------------
+//                🟢 LISTAR HISTORIAL DE UN EQUIPO
+// -------------------------------------------------------------
+app.get("/api/historial/:equipoId", auth, async (req, res) => {
+  const { equipoId } = req.params;
+
+  try {
+    const r = await pool.query(`
+      SELECT 
+        h.id,
+        h.accion,
+        h.fecha,
+        h.comentario,
+        h.acciones,
+        h.diagnostico,
+        es.nombre AS estado_final,
+        u.nombre AS usuario
+      FROM historial h
+      LEFT JOIN estados es ON h.estado_final_id = es.id
+      LEFT JOIN usuarios u ON h.usuario_id = u.id
+      WHERE h.equipo_id = $1
+      ORDER BY h.fecha DESC
+    `, [equipoId]);
+
+    res.json(r.rows);
+  } catch (err) {
+    console.error("❌ Error cargando historial:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 // -------------------------------------------------------------
 //                     🟢    PUERTO

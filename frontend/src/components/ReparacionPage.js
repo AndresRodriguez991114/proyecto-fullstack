@@ -16,6 +16,20 @@ const ReparacionPage = () => {
   const [estados, setEstados] = useState([]);
   const [equiposEnProceso, setEquiposEnProceso] = useState([]);
   const [mostrarLista, setMostrarLista] = useState(true);
+  const [equipoHistorial, setEquipoHistorial] = useState([]);
+  const [modalHistorialOpen, setModalHistorialOpen] = useState(false);
+
+
+  const verHistorial = async (equipo) => {
+    try {
+      const res = await api.get(`/historial/${equipo.id}`); // Asegúrate que el endpoint exista
+      setEquipoHistorial(res.data);
+      setModalHistorialOpen(true);
+    } catch (err) {
+      console.error("Error cargando historial:", err);
+      setToast({ show: true, type: "error", message: "Error cargando historial" });
+    }
+  };
 
   const [form, setForm] = useState({
     tipo: "Reparación",
@@ -199,10 +213,10 @@ const ReparacionPage = () => {
         </form>
 
         {mostrarLista && equiposEnProceso.length > 0 && (
-          <div className="card">
-            <h3>Equipos en reparación / mantenimiento</h3>
+          <section className="tabla-contenedor panel-slide">
+            <h3>Equipos en Reparación / Mantenimiento</h3>
 
-            <table className="tabla-equipos">
+            <table className="tabla-admin">
               <thead>
                 <tr>
                   <th>ID</th>
@@ -212,6 +226,7 @@ const ReparacionPage = () => {
                   <th>Marca</th>
                   <th>Modelo</th>
                   <th>Estado</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -224,11 +239,26 @@ const ReparacionPage = () => {
                     <td>{eq.marca}</td>
                     <td>{eq.modelo}</td>
                     <td>{eq.estado}</td>
+                    <td className="acciones-col">
+                      <button
+                        className="btn-small btn-view"
+                        title="Ver historial"
+                        onClick={() => verHistorial(eq)}
+                      >
+                        <i>
+                      <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 1.75a10.25 10.25 0 1010.25 10.25A10.262 10.262 0 0012 1.75zM12 
+                        20.25a8.25 8.25 0 118.25-8.25A8.26 8.26 0 0112 20.25z"/>
+                        <path d="M12 6.75a.75.75 0 00-.75.75v4.5l3.25 1.95a.75.75 0 10.75-1.3l-2.75-1.65V7.5A.75.75 0 0012 6.75z"/>
+                      </svg>
+                        </i>
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
+         </section>
         )}
 
         {/* EQUIPO ENCONTRADO */}
