@@ -124,6 +124,21 @@ app.post("/api/usuarios", async (req, res) => {
 });
 
 // -------------------------------------------------------------
+//     🟢 LISTAR ESTADOS (PROTEGIDO)
+// -------------------------------------------------------------
+app.get("/api/estados", auth, async (req, res) => {
+  try {
+    const r = await pool.query(
+      "SELECT id, nombre FROM estados ORDER BY id ASC"
+    );
+    res.json(r.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// -------------------------------------------------------------
 //     🟢 LISTAR EQUIPOS (PROTEGIDO)
 // -------------------------------------------------------------
 app.get("/api/equipos", auth, async (req, res) => {
@@ -547,52 +562,38 @@ app.post("/api/reparaciones", auth, async (req, res) => {
   try {
     const {
       equipoId,
-      tipo,
-      diagnostico,
+      estadoFinalId,
       acciones,
-      fecha,
-      estadoFinal
+      diagnostico
     } = req.body;
 
-    if (!equipoId || !tipo) {
-      return res.status(400).json({ error: "Datos incompletos" });
+    if (!equipoId || !estadoFinalId) {
+      return res.status(400).json({
+        error: "equipoId y estadoFinalId son obligatorios"
+      });
     }
 
-    const comentario = `
-Diagnóstico: ${diagnostico || "N/A"}
-Acciones: ${acciones || "N/A"}
-Estado final: ${estadoFinal || "N/A"}
-    `.trim();
-
-    // 1️⃣ Insertar en historial
+    // 1️⃣ Guardar en historial
     await pool.query(
-      `INSERT INTO historial (equipo_id, usuario_id, accion, fecha, comentario)
-       VALUES ($1,$2,$3,$4,$5)`,
-      [
-        equipoId,
-        req.user.id,      // 👈 del token
-        tipo,
-        fecha || new Date(),
-        comentario
-      ]
+      `INSERT INTO historial 
+        (equipo_id, accion, comentario, estado_final_id, acciones, diagnostico)
+       VALUES ($1, 'REPARACION', NULL, $2, $3, $4)`,
+      [equipoId, estadoFinalId, acciones, diagnostico]
     );
 
-    // 2️⃣ Actualizar estado del equipo
-    if (estadoFinal) {
-      await pool.query(
-        `UPDATE equipos SET estado = $1 WHERE id = $2`,
-        [estadoFinal.toLowerCase(), equipoId]
-      );
-    }
+    // 2️⃣ Actualizar estado actual del equipo
+    await pool.query(
+      "UPDATE equipos SET estado_id = $1 WHERE id = $2",
+      [estadoFinalId, equipoId]
+    );
 
-    res.status(201).json({ msg: "Reparación registrada correctamente" });
+    res.json({ msg: "Reparación registrada correctamente" });
 
   } catch (err) {
-    console.error("❌ Error guardando reparación:", err);
+    console.error("❌ Error creando reparación:", err);
     res.status(500).json({ error: err.message });
   }
 });
-
 
 // -------------------------------------------------------------
 //                     🟢    PUERTO

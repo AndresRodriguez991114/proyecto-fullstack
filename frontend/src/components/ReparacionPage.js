@@ -50,9 +50,13 @@ const ReparacionPage = () => {
 
     try {
       await api.post("/reparaciones", {
-        equipoId: equipo.id,
-        ...form,
-      });
+      equipoId: equipo.id,
+      tipo: form.tipo,
+      diagnostico: form.diagnostico,
+      acciones: form.acciones,
+      fecha: form.fecha,
+      estadoFinal: form.estadoFinal
+    });
 
       alert("✅ Reparación / mantenimiento registrado");
       setForm({
