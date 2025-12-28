@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../módulos/Sidebar";
 import Header from "../módulos/Header";
 import api from "../api";
 import "../Styles/ReparacionPage.css";
+
 
 const ReparacionPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -12,6 +13,7 @@ const ReparacionPage = () => {
   const [equipo, setEquipo] = useState(null);
   const [mensaje, setMensaje] = useState("");
   const [buscando, setBuscando] = useState(false);
+  const [estados, setEstados] = useState([]);
 
   const [form, setForm] = useState({
     tipo: "Reparación",
@@ -19,7 +21,7 @@ const ReparacionPage = () => {
     diagnostico: "",
     acciones: "",
     fecha: new Date().toISOString().slice(0, 10),
-    estadoFinal: "Operativo",
+    estadoFinalId: "",
   });
 
   const buscarEquipo = async (e) => {
@@ -44,18 +46,37 @@ const ReparacionPage = () => {
     }
   };
 
+  useEffect(() => {
+    const cargarEstados = async () => {
+      try {
+        const res = await api.get("/estados");
+        setEstados(res.data);
+      } catch (err) {
+        console.error("Error cargando estados", err);
+      }
+    };
+
+    cargarEstados();
+  }, []);
+
   const guardarReparacion = async (e) => {
     e.preventDefault();
-    if (!equipo) return alert("Primero debes seleccionar un equipo");
+    if (!equipo) {
+      alert("Primero debes seleccionar un equipo");
+      return;
+    }
+
+    if (!form.estadoFinalId) {
+      alert("Selecciona el estado final del equipo");
+      return;
+    }
 
     try {
-      await api.post("/reparaciones", {
+    await api.post("/reparaciones", {
       equipoId: equipo.id,
-      tipo: form.tipo,
-      diagnostico: form.diagnostico,
+      estadoFinalId: form.estadoFinalId,
       acciones: form.acciones,
-      fecha: form.fecha,
-      estadoFinal: form.estadoFinal
+      diagnostico: form.diagnostico
     });
 
       alert("✅ Reparación / mantenimiento registrado");
@@ -65,7 +86,7 @@ const ReparacionPage = () => {
         diagnostico: "",
         acciones: "",
         fecha: new Date().toISOString().slice(0, 10),
-        estadoFinal: "Operativo",
+        estadoFinalId: ""
       });
     } catch (err) {
       alert("❌ Error al guardar");
@@ -156,15 +177,20 @@ const ReparacionPage = () => {
               />
 
               <select
-                value={form.estadoFinal}
-                onChange={(e) =>
-                  setForm({ ...form, estadoFinal: e.target.value })
-                }
-              >
-                <option>Operativo</option>
-                <option>En reparación</option>
-                <option>Fuera de servicio</option>
-              </select>
+              value={form.estadoFinalId}
+              onChange={(e) =>
+                setForm({ ...form, estadoFinalId: e.target.value })
+              }
+              required
+            >
+              <option value="">Estado final</option>
+
+              {estados.map((e) => (
+                <option key={e.id} value={e.id}>
+                  {e.nombre}
+                </option>
+              ))}
+            </select>
             </div>
 
             <button className="btn-primary" type="submit">
