@@ -263,7 +263,7 @@ const ReparacionPage = () => {
 
         {modalHistorialOpen && (
           <div className="equipos-overlay">
-            <div className="equipos-modal">
+            <div className="equipos-modal-historial">
               <h2>Historial del equipo</h2>
 
               <div style={{ maxHeight: "300px", overflowY: "auto" }}>
@@ -300,7 +300,7 @@ const ReparacionPage = () => {
               </div>
 
               <button
-                className="equipos-btn-close"
+                className="historial-btn-close"
                 onClick={() => setModalHistorialOpen(false)}
               >
                 Cerrar

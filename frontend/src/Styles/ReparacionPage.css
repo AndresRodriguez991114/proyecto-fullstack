@@ -229,3 +229,57 @@
     transform: translateX(0);
   }
 }
+
+.equipos-modal-historial {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  padding: 30px;
+  width: min(92%, 900px);
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: 14px;
+  color: var(--text);
+  backdrop-filter: blur(12px);
+  animation: popEquipos 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+@keyframes popEquipos {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.equipos-modal-historial h2 {
+  margin-bottom: 5px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.equipos-modal-historial input,
+.equipos-modal-historial select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text);
+  width: 100%;
+}
+.historial-btn-close {
+  padding: 15px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+  display: block;     
+  margin: 20px auto 0 auto; 
+  transition: 0.2s ease;
+}
+
+.historial-btn-close:hover {
+  background: rgba(255, 255, 255, 0.516);
+}
+
+
