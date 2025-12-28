@@ -261,8 +261,8 @@ app.post("/api/equipos", auth, async (req, res) => {
     const {
       serial,
       sn,
-      estado,
-      fecha_ingreso,      // opcional (si no viene, Postgres usa CURRENT_DATE)
+      estado_id,
+      fecha_ingreso,   
       tipo_id,
       marca_id,
       modelo_id,
@@ -273,7 +273,7 @@ app.post("/api/equipos", auth, async (req, res) => {
     } = req.body;
 
     // VALIDACIONES BÁSICAS
-    if (!serial || !sn || !estado) {
+    if (!serial || !sn || !estado_id) {
       return res.status(400).json({
         error: "serial, sn y estado son obligatorios"
       });
@@ -282,7 +282,7 @@ app.post("/api/equipos", auth, async (req, res) => {
     // Insertar en base de datos
     const query = `
       INSERT INTO equipos 
-        (serial, sn, estado, fecha_ingreso, tipo_id, marca_id, modelo_id, departamento_id, usuario_asignado, proveedor , observaciones)
+        (serial, sn, estado_id, fecha_ingreso, tipo_id, marca_id, modelo_id, departamento_id, usuario_asignado, proveedor , observaciones)
       VALUES 
         ($1,$2,$3,COALESCE($4, CURRENT_DATE),$5,$6,$7,$8,$9,$10,$11)
       RETURNING *;
@@ -291,7 +291,7 @@ app.post("/api/equipos", auth, async (req, res) => {
     const values = [
       serial,
       sn,
-      estado,
+      estado_id,
       fecha_ingreso || null,
       tipo_id || null,
       marca_id || null,
@@ -337,7 +337,7 @@ app.put("/api/equipos/:id", auth, async (req, res) => {
     const {
       serial,
       sn,
-      estado,
+      estado_id,
       fecha_ingreso,
       tipo_id,
       marca_id,
@@ -352,7 +352,7 @@ app.put("/api/equipos/:id", auth, async (req, res) => {
       UPDATE equipos
       SET serial = $1,
           sn = $2,
-          estado = $3,
+          estado_id = $3,
           fecha_ingreso = $4,
           tipo_id = $5,
           marca_id = $6,
@@ -368,7 +368,7 @@ app.put("/api/equipos/:id", auth, async (req, res) => {
     const values = [
       serial,
       sn,
-      estado,
+      estado_id,
       fecha_ingreso || null,
       tipo_id || null,
       marca_id || null,
