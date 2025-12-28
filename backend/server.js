@@ -600,6 +600,33 @@ app.post("/api/reparaciones", auth, async (req, res) => {
 });
 
 // -------------------------------------------------------------
+// 🟢 LISTAR EQUIPOS EN REPARACIÓN O MANTENIMIENTO
+// -------------------------------------------------------------
+app.get("/api/equipos/en-proceso", auth, async (req, res) => {
+  try {
+    const r = await pool.query(`
+      SELECT 
+        e.id,
+        e.serial,
+        e.sn,
+        e.tipo,
+        e.marca,
+        e.modelo,
+        es.nombre AS estado
+      FROM equipos e
+      JOIN estados es ON e.estado_id = es.id
+      WHERE es.nombre IN ('Reparación', 'Mantenimiento')
+      ORDER BY e.id DESC
+    `);
+
+    res.json(r.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------------
 //                     🟢    LISTAR RESUMEN-ESTADOS
 // -------------------------------------------------------------
 

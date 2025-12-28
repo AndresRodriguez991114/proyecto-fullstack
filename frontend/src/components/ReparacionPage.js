@@ -14,6 +14,8 @@ const ReparacionPage = () => {
   const [mensaje, setMensaje] = useState("");
   const [buscando, setBuscando] = useState(false);
   const [estados, setEstados] = useState([]);
+  const [equiposEnProceso, setEquiposEnProceso] = useState([]);
+  const [mostrarLista, setMostrarLista] = useState(true);
 
   const [form, setForm] = useState({
     tipo: "Reparación",
@@ -42,6 +44,7 @@ const ReparacionPage = () => {
     try {
       const res = await api.get(`/equipos/buscar/${busqueda}`);
       setEquipo(res.data);
+      setMostrarLista(false);
     } catch (err) {
       if (err.response?.status === 404) {
         setMensaje("❌ Equipo no encontrado. Puedes registrarlo antes de continuar.");
@@ -50,6 +53,15 @@ const ReparacionPage = () => {
       }
     } finally {
       setBuscando(false);
+    }
+  };
+
+  const cargarEquiposEnProceso = async () => {
+    try {
+      const res = await api.get("/equipos/en-proceso");
+      setEquiposEnProceso(res.data);
+    } catch (err) {
+      console.error("Error cargando equipos en reparación/mantenimiento", err);
     }
   };
 
@@ -64,17 +76,26 @@ const ReparacionPage = () => {
     };
 
     cargarEstados();
+    cargarEquiposEnProceso();
   }, []);
 
   const guardarReparacion = async (e) => {
     e.preventDefault();
     if (!equipo) {
-      alert("Primero debes seleccionar un equipo");
+      setToast({
+        show: true,
+        type: "error",
+        message: "Primero debes seleccionar un equipo"
+      });
       return;
     }
 
     if (!form.estadoFinalId) {
-      alert("Selecciona el estado final del equipo");
+      setToast({
+        show: true,
+        type: "error",
+        message: "Selecciona el estado final del equipo"
+      });
       return;
     }
 
@@ -86,20 +107,29 @@ const ReparacionPage = () => {
       diagnostico: form.diagnostico
     });
 
-    setToast({
-      show: true,
-      type: "success",
-      message: "Reparación registrada correctamente"
-    });
+    setToast({ show: false, type: "", message: "" });
+    setTimeout(() => {
+      setToast({
+        show: true,
+        type: "success",
+        message: "Reparación registrada correctamente"
+      });
+    }, 150);
 
     // ocultar solo después de 3 segundos
     setTimeout(() => {
       setToast({ show: false, type: "success", message: "" });
     }, 3000);
 
-      // 🔴 CERRAR FORMULARIO
+      // CERRAR FORMULARIO
       setEquipo(null);
       setBusqueda("");
+
+      // volver a mostrar la lista
+      setMostrarLista(true);
+
+      // refrescar equipos en reparación/mantenimiento
+      cargarEquiposEnProceso();
 
       // 🔄 RESET FORM
       setForm({
@@ -110,17 +140,12 @@ const ReparacionPage = () => {
         fecha: new Date().toISOString().slice(0, 10),
         estadoFinalId: ""
       });
-
-      setForm({
-        tipo: "Reparación",
-        tecnico: "",
-        diagnostico: "",
-        acciones: "",
-        fecha: new Date().toISOString().slice(0, 10),
-        estadoFinalId: ""
-      });
     } catch (err) {
-      alert("❌ Error al guardar");
+      setToast({
+        show: true,
+        type: "error",
+        message: "Error al guardar la reparación"
+      });
     }
   };
 
@@ -172,6 +197,39 @@ const ReparacionPage = () => {
 
           {mensaje && <div className="alert error">{mensaje}</div>}
         </form>
+
+        {mostrarLista && equiposEnProceso.length > 0 && (
+          <div className="card">
+            <h3>Equipos en reparación / mantenimiento</h3>
+
+            <table className="tabla-equipos">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Serial</th>
+                  <th>S/N</th>
+                  <th>Tipo</th>
+                  <th>Marca</th>
+                  <th>Modelo</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {equiposEnProceso.map((eq) => (
+                  <tr key={eq.id}>
+                    <td>{eq.id}</td>
+                    <td>{eq.serial}</td>
+                    <td>{eq.sn}</td>
+                    <td>{eq.tipo}</td>
+                    <td>{eq.marca}</td>
+                    <td>{eq.modelo}</td>
+                    <td>{eq.estado}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
         {/* EQUIPO ENCONTRADO */}
         {equipo && (
