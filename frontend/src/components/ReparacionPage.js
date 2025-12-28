@@ -24,6 +24,13 @@ const ReparacionPage = () => {
     estadoFinalId: "",
   });
 
+  const [toast, setToast] = useState({
+    show: false,
+    type: "success", // success | error
+    message: ""
+  });
+
+
   const buscarEquipo = async (e) => {
     e.preventDefault();
     if (!busqueda.trim()) return;
@@ -79,7 +86,31 @@ const ReparacionPage = () => {
       diagnostico: form.diagnostico
     });
 
-      alert("✅ Reparación / mantenimiento registrado");
+    setToast({
+      show: true,
+      type: "success",
+      message: "Reparación registrada correctamente"
+    });
+
+    // ocultar solo después de 3 segundos
+    setTimeout(() => {
+      setToast({ show: false, type: "success", message: "" });
+    }, 3000);
+
+      // 🔴 CERRAR FORMULARIO
+      setEquipo(null);
+      setBusqueda("");
+
+      // 🔄 RESET FORM
+      setForm({
+        tipo: "Reparación",
+        tecnico: "",
+        diagnostico: "",
+        acciones: "",
+        fecha: new Date().toISOString().slice(0, 10),
+        estadoFinalId: ""
+      });
+
       setForm({
         tipo: "Reparación",
         tecnico: "",
@@ -103,6 +134,25 @@ const ReparacionPage = () => {
           menuOpen={menuOpen}
           setMenuOpen={setMenuOpen}
         />
+
+        {toast.show && (
+          <div className={`toast-card ${toast.type}`}>
+            <div className="toast-content">
+              <strong>
+                {toast.type === "success" && "Success"}
+                {toast.type === "error" && "Error"}
+              </strong>
+              <p>{toast.message}</p>
+            </div>
+
+            <button
+              className="toast-close"
+              onClick={() => setToast({ show: false, type: "", message: "" })}
+            >
+              ×
+            </button>
+          </div>
+        )}
 
         {/* BUSCAR EQUIPO */}
         <form className="card search-card" onSubmit={buscarEquipo}>

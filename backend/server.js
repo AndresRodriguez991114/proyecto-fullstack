@@ -600,6 +600,26 @@ app.post("/api/reparaciones", auth, async (req, res) => {
 });
 
 // -------------------------------------------------------------
+//                     🟢    LISTAR RESUMEN-ESTADOS
+// -------------------------------------------------------------
+
+app.get("/api/equipos/resumen-estados", auth, async (req, res) => {
+  try {
+    const r = await pool.query(`
+      SELECT es.nombre, COUNT(*) AS total
+      FROM equipos e
+      JOIN estados es ON e.estado_id = es.id
+      GROUP BY es.nombre
+    `);
+
+    res.json(r.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// -------------------------------------------------------------
 //                     🟢    PUERTO
 // -------------------------------------------------------------
 const PORT = process.env.PORT || 3000;
