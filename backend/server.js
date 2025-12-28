@@ -609,19 +609,22 @@ app.get("/api/equipos/en-proceso", auth, async (req, res) => {
         e.id,
         e.serial,
         e.sn,
-        e.tipo,
-        e.marca,
-        e.modelo,
+        te.nombre AS tipo,
+        ma.nombre AS marca,
+        mo.nombre AS modelo,
         es.nombre AS estado
       FROM equipos e
       JOIN estados es ON e.estado_id = es.id
+      LEFT JOIN tipos_de_equipos te ON e.tipo_id = te.id
+      LEFT JOIN marcas ma ON e.marca_id = ma.id
+      LEFT JOIN modelos mo ON e.modelo_id = mo.id
       WHERE es.nombre IN ('Reparación', 'Mantenimiento')
       ORDER BY e.id DESC
     `);
 
     res.json(r.rows);
   } catch (err) {
-    console.error(err);
+    console.error("❌ Error en /equipos/en-proceso:", err);
     res.status(500).json({ error: err.message });
   }
 });
