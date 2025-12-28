@@ -642,7 +642,12 @@ app.get("/api/equipos/resumen-estados", auth, async (req, res) => {
       WHERE es.nombre IN ('Reparacion','Mantenimiento')
       GROUP BY es.nombre
     `);
-
+    
+    res.json(r.rows.map(row => ({
+      nombre: row.nombre,
+      total: parseInt(row.total, 10) // convertir a número
+    })));
+    
     res.json(r.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
