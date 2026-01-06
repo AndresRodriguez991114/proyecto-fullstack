@@ -6,6 +6,8 @@ import dns from "dns";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { auth } from "./middleware/auth.js";
+import reportesRoutes from "./routes/reportes.routes.js";
+
 
 dotenv.config();
 
@@ -29,7 +31,6 @@ const pool = new Pool({
 const app = express();
 app.use(cors());
 app.use(express.json());
-const reportesRoutes = require("./routes/reportes.routes");
 app.use("/api/reportes", reportesRoutes);
 
 
