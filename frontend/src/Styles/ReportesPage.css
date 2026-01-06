@@ -1,0 +1,88 @@
+/* ===============================
+   📊 REPORTES – ESTILO FINAL
+================================ */
+
+.reportes-section {
+  padding: 24px;
+  max-width: 900px;
+}
+
+/* Título principal */
+.reportes-section h2 {
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Card de cada reporte */
+.reporte-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+/* Título del reporte */
+.reporte-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #1f2d3d;
+}
+
+/* Contenedor de botones */
+.reporte-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Botón base */
+.btn-reporte {
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Excel */
+.btn-excel {
+  background-color: #2ecc71;
+  color: #fff;
+}
+
+.btn-excel:hover {
+  background-color: #27ae60;
+  transform: translateY(-2px);
+}
+
+/* PDF */
+.btn-pdf {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.btn-pdf:hover {
+  background-color: #c0392b;
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .reporte-actions {
+    flex-direction: column;
+  }
+
+  .btn-reporte {
+    width: 100%;
+  }
+}
