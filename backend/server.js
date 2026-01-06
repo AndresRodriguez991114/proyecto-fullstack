@@ -29,6 +29,9 @@ const pool = new Pool({
 const app = express();
 app.use(cors());
 app.use(express.json());
+const reportesRoutes = require("./routes/reportes.routes");
+app.use("/api/reportes", reportesRoutes);
+
 
 // -------------------------------------------------------------
 //              🟢 HEALTH CHECK (SIN AUTENTICACIÓN)
@@ -684,7 +687,6 @@ app.get("/api/historial/:equipoId", auth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
 
 // -------------------------------------------------------------
 //                     🟢    PUERTO
