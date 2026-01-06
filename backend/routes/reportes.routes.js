@@ -6,7 +6,7 @@ const auth = require("../middleware/auth");
 const generarExcel = require("../utils/generarExcel");
 const generarPDF = require("../utils/generarPDF");
 
-router.get("/general", auth, async (req, res) => {
+router.get("/general",/* auth, */async (req, res) => {
   const { formato } = req.query;
 
   const result = await pool.query(`
