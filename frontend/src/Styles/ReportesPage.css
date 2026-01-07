@@ -1,10 +1,11 @@
 /* ===============================
-   📊 REPORTES – ESTILO FINAL
+   📊 REPORTES 
 ================================ */
 
 .reportes-section {
   padding: 24px;
   max-width: 900px;
+  color: var(--text);
 }
 
 /* Título principal */
@@ -17,26 +18,28 @@
   gap: 10px;
 }
 
-/* Card de cada reporte */
+/* Card */
 .reporte-card {
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 18px 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 18px 22px;
+  margin-bottom: 22px;
+  backdrop-filter: blur(6px);
 }
 
 /* Título del reporte */
 .reporte-card h3 {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   margin-bottom: 14px;
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #1f2d3d;
+  color: var(--text);
+  opacity: 0.9;
 }
 
-/* Contenedor de botones */
+/* Acciones */
 .reporte-actions {
   display: flex;
   gap: 12px;
@@ -46,33 +49,37 @@
 /* Botón base */
 .btn-reporte {
   padding: 10px 22px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: 600;
   font-size: 0.95rem;
-  border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  transition: all 0.25s ease;
 }
 
 /* Excel */
 .btn-excel {
-  background-color: #2ecc71;
-  color: #fff;
+  border-color: #22c55e;
+  color: #22c55e;
 }
 
 .btn-excel:hover {
-  background-color: #27ae60;
+  background: #22c55e;
+  color: #fff;
   transform: translateY(-2px);
 }
 
 /* PDF */
 .btn-pdf {
-  background-color: #e74c3c;
-  color: #fff;
+  border-color: #ef4444;
+  color: #ef4444;
 }
 
 .btn-pdf:hover {
-  background-color: #c0392b;
+  background: #ef4444;
+  color: #fff;
   transform: translateY(-2px);
 }
 
