@@ -1,12 +1,18 @@
 // db.js
-const { Pool } = require('pg');
+import pg from "pg";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const { Pool } = pg;
 
 const pool = new Pool({
-  user: 'postgres.vsoroeoqjkfzuphiohgh',       // DB_USER
-  host: 'aws-1-us-east-1.pooler.supabase.com', // DB_HOST
-  database: 'postgres',                         // DB_NAME
-  password: '3133326141An',                     // DB_PASS
-  port: 5432,                                   // DB_PORT
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASS,
+  port: process.env.DB_PORT,
+  ssl: { rejectUnauthorized: false }
 });
 
-module.exports = pool;
+export default pool;

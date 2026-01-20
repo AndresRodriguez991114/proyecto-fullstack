@@ -40,7 +40,21 @@ useEffect(() => {
         equipos: equiposTotal
       }));
 
-      // 🔹 En cuanto me confirmes las rutas reales de equipos, clientes y reparaciones,
+      // 🔹 Obtener reparaciones y mantenimientos activos
+      const resEstados = await api.get("/equipos/resumen-estados");
+      let totalReparaciones = 0;
+      if (Array.isArray(resEstados.data)) {
+        resEstados.data.forEach(e => {
+          totalReparaciones += e.total;
+        });
+      }
+
+      setStats(prev => ({
+        ...prev,
+        reparaciones: totalReparaciones
+      })); 
+      
+      // 🔹 En cuanto me confirmes las rutas reales de clientes
       //     también las conecto igual de fácil.
 
     } catch (err) {

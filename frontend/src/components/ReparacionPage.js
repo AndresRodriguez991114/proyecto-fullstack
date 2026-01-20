@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../módulos/Sidebar";
 import Header from "../módulos/Header";
 import api from "../api";
 import "../Styles/ReparacionPage.css";
+
 
 const ReparacionPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -12,6 +13,23 @@ const ReparacionPage = () => {
   const [equipo, setEquipo] = useState(null);
   const [mensaje, setMensaje] = useState("");
   const [buscando, setBuscando] = useState(false);
+  const [estados, setEstados] = useState([]);
+  const [equiposEnProceso, setEquiposEnProceso] = useState([]);
+  const [mostrarLista, setMostrarLista] = useState(true);
+  const [equipoHistorial, setEquipoHistorial] = useState([]);
+  const [modalHistorialOpen, setModalHistorialOpen] = useState(false);
+
+
+  const verHistorial = async (equipo) => {
+    try {
+      const res = await api.get(`/historial/${equipo.id}`);
+      setEquipoHistorial(res.data);
+      setModalHistorialOpen(true);
+    } catch (err) {
+      console.error("Error cargando historial:", err);
+      setToast({ show: true, type: "error", message: "Error cargando historial" });
+    }
+  };
 
   const [form, setForm] = useState({
     tipo: "Reparación",
@@ -19,8 +37,15 @@ const ReparacionPage = () => {
     diagnostico: "",
     acciones: "",
     fecha: new Date().toISOString().slice(0, 10),
-    estadoFinal: "Operativo",
+    estadoFinalId: "",
   });
+
+  const [toast, setToast] = useState({
+    show: false,
+    type: "success", // success | error
+    message: ""
+  });
+
 
   const buscarEquipo = async (e) => {
     e.preventDefault();
@@ -33,6 +58,7 @@ const ReparacionPage = () => {
     try {
       const res = await api.get(`/equipos/buscar/${busqueda}`);
       setEquipo(res.data);
+      setMostrarLista(false);
     } catch (err) {
       if (err.response?.status === 404) {
         setMensaje("❌ Equipo no encontrado. Puedes registrarlo antes de continuar.");
@@ -44,27 +70,96 @@ const ReparacionPage = () => {
     }
   };
 
+  const cargarEquiposEnProceso = async () => {
+    try {
+      const res = await api.get("/equipos/en-proceso");
+      setEquiposEnProceso(res.data);
+    } catch (err) {
+      console.error("Error cargando equipos en reparación/mantenimiento", err);
+    }
+  };
+
+  useEffect(() => {
+    const cargarEstados = async () => {
+      try {
+        const res = await api.get("/estados");
+        setEstados(res.data);
+      } catch (err) {
+        console.error("Error cargando estados", err);
+      }
+    };
+
+    cargarEstados();
+    cargarEquiposEnProceso();
+  }, []);
+
   const guardarReparacion = async (e) => {
     e.preventDefault();
-    if (!equipo) return alert("Primero debes seleccionar un equipo");
+    if (!equipo) {
+      setToast({
+        show: true,
+        type: "error",
+        message: "Primero debes seleccionar un equipo"
+      });
+      return;
+    }
+
+    if (!form.estadoFinalId) {
+      setToast({
+        show: true,
+        type: "error",
+        message: "Selecciona el estado final del equipo"
+      });
+      return;
+    }
 
     try {
-      await api.post("/reparaciones", {
-        equipoId: equipo.id,
-        ...form,
-      });
+    await api.post("/reparaciones", {
+      equipoId: equipo.id,
+      estadoFinalId: form.estadoFinalId,
+      acciones: form.acciones,
+      diagnostico: form.diagnostico
+    });
 
-      alert("✅ Reparación / mantenimiento registrado");
+    setToast({ show: false, type: "", message: "" });
+    setTimeout(() => {
+      setToast({
+        show: true,
+        type: "success",
+        message: "Reparación registrada correctamente"
+      });
+    }, 150);
+
+    // ocultar solo después de 3 segundos
+    setTimeout(() => {
+      setToast({ show: false, type: "success", message: "" });
+    }, 3000);
+
+      // CERRAR FORMULARIO
+      setEquipo(null);
+      setBusqueda("");
+
+      // volver a mostrar la lista
+      setMostrarLista(true);
+
+      // refrescar equipos en reparación/mantenimiento
+      cargarEquiposEnProceso();
+
+      // 🔄 RESET FORM
       setForm({
         tipo: "Reparación",
         tecnico: "",
         diagnostico: "",
         acciones: "",
         fecha: new Date().toISOString().slice(0, 10),
-        estadoFinal: "Operativo",
+        estadoFinalId: ""
       });
     } catch (err) {
-      alert("❌ Error al guardar");
+      setToast({
+        show: true,
+        type: "error",
+        message: "Error al guardar la reparación"
+      });
     }
   };
 
@@ -78,6 +173,25 @@ const ReparacionPage = () => {
           menuOpen={menuOpen}
           setMenuOpen={setMenuOpen}
         />
+
+        {toast.show && (
+          <div className={`toast-card ${toast.type}`}>
+            <div className="toast-content">
+              <strong>
+                {toast.type === "success" && "Success"}
+                {toast.type === "error" && "Error"}
+              </strong>
+              <p>{toast.message}</p>
+            </div>
+
+            <button
+              className="toast-close"
+              onClick={() => setToast({ show: false, type: "", message: "" })}
+            >
+              ×
+            </button>
+          </div>
+        )}
 
         {/* BUSCAR EQUIPO */}
         <form className="card search-card" onSubmit={buscarEquipo}>
@@ -97,6 +211,103 @@ const ReparacionPage = () => {
 
           {mensaje && <div className="alert error">{mensaje}</div>}
         </form>
+
+        {mostrarLista && equiposEnProceso.length > 0 && (
+          <section className="tabla-contenedor panel-slide">
+            <h3>Equipos en Reparación / Mantenimiento</h3>
+
+            <table className="tabla-admin">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Serial</th>
+                  <th>S/N</th>
+                  <th>Tipo</th>
+                  <th>Marca</th>
+                  <th>Modelo</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {equiposEnProceso.map((eq) => (
+                  <tr key={eq.id}>
+                    <td>{eq.id}</td>
+                    <td>{eq.serial}</td>
+                    <td>{eq.sn}</td>
+                    <td>{eq.tipo}</td>
+                    <td>{eq.marca}</td>
+                    <td>{eq.modelo}</td>
+                    <td>{eq.estado}</td>
+                    <td className="acciones-col">
+                      <button
+                        className="btn-small btn-view"
+                        title="Ver historial"
+                        onClick={() => verHistorial(eq)}
+                      >
+                        <i>
+                      <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 1.75a10.25 10.25 0 1010.25 10.25A10.262 10.262 0 0012 1.75zM12 
+                        20.25a8.25 8.25 0 118.25-8.25A8.26 8.26 0 0112 20.25z"/>
+                        <path d="M12 6.75a.75.75 0 00-.75.75v4.5l3.25 1.95a.75.75 0 10.75-1.3l-2.75-1.65V7.5A.75.75 0 0012 6.75z"/>
+                      </svg>
+                        </i>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+         </section>
+        )}
+
+        {modalHistorialOpen && (
+          <div className="equipos-overlay">
+            <div className="equipos-modal-historial">
+              <h2>Historial del equipo</h2>
+
+              <div style={{ maxHeight: "300px", overflowY: "auto" }}>
+                {equipoHistorial.length === 0 ? (
+                  <p>No hay historial disponible.</p>
+                ) : (
+                  <table className="tabla-admin">
+                    <thead>
+                      <tr>
+                        <th>Fecha</th>
+                        <th>Acción</th>
+                        <th>Usuario</th>
+                        <th>Diagnóstico</th>
+                        <th>Acciones</th>
+                        <th>Estado final</th>
+                        <th>Comentario</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {equipoHistorial.map((h) => (
+                        <tr key={h.id}>
+                          <td>{new Date(h.fecha).toLocaleString()}</td>
+                          <td>{h.accion}</td>
+                          <td>{h.usuario || h.usuario_id}</td>
+                          <td>{h.diagnostico}</td>
+                          <td>{h.acciones}</td>
+                          <td>{h.estado_final}</td>
+                          <td>{h.comentario}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+
+              <button
+                className="historial-btn-close"
+                onClick={() => setModalHistorialOpen(false)}
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* EQUIPO ENCONTRADO */}
         {equipo && (
@@ -152,15 +363,20 @@ const ReparacionPage = () => {
               />
 
               <select
-                value={form.estadoFinal}
-                onChange={(e) =>
-                  setForm({ ...form, estadoFinal: e.target.value })
-                }
-              >
-                <option>Operativo</option>
-                <option>En reparación</option>
-                <option>Fuera de servicio</option>
-              </select>
+              value={form.estadoFinalId}
+              onChange={(e) =>
+                setForm({ ...form, estadoFinalId: e.target.value })
+              }
+              required
+            >
+              <option value="">Estado final</option>
+
+              {estados.map((e) => (
+                <option key={e.id} value={e.id}>
+                  {e.nombre}
+                </option>
+              ))}
+            </select>
             </div>
 
             <button className="btn-primary" type="submit">

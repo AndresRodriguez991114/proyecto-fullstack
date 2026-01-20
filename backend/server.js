@@ -6,6 +6,8 @@ import dns from "dns";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { auth } from "./middleware/auth.js";
+import reportesRoutes from "./routes/reportes.routes.js";
+
 
 dotenv.config();
 
@@ -29,6 +31,8 @@ const pool = new Pool({
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use("/api/reportes", reportesRoutes);
+
 
 // -------------------------------------------------------------
 //              🟢 HEALTH CHECK (SIN AUTENTICACIÓN)
@@ -124,6 +128,21 @@ app.post("/api/usuarios", async (req, res) => {
 });
 
 // -------------------------------------------------------------
+//     🟢 LISTAR ESTADOS (PROTEGIDO)
+// -------------------------------------------------------------
+app.get("/api/estados", auth, async (req, res) => {
+  try {
+    const r = await pool.query(
+      "SELECT id, nombre FROM estados ORDER BY id ASC"
+    );
+    res.json(r.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// -------------------------------------------------------------
 //     🟢 LISTAR EQUIPOS (PROTEGIDO)
 // -------------------------------------------------------------
 app.get("/api/equipos", auth, async (req, res) => {
@@ -133,7 +152,6 @@ app.get("/api/equipos", auth, async (req, res) => {
         e.id,
         e.serial,
         e.sn,
-        e.estado,
         e.fecha_ingreso,
         e.proveedor,
         e.observaciones,
@@ -144,12 +162,14 @@ app.get("/api/equipos", auth, async (req, res) => {
         e.modelo_id,
         e.departamento_id,
         e.usuario_asignado AS usuario_id,
+        e.estado_id,
 
         -- Nombres para mostrar
         t.nombre  AS tipo,
         m.nombre  AS marca,
         mo.nombre AS modelo,
         d.nombre  AS departamento,
+        es.nombre AS estado,
 
         u.nombre AS usuario_nombre,
         u.email  AS usuario_email
@@ -160,6 +180,7 @@ app.get("/api/equipos", auth, async (req, res) => {
       LEFT JOIN modelos mo ON e.modelo_id = mo.id
       LEFT JOIN departamentos d ON e.departamento_id = d.id
       LEFT JOIN usuarios u ON e.usuario_asignado = u.id
+      LEFT JOIN estados es ON e.estado_id = es.id
       ORDER BY e.id ASC;
     `;
 
@@ -177,7 +198,7 @@ app.get("/api/equipos", auth, async (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 🟢 BUSCAR EQUIPO POR SERIAL O SN (PROTEGIDO)
+// 🟢 BUSCAR EQUIPO POR SERIAL O S/N (PROTEGIDO)
 // -------------------------------------------------------------
 app.get("/api/equipos/buscar/:valor", auth, async (req, res) => {
   try {
@@ -188,7 +209,8 @@ app.get("/api/equipos/buscar/:valor", auth, async (req, res) => {
         e.id,
         e.serial,
         e.sn,
-        e.estado,
+        e.estado_id,
+        es.nombre AS estado,
         e.fecha_ingreso,
         e.proveedor,
         e.observaciones,
@@ -213,6 +235,7 @@ app.get("/api/equipos/buscar/:valor", auth, async (req, res) => {
       LEFT JOIN tipos_de_equipos t ON e.tipo_id = t.id
       LEFT JOIN marcas m ON e.marca_id = m.id
       LEFT JOIN modelos mo ON e.modelo_id = mo.id
+      LEFT JOIN estados es ON e.estado_id = es.id
       LEFT JOIN departamentos d ON e.departamento_id = d.id
       LEFT JOIN usuarios u ON e.usuario_asignado = u.id
       WHERE e.serial ILIKE $1 OR e.sn ILIKE $1
@@ -242,8 +265,8 @@ app.post("/api/equipos", auth, async (req, res) => {
     const {
       serial,
       sn,
-      estado,
-      fecha_ingreso,      // opcional (si no viene, Postgres usa CURRENT_DATE)
+      estado_id,
+      fecha_ingreso,   
       tipo_id,
       marca_id,
       modelo_id,
@@ -254,7 +277,7 @@ app.post("/api/equipos", auth, async (req, res) => {
     } = req.body;
 
     // VALIDACIONES BÁSICAS
-    if (!serial || !sn || !estado) {
+    if (!serial || !sn || !estado_id) {
       return res.status(400).json({
         error: "serial, sn y estado son obligatorios"
       });
@@ -263,7 +286,7 @@ app.post("/api/equipos", auth, async (req, res) => {
     // Insertar en base de datos
     const query = `
       INSERT INTO equipos 
-        (serial, sn, estado, fecha_ingreso, tipo_id, marca_id, modelo_id, departamento_id, usuario_asignado, proveedor , observaciones)
+        (serial, sn, estado_id, fecha_ingreso, tipo_id, marca_id, modelo_id, departamento_id, usuario_asignado, proveedor , observaciones)
       VALUES 
         ($1,$2,$3,COALESCE($4, CURRENT_DATE),$5,$6,$7,$8,$9,$10,$11)
       RETURNING *;
@@ -272,7 +295,7 @@ app.post("/api/equipos", auth, async (req, res) => {
     const values = [
       serial,
       sn,
-      estado,
+      estado_id,
       fecha_ingreso || null,
       tipo_id || null,
       marca_id || null,
@@ -318,7 +341,7 @@ app.put("/api/equipos/:id", auth, async (req, res) => {
     const {
       serial,
       sn,
-      estado,
+      estado_id,
       fecha_ingreso,
       tipo_id,
       marca_id,
@@ -333,7 +356,7 @@ app.put("/api/equipos/:id", auth, async (req, res) => {
       UPDATE equipos
       SET serial = $1,
           sn = $2,
-          estado = $3,
+          estado_id = $3,
           fecha_ingreso = $4,
           tipo_id = $5,
           marca_id = $6,
@@ -349,7 +372,7 @@ app.put("/api/equipos/:id", auth, async (req, res) => {
     const values = [
       serial,
       sn,
-      estado,
+      estado_id,
       fecha_ingreso || null,
       tipo_id || null,
       marca_id || null,
@@ -453,13 +476,13 @@ app.put("/api/usuarios/:id", auth, async (req, res) => {
 });
 
 // -------------------------------------------------------------
-//     🔴 ELIMINAR USUARIO (PROTEGIDO)
+//     🟢 ELIMINAR USUARIO (PROTEGIDO)
 // -------------------------------------------------------------
 app.delete("/api/usuarios/:id", auth, async (req, res) => {
   try {
     const { id } = req.params;
 
-    // 1️⃣ Verificar si el usuario existe
+    // Verificar si el usuario existe
     const check = await pool.query(
       "SELECT id, rol FROM usuarios WHERE id = $1",
       [id]
@@ -471,12 +494,12 @@ app.delete("/api/usuarios/:id", auth, async (req, res) => {
 
     const user = check.rows[0];
 
-    // 2️⃣ Prohibir borrar administradores
+    // Prohibir borrar administradores
     if (user.rol === "administrador") {
       return res.status(403).json({ error: "No puedes eliminar un administrador" });
     }
 
-    // 3️⃣ Eliminar
+    // Eliminar
     await pool.query("DELETE FROM usuarios WHERE id = $1", [id]);
 
     res.json({ msg: "Usuario eliminado correctamente" });
@@ -539,7 +562,132 @@ app.get("/api/departamentos", auth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// -------------------------------------------------------------
+// 🟢 REGISTRAR REPARACIÓN / MANTENIMIENTO (HISTORIAL)
+// -------------------------------------------------------------
+app.post("/api/reparaciones", auth, async (req, res) => {
+  try {
+    const {
+      equipoId,
+      estadoFinalId,
+      acciones,
+      diagnostico
+    } = req.body;
+
+    if (!equipoId || !estadoFinalId) {
+      return res.status(400).json({
+        error: "equipoId y estadoFinalId son obligatorios"
+      });
+    }
+
+    // 1️⃣ Guardar en historial
+    await pool.query(
+      `INSERT INTO historial 
+        (equipo_id, usuario_id, accion, comentario, estado_final_id, acciones, diagnostico)
+       VALUES ($1, $2, 'REPARACION', NULL, $3, $4, $5)`,
+      [equipoId, req.user.id, estadoFinalId, acciones, diagnostico]
+    );
+
+    // 2️⃣ Actualizar estado actual del equipo
+    await pool.query(
+      "UPDATE equipos SET estado_id = $1 WHERE id = $2",
+      [estadoFinalId, equipoId]
+    );
+
+    res.json({ msg: "Reparación registrada correctamente" });
+
+  } catch (err) {
+    console.error("❌ Error creando reparación:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------------
+// 🟢 LISTAR EQUIPOS EN REPARACIÓN O MANTENIMIENTO
+// -------------------------------------------------------------
+app.get("/api/equipos/en-proceso", auth, async (req, res) => {
+  try {
+    const r = await pool.query(`
+      SELECT 
+        e.id,
+        e.serial,
+        e.sn,
+        te.nombre AS tipo,
+        ma.nombre AS marca,
+        mo.nombre AS modelo,
+        es.nombre AS estado
+      FROM equipos e
+      JOIN estados es ON e.estado_id = es.id
+      LEFT JOIN tipos_de_equipos te ON e.tipo_id = te.id
+      LEFT JOIN marcas ma ON e.marca_id = ma.id
+      LEFT JOIN modelos mo ON e.modelo_id = mo.id
+      WHERE es.nombre IN ('Reparacion', 'Mantenimiento')
+      ORDER BY e.id DESC
+    `);
+
+    res.json(r.rows);
+  } catch (err) {
+    console.error("❌ Error en /equipos/en-proceso:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------------
+//                     🟢    LISTAR ESTADOS
+// -------------------------------------------------------------
+
+app.get("/api/equipos/resumen-estados", auth, async (req, res) => {
+  try {
+    const r = await pool.query(`
+      SELECT es.nombre, COUNT(*) AS total
+      FROM equipos e
+      JOIN estados es ON e.estado_id = es.id
+      WHERE es.nombre IN ('Reparacion','Mantenimiento')
+      GROUP BY es.nombre
+    `);
     
+    res.json(r.rows.map(row => ({
+      nombre: row.nombre,
+      total: parseInt(row.total, 10) // convertir a número
+    })));
+    
+    res.json(r.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------------
+//                🟢 LISTAR HISTORIAL DE UN EQUIPO
+// -------------------------------------------------------------
+app.get("/api/historial/:equipoId", auth, async (req, res) => {
+  const { equipoId } = req.params;
+
+  try {
+    const r = await pool.query(`
+      SELECT 
+        h.id,
+        h.accion,
+        h.fecha,
+        h.comentario,
+        h.acciones,
+        h.diagnostico,
+        es.nombre AS estado_final,
+        u.nombre AS usuario
+      FROM historial h
+      LEFT JOIN estados es ON h.estado_final_id = es.id
+      LEFT JOIN usuarios u ON h.usuario_id = u.id
+      WHERE h.equipo_id = $1
+      ORDER BY h.fecha DESC
+    `, [equipoId]);
+
+    res.json(r.rows);
+  } catch (err) {
+    console.error("❌ Error cargando historial:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // -------------------------------------------------------------
 //                     🟢    PUERTO
