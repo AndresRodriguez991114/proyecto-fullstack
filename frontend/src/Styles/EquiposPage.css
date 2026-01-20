@@ -360,7 +360,7 @@
 
 /* BOTÓN FILTRO */
 .btn-filter {
-  background: var(--card-bg);
+  background: transparent;
   border: 1px solid var(--input-border);
   border-radius: 10px;
   padding: 10px;
