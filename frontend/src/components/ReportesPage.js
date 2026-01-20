@@ -17,7 +17,7 @@ const ReportesPage = () => {
          <Header title="Reportes" menuOpen={menuOpen} setMenuOpen={setMenuOpen} /> 
         <p>Visualización de reportes y estadísticas.</p>
         <footer className="admin-legal">
-          © 2025 Cloud + Inventory. Todos los derechos reservados.
+          © 2025 Cloud + Inventory. Todos los derechos reservados. 
         </footer>
       </main>
     </div>
