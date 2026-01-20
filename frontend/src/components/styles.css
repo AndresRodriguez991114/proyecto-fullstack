@@ -29,7 +29,7 @@
 
   --main-bg: linear-gradient(180deg,#0b0713,#12061b);
 
-  --card-bg: rgba(255,255,255,0.04);
+  --card-bg: rgb(20, 20, 30);
   --card-border: rgba(255,255,255,0.06);
 
   --input-bg: rgba(0,0,0,0.25);

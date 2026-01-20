@@ -223,7 +223,7 @@
   color: var(--text);
   width: 100%;
 }
-
+   
 .equipos-btn-save {
   padding: 12px;
   background: linear-gradient(90deg,#5e2fb8,#8f55ff);
@@ -294,4 +294,126 @@
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 10px;
   padding: 12px;
+}
+.btn-wrap-export {
+  display: flex;
+  justify-content: flex-end; /* derecha */
+  gap: 10px;
+  margin-top: 24px;
+}
+
+/* base */
+.btn-export {
+  padding: 8px 14px;
+  font-size: 13px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  background-color: transparent;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+/* Excel */
+.btn-export.excel {
+  color: #2e7d32;
+  border-color: #2e7d3230;
+}
+
+.btn-export.excel:hover {
+  background-color: #2e7d3215;
+}
+
+/* PDF */
+.btn-export.pdf {
+  color: #c62828;
+  border-color: #c6282830;
+}
+
+.btn-export.pdf:hover {
+  background-color: #c6282815;
+}
+.equipos-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+/* IZQUIERDA */
+.toolbar-left input {
+  width: 280px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text);
+}
+
+/* DERECHA */
+.toolbar-right {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* BOTÓN FILTRO */
+.btn-filter {
+  background: var(--card-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  padding: 10px;
+  cursor: pointer;
+  color:var(--filter-color);
+}
+
+.btn-filter:hover {
+  background: var(--hover);
+}
+
+/* PANEL DESPLEGABLE */
+.filtro-panel {
+  position: absolute;
+  top: 48px;
+  right: 0; 
+  width: 320px;
+  background: var(--card-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.15);
+  z-index: 50;
+}
+
+/* CAMPOS */
+.filtro-panel select {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text);
+}
+
+/* BOTONES */
+.filtro-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.filtro-actions button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+}
+.filtro-actions button:hover {
+  background: linear-gradient(90deg,#5e2fb8,#8f55ff);
+}
+.filtro-actions .ghost {
+  background: transparent;
+  color: var(--text-muted);
 }

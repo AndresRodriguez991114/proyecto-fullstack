@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback  } from "react";
 import Sidebar from "../módulos/Sidebar";
 import Header from "../módulos/Header";
 import api from "../api";
@@ -6,11 +6,31 @@ import "../Styles/EquiposPage.css";
 
 const EquiposPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mostrarFiltro, setMostrarFiltro] = useState(false);
   const raw = localStorage.getItem("user");
   const user = raw ? JSON.parse(raw) : null;
+
   const [formError, setFormError] = useState("");
   const [equipos, setEquipos] = useState([]);
   const [loading, setLoading] = useState(true);
+    const [filtros, setFiltros] = useState({
+    search: "",
+    cliente: "",
+    departamento: "",
+    tipo: "",
+    marca: "",
+    estado: ""
+  });
+    /* =======================
+     📥 LISTAS
+  ======================= */
+  const [tipos, setTipos] = useState([]);
+  const [marcas, setMarcas] = useState([]);
+  const [modelos, setModelos] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
+  const [departamentos, setDepartamentos] = useState([]);
+  const [estados, setEstados] = useState([]);
+
   const [showModal, setShowModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [equipoEditando, setEquipoEditando] = useState(null);
@@ -18,7 +38,6 @@ const EquiposPage = () => {
   const [equipoDetalle, setEquipoDetalle] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [equipoToDelete, setEquipoToDelete] = useState(null);
-  const [estados, setEstados] = useState([]);
 
   // Formulario real
   const [nuevoEquipo, setNuevoEquipo] = useState({
@@ -32,21 +51,99 @@ const EquiposPage = () => {
     departamento_id: null,
     proveedor: "",
     observaciones: "",
-  });
+  }); 
+    const cargarEquipos = useCallback(async () => {
+      try {
+        setLoading(true);
+        const params = new URLSearchParams(filtros).toString();
+        const res = await api.get(`/equipos?${params}`);
+        setEquipos(res.data);
+      } catch (err) {
+        console.error("Error cargando equipos", err);
+      } finally {
+        setLoading(false);
+      }
+    }, [filtros]);
 
-  const [tipos, setTipos] = useState([]);
-  const [marcas, setMarcas] = useState([]);
-  const [modelos, setModelos] = useState([]);
+      /* =======================
+        📦 CARGAR LISTAS
+      ======================= */
+      const fetchListas = async () => {
+        try {
+          const [t, m, u,,mo, d, e] = await Promise.all([
+            api.get("/tipos"),
+            api.get("/marcas"),
+            api.get("/modelos"),
+            api.get("/usuarios"),
+            api.get("/departamentos"),
+            api.get("/estados")
+          ]);
 
-  const [usuarios, setUsuarios] = useState([]);
-  const [departamentos, setDepartamentos] = useState([]);
-
+          setTipos(t.data);
+          setMarcas(m.data);
+          setModelos(mo.data);
+          setUsuarios(u.data);
+          setDepartamentos(d.data);
+          setEstados(e.data);
+        } catch (err) {
+          console.error("❌ Error cargando listas", err);
+        }
+      };
 
   useEffect(() => {
-    fetchEquipos();
+    cargarEquipos();
     fetchListas();
-  }, []);
+  }, [cargarEquipos]);
 
+    const limpiarFiltros = () => {
+      setFiltros({
+        search: "",
+        cliente: "",
+        departamento: "",
+        tipo: "",
+        marca: "",
+        estado: ""
+      });
+    };
+
+        const exportarEquipos = async (formato) => {
+      try {
+        const token = localStorage.getItem("token");
+
+        // 🧠 convertir filtros en query params
+        const params = new URLSearchParams(filtros).toString();
+
+        const response = await fetch(
+          `https://proyecto-fullstack-nfai.onrender.com/api/reportes/equipos?formato=${formato}&${params}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Error exportando reporte");
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `equipos_${Date.now()}.${formato === "excel" ? "xlsx" : "pdf"}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        window.URL.revokeObjectURL(url);
+
+      } catch (err) {
+        console.error(err);
+        alert("❌ Error exportando equipos");
+      }
+    };
+    
   useEffect(() => {
     const cargarEstados = async () => {
       try {
@@ -70,24 +167,6 @@ const EquiposPage = () => {
       console.error("Error cargando equipos:", err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchListas = async () => {
-    try {
-      const t = await api.get("/tipos");
-      const m = await api.get("/marcas");
-      const mo = await api.get("/modelos");
-      const u = await api.get("/usuarios"); 
-      const d = await api.get("/departamentos"); 
-
-      setTipos(t.data);
-      setMarcas(m.data);
-      setModelos(mo.data);
-      setUsuarios(u.data);
-      setDepartamentos(d.data);
-    } catch (err) {
-      console.error("Error listas:", err);
     }
   };
 
@@ -237,7 +316,95 @@ const validarFormulario = () => {
           >
             + Registrar Equipo
           </button>
+        </div>
 
+        <div className="equipos-toolbar">
+          
+          {/* IZQUIERDA */}
+          <div className="toolbar-left">
+            <input
+              type="text"
+              placeholder="Buscar equipo"
+              value={filtros.search}
+              onChange={(e) =>
+                setFiltros({ ...filtros, search: e.target.value })
+              }
+            />
+          </div>
+
+          {/* DERECHA */}
+          <div className="toolbar-right">
+            <button
+              className="btn-filter"
+              onClick={() => setMostrarFiltro(!mostrarFiltro)}
+              title="Filtrar"
+            >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 4h18l-7 8v6l-4 2v-8L3 4z"/>
+            </svg>
+            </button>
+
+            {mostrarFiltro && (
+              <div className="filtro-panel">
+                
+                <select
+                  value={filtros.cliente}
+                  onChange={(e) =>
+                    setFiltros({ ...filtros, cliente: e.target.value })
+                  }
+                >
+                  <option value="">Cliente</option>
+                </select>
+
+                <select
+                  value={filtros.departamento}
+                  onChange={(e) =>
+                    setFiltros({ ...filtros, departamento: e.target.value })
+                  }
+                >
+                  <option value="">Departamento</option>
+                </select>
+
+                <select
+                  value={filtros.tipo}
+                  onChange={(e) =>
+                    setFiltros({ ...filtros, tipo: e.target.value })
+                  }
+                >
+                  <option value="">Tipo</option>
+                </select>
+
+                <select
+                  value={filtros.marca}
+                  onChange={(e) =>
+                    setFiltros({ ...filtros, marca: e.target.value })
+                  }
+                >
+                  <option value="">Marca</option>
+                </select>
+
+                <select
+                  value={filtros.estado}
+                  onChange={(e) =>
+                    setFiltros({ ...filtros, estado: e.target.value })
+                  }
+                >
+                  <option value="">Estado</option>
+                </select>
+
+                <div className="filtro-actions">
+                  <button onClick={cargarEquipos}>Aplicar</button>
+                  <button
+                    className="ghost"
+                    onClick={limpiarFiltros}
+                  >
+                    Limpiar
+                  </button>
+                </div>
+
+              </div>
+            )}
+          </div>
         </div>
 
         {/* ========================= */}
@@ -561,6 +728,21 @@ const validarFormulario = () => {
             </div>
           </div>
         )}
+        <div className="btn-wrap-export">
+          <button
+            className="btn-export excel"
+            onClick={() => exportarEquipos("excel")}
+          >
+            Excel
+          </button>
+
+          <button
+            className="btn-export pdf"
+            onClick={() => exportarEquipos("pdf")}
+          >
+            PDF
+          </button>
+        </div>
 
         <footer className="admin-legal">
           © 2025 Cloud + Inventory. Todos los derechos reservados.
