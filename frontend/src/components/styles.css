@@ -8,7 +8,7 @@
   --sidebar-bg: linear-gradient(180deg,#fefefe,#dadff5);
   --sidebar-text: #222;
 
-  --main-bg: linear-gradient(180deg,#eef2ff,#d9e1ff);
+  --main-bg: linear-gradient(180deg,#eef2ff, #cdd6ff);
 
   --card-bg: rgb(255, 255, 255);
   --card-border: rgba(0,0,0,0.08);
@@ -27,9 +27,9 @@
   --sidebar-bg: linear-gradient(180deg,#0f0520,#2b0b3a);
   --sidebar-text: #fff;
 
-  --main-bg: linear-gradient(180deg,#0b0713,#12061b);
+  --main-bg: linear-gradient(180deg,#10061e,#130720);
 
-  --card-bg: rgb(20, 20, 30);
+  --card-bg: rgba(31, 21, 44); 
   --card-border: rgba(255,255,255,0.06);
 
   --input-bg: rgba(0,0,0,0.25);

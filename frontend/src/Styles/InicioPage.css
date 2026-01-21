@@ -11,7 +11,7 @@
 
   [data-theme="dark"] {
     --main-bg: linear-gradient(180deg,#10061e,#130720);
-    --card-bg: rgba(255,255,255,0.06); /* ligeramente más opaco */
+    --card-bg: rgba(31, 21, 44); 
   }
   
 }
