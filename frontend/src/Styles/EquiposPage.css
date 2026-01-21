@@ -405,6 +405,8 @@
 }
 
 .filtro-actions button {
+  background: var(--card-bg);
+  color: var(--text-muted);
   padding: 8px 14px;
   border-radius: 8px;
   cursor: pointer;
