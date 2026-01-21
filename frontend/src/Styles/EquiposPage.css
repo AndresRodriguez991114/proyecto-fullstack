@@ -405,7 +405,7 @@
 }
 
 .filtro-actions button {
-  background: var(--input-bg);
+  background: transparent;
   padding: 8px 14px;
   border-radius: 8px;
   cursor: pointer;
