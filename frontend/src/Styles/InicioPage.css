@@ -6,7 +6,7 @@
   /* Fondo menos brillante */
   :root {
     --main-bg: linear-gradient(180deg, #eef2ff, #cdd6ff);
-    --card-bg: rgba(255, 255, 255, 0.92);
+    --card-bg: rgb(255, 255, 255);
   }
 
   [data-theme="dark"] {
