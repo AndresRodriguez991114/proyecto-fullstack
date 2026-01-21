@@ -360,7 +360,7 @@
 
 /* BOTÓN FILTRO */
 .btn-filter {
-  background: transparent;
+  background: var(--input-bg);
   border: 1px solid var(--input-border);
   border-radius: 10px;
   padding: 10px;
@@ -405,6 +405,7 @@
 }
 
 .filtro-actions button {
+  background: var(--input-bg);
   padding: 8px 14px;
   border-radius: 8px;
   cursor: pointer;
