@@ -412,9 +412,11 @@
   cursor: pointer;
   border: none;
 }
+
 .filtro-actions button:hover {
   background: linear-gradient(90deg,#5e2fb8,#8f55ff);
-}*/
+}
+
 .filtro-actions .ghost {
   background: transparent;
   color: var(--text-muted);
