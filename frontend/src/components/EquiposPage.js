@@ -16,7 +16,7 @@ const EquiposPage = () => {
   const [loading, setLoading] = useState(true);
     const [filtros, setFiltros] = useState({
     search: "",
-    cliente: "",
+    usuario_asignado: "",
     departamento: "",
     tipo: "",
     marca: "",
@@ -24,11 +24,12 @@ const EquiposPage = () => {
   });
 
 // 🔽 SOLO PARA FILTROS
-const obtenerOpciones = (array, campo) =>
-  [...new Set(array.map(item => item[campo]).filter(Boolean))];
-  
+const obtenerOpciones = (array, campo) => {
+  return [...new Set(array.map(item => item[campo]).filter(Boolean))];
+};
+
   // 🔽 Opciones dinámicas para el embudo
-const clientes = obtenerOpciones(equipos, "cliente");
+const usuariosAsignados = obtenerOpciones(equipos, "usuario_nombre");
 const departamentosFiltro = obtenerOpciones(equipos, "departamento");
 const tiposFiltro = obtenerOpciones(equipos, "tipo");
 const marcasFiltro = obtenerOpciones(equipos, "marca");
@@ -111,7 +112,7 @@ const estadosFiltro = obtenerOpciones(equipos, "estado");
     const limpiarFiltros = () => {
       setFiltros({
         search: "",
-        cliente: "",
+        usuario_asignado: "",
         departamento: "",
         tipo: "",
         marca: "",
@@ -361,16 +362,17 @@ const validarFormulario = () => {
               <div className="filtro-panel">
                 
                 <select
-                  value={filtros.cliente}
+                  value={filtros.usuario_nombre}
                   onChange={(e) =>
-                    setFiltros({ ...filtros, cliente: e.target.value })
+                    setFiltros({ ...filtros, usuario_nombre: e.target.value })
                   }
                 >
-                  <option value="">Cliente</option>
-                {clientes.map(c => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
+                  <option value="">Usuario asignado</option>
+
+                  {usuariosAsignados.map((u) => (
+                    <option key={u} value={u}>{u}</option>
+                  ))}
+                </select>
 
                 <select
                   value={filtros.departamento}
