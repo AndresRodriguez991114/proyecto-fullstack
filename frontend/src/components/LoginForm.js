@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import api from "../api";
-import "./LoginForm.css";
+import "../Styles/LoginForm.css";
 import { FaEye, FaEyeSlash, FaEnvelope } from "react-icons/fa";
 import Logo from "../images/Logo.png";
 

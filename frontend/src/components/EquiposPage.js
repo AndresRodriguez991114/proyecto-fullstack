@@ -4,6 +4,7 @@ import Header from "../módulos/Header";
 import api from "../api";
 import "../Styles/EquiposPage.css";
 
+
 const EquiposPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mostrarFiltro, setMostrarFiltro] = useState(false);
@@ -21,6 +22,18 @@ const EquiposPage = () => {
     marca: "",
     estado: ""
   });
+
+// 🔽 SOLO PARA FILTROS
+const obtenerOpciones = (array, campo) =>
+  [...new Set(array.map(item => item[campo]).filter(Boolean))];
+  
+  // 🔽 Opciones dinámicas para el embudo
+const clientes = obtenerOpciones(equipos, "cliente");
+const departamentosFiltro = obtenerOpciones(equipos, "departamento");
+const tiposFiltro = obtenerOpciones(equipos, "tipo");
+const marcasFiltro = obtenerOpciones(equipos, "marca");
+const estadosFiltro = obtenerOpciones(equipos, "estado");
+
     /* =======================
      📥 LISTAS
   ======================= */
@@ -70,7 +83,7 @@ const EquiposPage = () => {
       ======================= */
       const fetchListas = async () => {
         try {
-          const [t, m, u,,mo, d, e] = await Promise.all([
+          const [t, m, mo, u, d, e] = await Promise.all([
             api.get("/tipos"),
             api.get("/marcas"),
             api.get("/modelos"),
@@ -354,7 +367,10 @@ const validarFormulario = () => {
                   }
                 >
                   <option value="">Cliente</option>
-                </select>
+                {clientes.map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
 
                 <select
                   value={filtros.departamento}
@@ -363,6 +379,9 @@ const validarFormulario = () => {
                   }
                 >
                   <option value="">Departamento</option>
+                  {departamentosFiltro.map(d => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
                 </select>
 
                 <select
@@ -372,6 +391,9 @@ const validarFormulario = () => {
                   }
                 >
                   <option value="">Tipo</option>
+                  {tiposFiltro.map(t => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
                 </select>
 
                 <select
@@ -381,6 +403,9 @@ const validarFormulario = () => {
                   }
                 >
                   <option value="">Marca</option>
+                  {marcasFiltro.map(m => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
                 </select>
 
                 <select
@@ -390,6 +415,9 @@ const validarFormulario = () => {
                   }
                 >
                   <option value="">Estado</option>
+                  {estadosFiltro.map(e => (
+                    <option key={e} value={e}>{e}</option>
+                  ))}
                 </select>
 
                 <div className="filtro-actions">
