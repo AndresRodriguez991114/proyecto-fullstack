@@ -384,8 +384,14 @@ const validarFormulario = () => {
             </button>
 
             {mostrarFiltro && (
-              <div className="filtro-panel">
-                
+              <div
+                className="filtro-overlay"
+                onClick={() => setMostrarFiltro(false)}
+              >
+                <div
+                  className="filtro-panel"
+                  onClick={(e) => e.stopPropagation()}
+                >           
                 <select
                   value={filtros.usuario_nombre}
                   onChange={(e) =>
@@ -456,7 +462,7 @@ const validarFormulario = () => {
                     Limpiar
                   </button>
                 </div>
-
+              </div>
               </div>
             )}
           </div>

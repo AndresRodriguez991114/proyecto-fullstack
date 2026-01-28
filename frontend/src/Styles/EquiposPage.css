@@ -373,10 +373,19 @@
 }
 
 /* PANEL DESPLEGABLE */
+
+.filtro-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  z-index: 100;
+}
+
 .filtro-panel {
   position: absolute;
-  top: 48px;
+  top: 300px;
   right: 0; 
+  transform: translateX(-24px);
   width: 320px;
   background: var(--card-bg);
   border: 1px solid var(--input-border);
