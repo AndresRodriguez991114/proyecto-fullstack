@@ -16,12 +16,37 @@ const EquiposPage = () => {
   const [loading, setLoading] = useState(true);
     const [filtros, setFiltros] = useState({
     search: "",
-    usuario_asignado: "",
+    usuario_nombre: "",
     departamento: "",
     tipo: "",
     marca: "",
     estado: ""
   });
+
+const equiposFiltrados = equipos.filter(e => {
+  const textoBusqueda = filtros.search.toLowerCase();
+
+  const coincideBusqueda =
+    !textoBusqueda ||
+    e.serial?.toLowerCase().includes(textoBusqueda) ||
+    e.sn?.toLowerCase().includes(textoBusqueda) ||
+    e.tipo?.toLowerCase().includes(textoBusqueda) ||
+    e.marca?.toLowerCase().includes(textoBusqueda) ||
+    e.modelo?.toLowerCase().includes(textoBusqueda) ||
+    e.departamento?.toLowerCase().includes(textoBusqueda) ||
+    e.estado?.toLowerCase().includes(textoBusqueda) ||
+    e.usuario_nombre?.toLowerCase().includes(textoBusqueda);
+
+  return (
+    coincideBusqueda &&
+    (!filtros.usuario_nombre || e.usuario_nombre === filtros.usuario_nombre) &&
+    (!filtros.departamento || e.departamento === filtros.departamento) &&
+    (!filtros.tipo || e.tipo === filtros.tipo) &&
+    (!filtros.marca || e.marca === filtros.marca) &&
+    (!filtros.estado || e.estado === filtros.estado)
+  );
+});
+
 
 // 🔽 SOLO PARA FILTROS
 const obtenerOpciones = (array, campo) => {
@@ -461,7 +486,7 @@ const validarFormulario = () => {
               </thead>
 
               <tbody>
-                {equipos.map((e) => (
+                {equiposFiltrados.map((e) => (
                   <tr key={e.id}>
                     <td>{e.id}</td>
                     <td>{e.serial}</td>
