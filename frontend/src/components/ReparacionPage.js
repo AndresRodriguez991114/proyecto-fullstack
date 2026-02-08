@@ -177,6 +177,7 @@ const finalizarReparacion = async () => {
     await api.post("/reparaciones", {
       equipoId: equipo.id,
       estadoFinalId: form.estadoFinalId,
+      tipo: form.tipo, 
       acciones: form.acciones,
       diagnostico: form.diagnostico
     });

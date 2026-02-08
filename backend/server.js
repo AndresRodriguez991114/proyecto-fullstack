@@ -571,6 +571,7 @@ app.post("/api/reparaciones", auth, async (req, res) => {
     const {
       equipoId,
       estadoFinalId,
+      tipo,
       acciones,
       diagnostico
     } = req.body;
@@ -585,8 +586,8 @@ app.post("/api/reparaciones", auth, async (req, res) => {
     await pool.query(
       `INSERT INTO historial 
         (equipo_id, usuario_id, accion, comentario, estado_final_id, acciones, diagnostico)
-       VALUES ($1, $2, 'REPARACION', NULL, $3, $4, $5)`,
-      [equipoId, req.user.id, estadoFinalId, acciones, diagnostico]
+       VALUES ($1, $2, $3, NULL, $4, $5, $6)`,
+      [equipoId, req.user.id, tipo.toUpperCase(), estadoFinalId, acciones, diagnostico]
     );
 
     // 2️⃣ Actualizar estado actual del equipo
