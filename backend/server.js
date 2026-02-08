@@ -638,28 +638,66 @@ app.get("/api/equipos/en-proceso", auth, async (req, res) => {
 // -------------------------------------------------------------
 app.put("/api/equipos/:id/cerrar", auth, async (req, res) => {
   const { id } = req.params;
-  const { acciones } = req.body;
+  const { acciones, diagnostico, comentario } = req.body;
+  const usuario_id = req.user.id; // del middleware auth
 
   try {
-    const result = await pool.query(
+    await pool.query("BEGIN");
+
+    // 1️⃣ Cambiar estado del equipo a Activo
+    const equipoResult = await pool.query(
       `
       UPDATE equipos
       SET estado_id = (
         SELECT id FROM estados WHERE nombre = 'Activo'
-      ),
-      observaciones = $1
-      WHERE id = $2
+      )
+      WHERE id = $1
       RETURNING *;
       `,
-      [acciones, id]
+      [id]
     );
 
-    if (result.rows.length === 0) {
+    if (equipoResult.rows.length === 0) {
+      await pool.query("ROLLBACK");
       return res.status(404).json({ error: "Equipo no encontrado" });
     }
 
-    res.json({ msg: "Equipo cerrado correctamente", equipo: result.rows[0] });
+    const equipo = equipoResult.rows[0];
+
+    // 2️⃣ Registrar historial
+    await pool.query(
+      `
+      INSERT INTO historial (
+        equipo_id,
+        usuario_id,
+        accion,
+        acciones,
+        diagnostico,
+        comentario,
+        estado_final_id
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7);
+      `,
+      [
+        id,
+        usuario_id,
+        "Finalizar reparación",
+        acciones,
+        diagnostico || null,
+        comentario || "Reparación finalizada",
+        equipo.estado_id
+      ]
+    );
+
+    await pool.query("COMMIT");
+
+    res.json({
+      msg: "Reparación finalizada correctamente",
+      equipo
+    });
+
   } catch (err) {
+    await pool.query("ROLLBACK");
     console.error("❌ ERROR CERRANDO EQUIPO:", err);
     res.status(500).json({ error: err.message });
   }
