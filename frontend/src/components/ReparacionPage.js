@@ -107,7 +107,8 @@ const finalizarReparacion = async () => {
   }
 
   try {
-    await api.put(`/equipos/${equipoCerrar.id}/finalizar`, {
+    await api.put(`/equipos/${equipoCerrar.id}/cerrar`, {
+      estado_id: 1,
       acciones: cierre.acciones,
       fecha: cierre.fecha,
     });
