@@ -635,39 +635,43 @@ app.get("/api/equipos/en-proceso", auth, async (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 🟢 ACTUALIZAR EQUIPOS EN REPARACIÓN O MANTENIMIENTO
+// 🟢 CERRAR REPARACIÓN / MANTENIMIENTO
 // -------------------------------------------------------------
 app.put("/api/equipos/:id/cerrar", auth, async (req, res) => {
   const { id } = req.params;
   const { acciones, diagnostico, comentario, tipo  } = req.body;
-  const usuario_id = req.user.id; // del middleware auth
+  const usuario_id = req.user.id;
 
   try {
     await pool.query("BEGIN");
 
-    // 1️⃣ Cambiar estado del equipo a Activo
-    const equipoResult = await pool.query(
-      `
-      UPDATE equipos
-      SET estado_id = (
-        SELECT id FROM estados WHERE nombre = 'Activo'
-      )
-      WHERE id = $1
-      RETURNING *;
-      `,
-      [id]
-    );
+    // 1️⃣ Obtener estado actual ANTES de cambiarlo
+    const estadoActual = await pool.query(`
+      SELECT es.nombre, es.id
+      FROM equipos e
+      JOIN estados es ON e.estado_id = es.id
+      WHERE e.id = $1
+    `, [id]);
 
-    if (equipoResult.rows.length === 0) {
+    if (estadoActual.rows.length === 0) {
       await pool.query("ROLLBACK");
       return res.status(404).json({ error: "Equipo no encontrado" });
     }
 
+    const tipo = estadoActual.rows[0].nombre; // Reparacion | Mantenimiento
+
+    // 2️⃣ Cambiar estado a Activo
+    const equipoResult = await pool.query(`
+      UPDATE equipos
+      SET estado_id = (SELECT id FROM estados WHERE nombre = 'Activo')
+      WHERE id = $1
+      RETURNING *;
+    `, [id]);
+
     const equipo = equipoResult.rows[0];
 
-    // 2️⃣ Registrar historial
-    await pool.query(
-      `
+    // 3️⃣ Registrar historial
+    await pool.query(`
       INSERT INTO historial (
         equipo_id,
         usuario_id,
@@ -677,23 +681,21 @@ app.put("/api/equipos/:id/cerrar", auth, async (req, res) => {
         comentario,
         estado_final_id
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7);
-      `,
-      [
-        id,
-        usuario_id,
-        `FIN ${tipo}`,
-        acciones,
-        diagnostico || null,
-        comentario || `finalizada ${tipo} `,
-        equipo.estado_id
-      ]
-    );
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `, [
+      id,
+      usuario_id,
+      `FIN ${tipo.toUpperCase()}`,
+      acciones || null,
+      diagnostico || null,
+      comentario || `${tipo.toUpperCase()} finalizado`,
+      equipo.estado_id
+    ]);
 
     await pool.query("COMMIT");
 
     res.json({
-      msg:  `${tipo} finalizada correctamente`,
+      msg: `${tipo} finalizada correctamente`,
       equipo
     });
 
