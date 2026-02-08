@@ -3,6 +3,8 @@ import Sidebar from "../módulos/Sidebar";
 import Header from "../módulos/Header";
 import api from "../api";
 import "../Styles/ReparacionPage.css";
+import { createPortal } from "react-dom";
+
 
 
 const ReparacionPage = () => {
@@ -69,6 +71,63 @@ const ReparacionPage = () => {
       setBuscando(false);
     }
   };
+
+  const [modalCerrarOpen, setModalCerrarOpen] = useState(false);
+  const [equipoCerrar, setEquipoCerrar] = useState(null);
+
+  const [cierre, setCierre] = useState({
+    acciones: "",
+    fecha: new Date().toISOString().slice(0, 10),
+  });
+
+  const abrirModalCerrar = (eq) => {
+  setEquipoCerrar(eq);      // equipo que voy a cerrar
+  setModalCerrarOpen(true); // abrir modal
+  };
+
+  const cerrarModal = () => {
+    setModalCerrarOpen(false);
+    setEquipoCerrar(null);
+    setCierre({
+      acciones: "",
+      fecha: new Date().toISOString().slice(0, 10),
+    });
+  };
+
+const finalizarReparacion = async () => {
+  if (!equipoCerrar) return;
+
+  if (!cierre.acciones.trim()) {
+    setToast({
+      show: true,
+      type: "error",
+      message: "Debes ingresar las acciones realizadas",
+    });
+    return;
+  }
+
+  try {
+    await api.put(`/equipos/${equipoCerrar.id}/finalizar`, {
+      acciones: cierre.acciones,
+      fecha: cierre.fecha,
+    });
+
+    setToast({
+      show: true,
+      type: "success",
+      message: "Reparación finalizada correctamente",
+    });
+
+    cerrarModal();
+    cargarEquiposEnProceso();
+  } catch (error) {
+    setToast({
+      show: true,
+      type: "error",
+      message: "Error al finalizar la reparación",
+    });
+  }
+};
 
   const cargarEquiposEnProceso = async () => {
     try {
@@ -173,6 +232,49 @@ const ReparacionPage = () => {
           menuOpen={menuOpen}
           setMenuOpen={setMenuOpen}
         />
+          {modalCerrarOpen &&
+            createPortal(
+              <div className="modal-overlay show" onClick={cerrarModal}>
+                <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+                  <div className="modal-header">
+                    <h2>Finalizar reparación</h2>
+                    <button className="modal-close" onClick={cerrarModal}>×</button>
+                  </div>
+
+                  <div className="modal-form">
+                    <textarea
+                      className="modal-textarea"
+                      placeholder=" Acciones realizadas"
+                      value={cierre.acciones}
+                      onChange={(e) =>
+                        setCierre({ ...cierre, acciones: e.target.value })
+                      }
+                      required
+                    />
+
+                    <input
+                      type="date"
+                      value={cierre.fecha}
+                      onChange={(e) =>
+                        setCierre({ ...cierre, fecha: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div className="modal-buttons">
+                    <button className="btn-secondary" onClick={cerrarModal}>
+                      Cancelar
+                    </button>
+
+                    <button className="modal-save" onClick={finalizarReparacion}>
+                      Finalizar
+                    </button>
+                  </div>
+                </div>
+              </div>,
+              document.body
+            )
+          }
 
         {toast.show && (
           <div className={`toast-card ${toast.type}`}>
@@ -240,6 +342,19 @@ const ReparacionPage = () => {
                     <td>{eq.modelo}</td>
                     <td>{eq.estado}</td>
                     <td className="acciones-col">
+                      <button
+                        type="button"
+                        className="botn-small botn-finish"
+                        title="Finalizar reparación"
+                        onClick={() => abrirModalCerrar(eq)}
+                      >
+                        <i>
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M14.7 6.3a5 5 0 00-6.4 6.4L3 18v3h3l5.3-5.3a5 5 0 006.4-6.4l-2.2 2.2-2.2-2.2 2.2-2.2z"/>
+                        </svg>
+                        </i>
+                      </button>
+
                       <button
                         className="btn-small btn-view"
                         title="Ver historial"
@@ -380,7 +495,7 @@ const ReparacionPage = () => {
             </div>
 
             <button className="btn-primary" type="submit">
-              Guardar reparación
+              Guardar
             </button>
           </form>
         )}

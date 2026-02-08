@@ -229,7 +229,7 @@
   background: linear-gradient(90deg,#5e2fb8,#8f55ff);
   border: none;
   border-radius: 8px;
-  color: white;
+  color: var(--text);
   font-weight: 600;
   cursor: pointer;
   transition: 0.25s ease;

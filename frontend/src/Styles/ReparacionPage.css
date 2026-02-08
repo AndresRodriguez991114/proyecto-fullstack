@@ -101,7 +101,7 @@
   border-radius: 10px;
   border: none;
   background: linear-gradient(90deg,#5e2fb8,#8f55ff);
-  color: white;
+  color: var(--text);
   font-weight: 500;
   cursor: pointer;
 }
@@ -137,12 +137,12 @@
 
 .toast.success {
   background: linear-gradient(135deg, #4caf50, #2e7d32);
-  color: white;
+  color: var(--text);
 }
 
 .toast.error {
   background: linear-gradient(135deg, #f44336, #c62828);
-  color: white;
+  color: var(--text);
 }
 
 @keyframes slideIn {
@@ -282,4 +282,91 @@
   background: rgba(255, 255, 255, 0.516);
 }
 
+:root {    
+  --botn-hover: #d5cb3a30; 
+
+}
+
+.botn-finish {
+  background: var(--btn-bg);
+  border: none;
+  padding: 6px;
+  margin-right: 5px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.botn-finish svg {
+  color: #d5cb3a;
+}
+.botn-small svg {
+  width:  16px;
+  height: 16px;
+}
+.botn-finish:hover {
+  background: var(--botn-hover);
+}
+
+.modal-textarea,
+.modal input {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn-secondary {
+  gap: 12px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+  width: 100%;
+  padding: 12px;
+  margin-top: 18px;
+  font-weight: 600;
+  transition: 0.25s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.modal-textarea {
+  width: 90%;
+  min-height: 120px;
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid #3f3f5f;
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: none;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modal-textarea::placeholder {
+  color: #a8a8c298;
+  font-style: italic;
+}
 
