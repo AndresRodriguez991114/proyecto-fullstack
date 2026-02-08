@@ -587,7 +587,7 @@ app.post("/api/reparaciones", auth, async (req, res) => {
       `INSERT INTO historial 
         (equipo_id, usuario_id, accion, comentario, estado_final_id, acciones, diagnostico)
        VALUES ($1, $2, $3, NULL, $4, $5, $6)`,
-      [equipoId, req.user.id, tipo.toUpperCase(), estadoFinalId, acciones, diagnostico]
+      [equipoId, req.user.id, accionInicio, estadoFinalId, acciones, diagnostico]
     );
 
     // 2️⃣ Actualizar estado actual del equipo
@@ -682,7 +682,7 @@ app.put("/api/equipos/:id/cerrar", auth, async (req, res) => {
       [
         id,
         usuario_id,
-        "Finalizar reparación",
+        `Fin ${accion}`,
         acciones,
         diagnostico || null,
         comentario || "Reparación finalizada",
