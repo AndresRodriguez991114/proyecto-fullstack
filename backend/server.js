@@ -682,7 +682,7 @@ app.put("/api/equipos/:id/cerrar", auth, async (req, res) => {
       [
         id,
         usuario_id,
-        `Fin ${accion}`,
+        `Fin ${acciones}`,
         acciones,
         diagnostico || null,
         comentario || "Reparación finalizada",
