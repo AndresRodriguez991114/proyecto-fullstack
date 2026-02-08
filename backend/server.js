@@ -693,7 +693,7 @@ app.put("/api/equipos/:id/cerrar", auth, async (req, res) => {
     await pool.query("COMMIT");
 
     res.json({
-      msg: "Reparación finalizada correctamente",
+      msg:  `${tipo} finalizada correctamente`,
       equipo
     });
 
