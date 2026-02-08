@@ -685,7 +685,7 @@ app.put("/api/equipos/:id/cerrar", auth, async (req, res) => {
         `FIN ${tipo}`,
         acciones,
         diagnostico || null,
-        comentario || `${tipo} finalizada`,
+        comentario || `finalizada ${tipo} `,
         equipo.estado_id
       ]
     );

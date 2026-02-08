@@ -109,10 +109,10 @@ const finalizarReparacion = async () => {
   try {
     await api.put(`/equipos/${equipoCerrar.id}/cerrar`, {
       estado_id: 1,
-      tipo: cierre.tipo,              
+      tipo: form.tipo,              
       acciones: cierre.acciones,
       diagnostico: cierre.diagnostico || null,
-      comentario: `${cierre.tipo} finalizada`,
+      comentario: `${form.tipo} finalizada`,
       fecha: cierre.fecha,
     });
 
