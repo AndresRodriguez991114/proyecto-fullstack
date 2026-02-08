@@ -645,7 +645,7 @@ app.put("/api/equipos/:id/cerrar", auth, async (req, res) => {
       `
       UPDATE equipos
       SET estado_id = (
-        SELECT id FROM estados WHERE nombre = 'Disponible'
+        SELECT id FROM estados WHERE nombre = 'Activo'
       ),
       observaciones = $1
       WHERE id = $2
