@@ -639,7 +639,7 @@ app.get("/api/equipos/en-proceso", auth, async (req, res) => {
 // -------------------------------------------------------------
 app.put("/api/equipos/:id/cerrar", auth, async (req, res) => {
   const { id } = req.params;
-  const { acciones, diagnostico, comentario } = req.body;
+  const { acciones, diagnostico, comentario, tipo  } = req.body;
   const usuario_id = req.user.id; // del middleware auth
 
   try {
