@@ -430,3 +430,61 @@
   background: transparent;
   color: var(--text-muted);
 }
+
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 14px 22px;
+  border-radius: 12px;
+  font-weight: 500;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  animation: slideIn 0.4s ease;
+  z-index: 9999;
+}
+
+.toast.success {
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  color: var(--text);
+}
+
+.toast.error {
+  background: linear-gradient(135deg, #f44336, #c62828);
+  color: var(--text);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.historial-link {
+  margin-top: 15px;
+}
+
+.btn-link-historial {
+  background: none;
+  border: none;
+  color: #3a7fd5;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  font-size: 14px;
+}
+
+.btn-link-historial:hover {
+  text-decoration: underline;
+}
+
+.full-width {
+  width: 100%;
+  margin-top: 25px;
+}

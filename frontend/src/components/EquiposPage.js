@@ -14,6 +14,26 @@ const EquiposPage = () => {
   const [formError, setFormError] = useState("");
   const [equipos, setEquipos] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  const [equipoHistorial, setEquipoHistorial] = useState([]);
+  const [modalHistorialOpen, setModalHistorialOpen] = useState(false);
+
+  const [toast, setToast] = useState({
+    show: false,
+    type: "success", // success | error
+    message: ""
+  });
+
+  const verHistorial = async (equipo) => {
+    try {
+      const res = await api.get(`/historial/${equipo.id}`);
+      setEquipoHistorial(res.data);
+      setModalHistorialOpen(true);
+    } catch (err) {
+      console.error("Error cargando historial:", err);
+      setToast({ show: true, type: "error", message: "Error cargando historial" });
+    }
+  };
     const [filtros, setFiltros] = useState({
     search: "",
     usuario_nombre: "",
@@ -722,7 +742,72 @@ const validarFormulario = () => {
                 </p>
               </div>
 
+                <div className="historial-link">
+
+                <button
+                  className="btn-link-historial"
+                  title="Ver historial"
+                  onClick={() => verHistorial(equipoDetalle)}
+                >
+                  <i>
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 1.75a10.25 10.25 0 1010.25 10.25A10.262 10.262 0 0012 1.75zM12 
+                      20.25a8.25 8.25 0 118.25-8.25A8.26 8.26 0 0112 20.25z"/>
+                      <path d="M12 6.75a.75.75 0 00-.75.75v4.5l3.25 1.95a.75.75 0 10.75-1.3l-2.75-1.65V7.5A.75.75 0 0012 6.75z"/>
+                    </svg>
+                  </i>
+                    Ver Historial
+                </button>
+              </div>
               <button className="equipos-btn-close" onClick={() => setShowDetalle(false)}>
+                Cerrar
+              </button>
+            </div>
+          </div>
+        )}
+
+        {modalHistorialOpen && (
+          <div className="equipos-overlay">
+            <div className="equipos-modal-historial">
+              <h2>Historial del equipo # {equipoDetalle?.serial}</h2>
+
+              <div style={{ maxHeight: "300px", overflowY: "auto" }}>
+                {equipoHistorial.length === 0 ? (
+                  <p>No hay historial disponible.</p>
+                ) : (
+                  <table className="tabla-admin">
+                    <thead>
+                      <tr>
+                        <th>Fecha</th>
+                        <th>Acción</th>
+                        <th>Usuario</th>
+                        <th>Diagnóstico</th>
+                        <th>Acciones</th>
+                        <th>Estado final</th>
+                        <th>Comentario</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {equipoHistorial.map((h) => (
+                        <tr key={h.id}>
+                          <td>{new Date(h.fecha).toLocaleString()}</td>
+                          <td>{h.accion}</td>
+                          <td>{h.usuario || h.usuario_id}</td>
+                          <td>{h.diagnostico}</td>
+                          <td>{h.acciones}</td>
+                          <td>{h.estado_final}</td>
+                          <td>{h.comentario}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+
+              <button
+                className="historial-btn-close"
+                onClick={() => setModalHistorialOpen(false)}
+              >
                 Cerrar
               </button>
             </div>
@@ -804,6 +889,12 @@ const validarFormulario = () => {
             PDF
           </button>
         </div>
+
+{toast.show && (
+  <div className={`toast ${toast.type}`}>
+    {toast.message}
+  </div>
+)}
 
         <footer className="admin-legal">
           © 2025 Cloud + Inventory. Todos los derechos reservados.
