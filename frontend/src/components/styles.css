@@ -469,7 +469,8 @@
   border-radius: 8px;
   cursor: pointer;
   background: linear-gradient(90deg,#5e2fb8,#8f55ff);
-  color: white;
+  color: var(--text);
+    color: var(--text);
   font-weight: 600;
   transition: 0.25s ease;
 }

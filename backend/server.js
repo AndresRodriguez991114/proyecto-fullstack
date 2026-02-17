@@ -571,6 +571,7 @@ app.post("/api/reparaciones", auth, async (req, res) => {
     const {
       equipoId,
       estadoFinalId,
+      tipo,
       acciones,
       diagnostico
     } = req.body;
@@ -585,8 +586,8 @@ app.post("/api/reparaciones", auth, async (req, res) => {
     await pool.query(
       `INSERT INTO historial 
         (equipo_id, usuario_id, accion, comentario, estado_final_id, acciones, diagnostico)
-       VALUES ($1, $2, 'REPARACION', NULL, $3, $4, $5)`,
-      [equipoId, req.user.id, estadoFinalId, acciones, diagnostico]
+       VALUES ($1, $2, $3, NULL, $4, $5, $6)`,
+      [equipoId, req.user.id, tipo.toUpperCase(), estadoFinalId, acciones, diagnostico]
     );
 
     // 2️⃣ Actualizar estado actual del equipo
@@ -629,6 +630,78 @@ app.get("/api/equipos/en-proceso", auth, async (req, res) => {
     res.json(r.rows);
   } catch (err) {
     console.error("❌ Error en /equipos/en-proceso:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------------
+// 🟢 CERRAR REPARACIÓN / MANTENIMIENTO
+// -------------------------------------------------------------
+app.put("/api/equipos/:id/cerrar", auth, async (req, res) => {
+  const { id } = req.params;
+  const { acciones, diagnostico, comentario, tipo  } = req.body;
+  const usuario_id = req.user.id;
+
+  try {
+    await pool.query("BEGIN");
+
+    // 1️⃣ Obtener estado actual ANTES de cambiarlo
+    const estadoActual = await pool.query(`
+      SELECT es.nombre, es.id
+      FROM equipos e
+      JOIN estados es ON e.estado_id = es.id
+      WHERE e.id = $1
+    `, [id]);
+
+    if (estadoActual.rows.length === 0) {
+      await pool.query("ROLLBACK");
+      return res.status(404).json({ error: "Equipo no encontrado" });
+    }
+
+    const tipo = estadoActual.rows[0].nombre; // Reparacion | Mantenimiento
+
+    // 2️⃣ Cambiar estado a Activo
+    const equipoResult = await pool.query(`
+      UPDATE equipos
+      SET estado_id = (SELECT id FROM estados WHERE nombre = 'Activo')
+      WHERE id = $1
+      RETURNING *;
+    `, [id]);
+
+    const equipo = equipoResult.rows[0];
+
+    // 3️⃣ Registrar historial
+    await pool.query(`
+      INSERT INTO historial (
+        equipo_id,
+        usuario_id,
+        accion,
+        acciones,
+        diagnostico,
+        comentario,
+        estado_final_id
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `, [
+      id,
+      usuario_id,
+      `FIN ${tipo.toUpperCase()}`,
+      acciones || null,
+      diagnostico || null,
+      comentario || `${tipo.toUpperCase()} finalizado`,
+      equipo.estado_id
+    ]);
+
+    await pool.query("COMMIT");
+
+    res.json({
+      msg: `${tipo} finalizada correctamente`,
+      equipo
+    });
+
+  } catch (err) {
+    await pool.query("ROLLBACK");
+    console.error("❌ ERROR CERRANDO EQUIPO:", err);
     res.status(500).json({ error: err.message });
   }
 });
