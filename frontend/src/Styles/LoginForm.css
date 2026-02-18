@@ -85,6 +85,11 @@
   gap: 6px;
 }
 
+.remember-label input[type="checkbox"] {
+  accent-color: #007bff;
+}
+
+
 /* ===== BUTTON ===== */
 .btn-login {
   width: 100%;
