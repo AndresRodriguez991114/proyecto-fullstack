@@ -37,7 +37,7 @@ const ReparacionPage = () => {
     tipo: "Reparación",
     tecnico: "",
     diagnostico: "",
-    acciones: "",
+    comentarios: "",
     fecha: new Date().toISOString().slice(0, 10),
     estadoFinalId: "",
   });
@@ -180,9 +180,10 @@ const finalizarReparacion = async () => {
     await api.post("/reparaciones", {
       equipoId: equipo.id,
       estadoFinalId: form.estadoFinalId,
-      tipo: form.tipo, 
-      acciones: form.acciones,
-      diagnostico: form.diagnostico
+      tipo: form.tipo,
+      diagnostico: form.diagnostico,
+      comentario: form.comentarios,
+
     });
 
     setToast({ show: false, type: "", message: "" });
@@ -214,7 +215,7 @@ const finalizarReparacion = async () => {
         tipo: "Reparación",
         tecnico: "",
         diagnostico: "",
-        acciones: "",
+        comentarios: "",
         fecha: new Date().toISOString().slice(0, 10),
         estadoFinalId: ""
       });
@@ -471,9 +472,9 @@ const finalizarReparacion = async () => {
               />
 
               <textarea
-                placeholder="Acciones realizadas"
-                value={form.acciones}
-                onChange={(e) => setForm({ ...form, acciones: e.target.value })}
+                placeholder="Comentarios del equipo"
+                value={form.comentarios}
+                onChange={(e) => setForm({ ...form, comentarios: e.target.value })}
               />
 
               <input
