@@ -363,7 +363,7 @@ const validarFormulario = () => {
 
         <section className="inicio-stats">
           <div className="stat-card">
-            <h2>{equipos.length}</h2>
+            <h2>{equiposFiltrados.length}</h2>
             <p>Total Equipos</p>
           </div>
         </section>
