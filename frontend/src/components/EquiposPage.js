@@ -544,7 +544,7 @@ const validarFormulario = () => {
                           </svg>
                         </i>
                       </button>
-
+                    {user?.rol === "administrador" && (
                       <button className="btn-small btn-delete" onClick={() => confirmarEliminarEquipo(e)}>
                         <i>
                           <svg width="16" height="16" fill="currentColor">
@@ -561,13 +561,15 @@ const validarFormulario = () => {
                           </svg>
                         </i>
                       </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </section>
+                    )}
+
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
 
         {/* ========================= */}
         {/* MODAL CREAR EQUIPO       */}
