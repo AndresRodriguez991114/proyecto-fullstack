@@ -9,6 +9,7 @@ import ReparacionPage from "./components/ReparacionPage";
 import ClientesPage from "./components/ClientesPage";
 import ConfiguracionPage from "./components/ConfiguracionPage";
 import InicioPage from "./components/InicioPage";
+import Dashboard from "./components/Dashboard";
 
 
 function App() {
@@ -18,15 +19,14 @@ function App() {
         <Route path="/" element={<LoginForm />} />
 
         <Route path="/AdminDashboard" element={<div>Usuario normal: dashboard</div>} />
-
-        <Route path="/inicio" element={<InicioPage />} />
+        
+        <Route path="/Dashboard" element={<Dashboard />} />
         <Route path="/equipos" element={<EquiposPage />} />
-        <Route path="/reportes" element={<ReportesPage />} />
         <Route path="/diademas" element={<DiademasPage />} />
-        <Route path="/usuarios" element={<UsuariosPage />} />
         <Route path="/reparacion" element={<ReparacionPage />} />
         <Route path="/clientes" element={<ClientesPage />} />
         <Route path="/configuracion" element={<ConfiguracionPage />} />
+
         <Route
           path="/inicio"
           element={
@@ -35,7 +35,22 @@ function App() {
             </ProtectedRoute>
           }
         />
-        {/* otras rutas */}
+        <Route
+          path="/usuarios"
+          element={
+            <ProtectedRoute>
+              <UsuariosPage/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reportes"
+          element={
+            <ProtectedRoute>
+              <ReportesPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

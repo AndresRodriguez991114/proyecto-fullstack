@@ -13,25 +13,14 @@ const InicioPage = () => {
     const [stats, setStats] = useState({
         equipos: "-",
         reparaciones: "-",
-        clientes: 0,
-        usuarios: "-"
+        Diademas: 0
     });
 
   // Obtener datos desde el backend
 useEffect(() => {
   const fetchStats = async () => {
     try {
-
-      // 🔹 Obtener usuarios existentes
-      const resUsers = await api.get("/usuarios");
-      const usuariosTotal = Array.isArray(resUsers.data) ? resUsers.data.length : 0;
-
-      setStats(prev => ({
-        ...prev,
-        usuarios: usuariosTotal
-      }));
-      
-      // 🔹 Obtener equipos existentes
+              // 🔹 Obtener equipos existentes
       const resEquipos = await api.get("/equipos"); // O "/api/equipos" según tu configuración
       const equiposTotal = Array.isArray(resEquipos.data) ? resEquipos.data.length : 0;
 
@@ -39,7 +28,7 @@ useEffect(() => {
         ...prev,
         equipos: equiposTotal
       }));
-
+      
       // 🔹 Obtener reparaciones y mantenimientos activos
       const resEstados = await api.get("/equipos/resumen-estados");
       let totalReparaciones = 0;
@@ -53,9 +42,6 @@ useEffect(() => {
         ...prev,
         reparaciones: totalReparaciones
       })); 
-      
-      // 🔹 En cuanto me confirmes las rutas reales de clientes
-      //     también las conecto igual de fácil.
 
     } catch (err) {
       console.error("Error cargando estadísticas:", err);
@@ -93,13 +79,8 @@ useEffect(() => {
           </div>
 
           <div className="stat-card">
-            <h2>{stats.clientes}</h2>
-            <p>Clientes</p>
-          </div>
-
-          <div className="stat-card">
-            <h2>{stats.usuarios}</h2>
-            <p>Usuarios del sistema</p>
+            <h2>{stats.Diademas}</h2>
+            <p>Diademas</p>
           </div>
         </section>
 
@@ -113,19 +94,14 @@ useEffect(() => {
               <p>Equipos</p>
             </div>
 
-            <div className="atajo-card" onClick={() => window.location.href = "/usuarios"}>
-              <span>👥</span>
-              <p>Usuarios</p>
-            </div>
-
             <div className="atajo-card" onClick={() => window.location.href = "/reparacion"}>
               <span>🛠️</span>
               <p>Reparaciones</p>
             </div>
 
-            <div className="atajo-card" onClick={() => window.location.href = "/reportes"}>
-              <span>📊</span>
-              <p>Reportes</p>
+            <div className="atajo-card" onClick={() => window.location.href = "/Diademas"}>
+              <span>🎧</span>
+              <p>Diademas</p>
             </div>
           </div>
         </section>

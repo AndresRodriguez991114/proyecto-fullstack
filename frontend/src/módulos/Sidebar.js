@@ -1,4 +1,3 @@
-// src/módulos/Sidebar.js
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../images/Logo2.png";
@@ -34,15 +33,20 @@ const Sidebar = ({ user, menuOpen, setMenuOpen }) => {
 
       {/* MENÚ */}
       <nav className="admin-nav">
-
-        <button onClick={() => go("/inicio")}>
-          <Home size={18} /> <span>Inicio</span>
+        <button
+          onClick={() =>
+            go(user?.rol === "administrador" ? "/Inicio" : "/Dashboard")
+          }
+        >
+          <Home size={18} />
+          <span> Inicio</span>
         </button>
 
         <button onClick={() => go("/equipos")}>
           <Laptop size={18} /> <span>Equipos</span>
         </button>
-
+    {user?.rol === "administrador" && (
+    <>
         <button onClick={() => go("/reportes")}>
           <BarChart2 size={18} /> <span>Reportes</span>
         </button>
@@ -50,7 +54,8 @@ const Sidebar = ({ user, menuOpen, setMenuOpen }) => {
         <button onClick={() => go("/usuarios")}>
           <Users size={18} /> <span>Usuarios</span>
         </button>
-
+     </>
+    )}
         <button onClick={() => go("/diademas")}>
           <Headphones size={18} /> <span>Diademas</span>
         </button>
