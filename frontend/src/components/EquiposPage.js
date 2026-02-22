@@ -474,7 +474,15 @@ const validarFormulario = () => {
                 </select>
 
                 <div className="filtro-actions">
-                  <button onClick={cargarEquipos}>Aplicar</button>
+                  <button
+                    onClick={() => {
+                      cargarEquipos();
+                      setMostrarFiltro(false);
+                    }}
+                  >
+                    Aplicar
+                  </button>
+                  
                   <button
                     className="ghost"
                     onClick={limpiarFiltros}
