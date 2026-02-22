@@ -615,3 +615,10 @@
   transition: color 0.2s ease;
   flex-shrink: 0;
 }
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+}

@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, Link } from "react-router-dom";
 import Logo from "../images/Logo2.png";
 
 // ICONOS
@@ -22,10 +22,14 @@ const Sidebar = ({ user, menuOpen, setMenuOpen }) => {
     <aside className={`admin-sidebar ${menuOpen ? "open" : ""}`}>
       
       {/* LOGO */}
-      <div className="brand">
+      <Link
+        to={user?.rol === "administrador" ? "/Inicio" : "/Dashboard"}
+        className="brand"
+        onClick={() => setMenuOpen(false)}
+      >
         <img src={Logo} alt="Logo" />
         <h3>Cloud + Inventory</h3>
-      </div>
+      </Link>
 
       {/* MENÚ */}
       <nav className="admin-nav">
