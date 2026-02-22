@@ -1,8 +1,8 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import Logo from "../images/Logo2.png";
 
-// ICONOS BONITOS 😎
+// ICONOS
 import {
   Home,
   Laptop,
@@ -18,13 +18,9 @@ import {
 const Sidebar = ({ user, menuOpen, setMenuOpen }) => {
   const navigate = useNavigate();
 
-  const go = (ruta) => {
-    navigate(ruta);
-    setMenuOpen(false);
-  };
-
   return (
     <aside className={`admin-sidebar ${menuOpen ? "open" : ""}`}>
+      
       {/* LOGO */}
       <div className="brand">
         <img src={Logo} alt="Logo" />
@@ -33,54 +29,116 @@ const Sidebar = ({ user, menuOpen, setMenuOpen }) => {
 
       {/* MENÚ */}
       <nav className="admin-nav">
-        <button
-          onClick={() =>
-            go(user?.rol === "administrador" ? "/Inicio" : "/Dashboard")
+
+        <NavLink
+          to={user?.rol === "administrador" ? "/Inicio" : "/Dashboard"}
+          className={({ isActive }) =>
+            `menu-item ${isActive ? "active" : ""}`
           }
+          onClick={() => setMenuOpen(false)}
         >
           <Home size={18} />
-          <span> Inicio</span>
-        </button>
+          <span>Inicio</span>
+        </NavLink>
 
-        <button onClick={() => go("/equipos")}>
-          <Laptop size={18} /> <span>Equipos</span>
-        </button>
-    {user?.rol === "administrador" && (
-    <>
-        <button onClick={() => go("/reportes")}>
-          <BarChart2 size={18} /> <span>Reportes</span>
-        </button>
+        <NavLink
+          to="/equipos"
+          className={({ isActive }) =>
+            `menu-item ${isActive ? "active" : ""}`
+          }
+          onClick={() => setMenuOpen(false)}
+        >
+          <Laptop size={18} />
+          <span>Equipos</span>
+        </NavLink>
 
-        <button onClick={() => go("/usuarios")}>
-          <Users size={18} /> <span>Usuarios</span>
-        </button>
-     </>
-    )}
-        <button onClick={() => go("/diademas")}>
-          <Headphones size={18} /> <span>Diademas</span>
-        </button>
+        {user?.rol === "administrador" && (
+          <>
+            <NavLink
+              to="/reportes"
+              className={({ isActive }) =>
+                `menu-item ${isActive ? "active" : ""}`
+              }
+              onClick={() => setMenuOpen(false)}
+            >
+              <BarChart2 size={18} />
+              <span>Reportes</span>
+            </NavLink>
 
-        <button onClick={() => go("/reparacion")}>
-          <Wrench size={18} /> <span>Reparación / Mantenimiento</span>
-        </button>
+            <NavLink
+              to="/usuarios"
+              className={({ isActive }) =>
+                `menu-item ${isActive ? "active" : ""}`
+              }
+              onClick={() => setMenuOpen(false)}
+            >
+              <Users size={18} />
+              <span>Usuarios</span>
+            </NavLink>
+          </>
+        )}
 
-        <button onClick={() => go("/clientes")}>
-          <UserCircle size={18} /> <span>Clientes</span>
-        </button>
+        <NavLink
+          to="/diademas"
+          className={({ isActive }) =>
+            `menu-item ${isActive ? "active" : ""}`
+          }
+          onClick={() => setMenuOpen(false)}
+        >
+          <Headphones size={18} />
+          <span>Diademas</span>
+        </NavLink>
 
-        <button onClick={() => go("/configuracion")}>
-          <Settings size={18} /> <span>Configuración</span>
-        </button>
+        <NavLink
+          to="/reparacion"
+          className={({ isActive }) =>
+            `menu-item ${isActive ? "active" : ""}`
+          }
+          onClick={() => setMenuOpen(false)}
+        >
+          <Wrench size={18} />
+          <span>Reparación / Mantenimiento</span>
+        </NavLink>
+
+        <NavLink
+          to="/clientes"
+          className={({ isActive }) =>
+            `menu-item ${isActive ? "active" : ""}`
+          }
+          onClick={() => setMenuOpen(false)}
+        >
+          <UserCircle size={18} />
+          <span>Clientes</span>
+        </NavLink>
+
+        <NavLink
+          to="/configuracion"
+          className={({ isActive }) =>
+            `menu-item ${isActive ? "active" : ""}`
+          }
+          onClick={() => setMenuOpen(false)}
+        >
+          <Settings size={18} />
+          <span>Configuración</span>
+        </NavLink>
+
       </nav>
 
       {/* FOOTER */}
       <div className="sidebar-footer">
         <small>{user?.nombre || user?.email || "Usuario"}</small>
 
-        <button className="btn-logout" onClick={() => { localStorage.removeItem("user"); navigate("/"); }}>
+        <button
+          className="btn-logout"
+          onClick={() => {
+            localStorage.removeItem("user");
+            navigate("/");
+          }}
+        >
           <LogOut size={16} /> Sign out
         </button>
       </div>
+
     </aside>
   );
 };
