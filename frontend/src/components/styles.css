@@ -370,17 +370,13 @@
   top: -35px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--card-bg);
   color: var(--text);
-  padding: 6px 10px;
-  font-size: 12px;
-  border-radius: 6px;
-  border: 1px solid var(--card-border);
+  padding: 20px 24px;
+  font-size: 10px;
   opacity: 0;
   pointer-events: none;
   white-space: nowrap;
   transition: 0.25s ease;
-  box-shadow: var(--shadow);
 }
 
 .theme-toggle-wrapper:hover .theme-tooltip {
