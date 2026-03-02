@@ -1,5 +1,5 @@
 /* =========================================================
-   🎨 PALETA CON SOPORTE LIGHT / DARK 
+   🎨 PALETA LIGHT / DARK 
    ========================================================= */
 :root {
   --bg: #f7f9fc;
@@ -15,6 +15,8 @@
 
   --input-bg: rgba(255,255,255,0.9);
   --input-border: rgba(0,0,0,0.15);
+
+  --toggle-bg: #eef2ff;
 
   --logout-bg: #ff5b6b;
   --logout-text: #fff;
@@ -34,6 +36,8 @@
 
   --input-bg: rgba(0,0,0,0.25);
   --input-border: rgba(255,255,255,0.08);
+
+  --toggle-bg:  rgba(0,0,0,0.25);
 
   --logout-bg: #ff5b6b;
   --logout-text: #fff;
@@ -301,6 +305,10 @@
 @media (max-width: 768px) {
 
   /* Sidebar se vuelve deslizable */
+  .theme-toggle {
+    background: var(--toggle-bg);
+  }
+
   .admin-sidebar {
     position: fixed;
     left: -260px;
