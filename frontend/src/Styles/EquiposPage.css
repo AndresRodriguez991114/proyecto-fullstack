@@ -444,12 +444,12 @@
   z-index: 9999;
 }
 
-.toast.success {
+.equipos-page .toast.success {
   background: linear-gradient(135deg, #4caf50, #2e7d32);
   color: var(--text);
 }
 
-.toast.error {
+.equipos-page .toast.error {
   background: linear-gradient(135deg, #f44336, #c62828);
   color: var(--text);
 }

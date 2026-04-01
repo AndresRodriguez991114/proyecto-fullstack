@@ -16,6 +16,49 @@ const UsuariosPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openUserModal, setOpenUserModal] = useState(false);
 
+  // 🔥 TOAST STATE
+  const [toast, setToast] = useState({
+    show: false,
+    type: "",
+    message: ""
+  });
+
+  // -----------------------------
+  // 🔥 FUNCIONES TOAST
+  // -----------------------------
+
+  const showSuccess = (message) => {
+    setToast({ show: false, type: "", message: "" });
+
+    setTimeout(() => {
+      setToast({
+        show: true,
+        type: "success",
+        message
+      });
+    }, 150);
+
+    setTimeout(() => {
+      setToast({ show: false, type: "", message: "" });
+    }, 3000);
+  };
+
+  const showError = (message) => {
+    setToast({ show: false, type: "", message: "" });
+
+    setTimeout(() => {
+      setToast({
+        show: true,
+        type: "error",
+        message
+      });
+    }, 150);
+
+    setTimeout(() => {
+      setToast({ show: false, type: "", message: "" });
+    }, 3000);
+  };
+
   // -----------------------------
   // 🔥 TOGGLE MODO OSCURO / CLARO
   // -----------------------------
@@ -30,20 +73,39 @@ const UsuariosPage = () => {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-
   // -----------------------------
   // 📱 CONTROL DEL MENÚ MÓVIL
   // -----------------------------
 
   const toggleMenu = () => setMenuOpen(prev => !prev);
 
-
   return (
     <div className={`admin-root ${theme}`}>
 
-       {/*===== SIDEBAR =====*/}
-         <Sidebar user={user} menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-         
+      {/* 🔥 TOAST UI */}
+    {toast.show && (
+      <div className={`toast-card ${toast.type}`}>
+        
+        <div className="toast-content">
+          <strong>
+            {toast.type === "success" ? "Success" : "Error"}
+          </strong>
+          <p>{toast.message}</p>
+        </div>
+
+        <button
+          className="toast-close"
+          onClick={() => setToast({ show: false, type: "", message: "" })}
+        >
+          ✖
+        </button>
+
+      </div>
+    )}
+
+      {/*===== SIDEBAR =====*/}
+      <Sidebar user={user} menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+      
       {/* 🔥 Overlay para cerrar menú al tocar afuera */}
       <div
         className={`sidebar-overlay ${menuOpen ? "show" : ""}`}
@@ -80,6 +142,8 @@ const UsuariosPage = () => {
           </button>
           
           <UsersPanel
+            showSuccess={showSuccess}
+            showError={showError}
             onTotalChange={(n) => {
               const el = document.getElementById("total-users");
               if (el) el.innerText = String(n);

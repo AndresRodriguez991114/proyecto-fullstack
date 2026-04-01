@@ -634,3 +634,66 @@
   text-decoration: none;
   color: inherit;
 }
+
+.toast-card {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  min-width: 320px;
+  max-width: 380px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+  animation: slideIn 0.35s ease;
+  z-index: 9999;
+}
+
+/* CONTENIDO */
+.toast-content strong {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.toast-content p {
+  font-size: 14px;
+  margin: 0;
+  color: #555;
+}
+
+/* BOTÓN */
+.toast-close {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  cursor: pointer;
+  color: #999;
+}
+
+.toast-close:hover {
+  color: #000;
+}
+
+/* SUCCESS */
+.toast-card.success {
+  border-left: 6px solid #22c55e;
+  background: #ecfdf5;
+}
+
+.toast-card.success strong {
+  color: #166534;
+}
+
+/* ERROR */
+.toast-card.error {
+  border-left: 6px solid #ef4444;
+  background: #fef2f2;
+}
+
+.toast-card.error strong {
+  color: #991b1b;
+}

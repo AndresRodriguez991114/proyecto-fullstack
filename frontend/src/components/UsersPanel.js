@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import api from "../api";
 import { useForm } from "react-hook-form";
 
-const UsersPanel = ({ onTotalChange, openUserModal, setOpenUserModal }) => {
+const UsersPanel = ({ onTotalChange, openUserModal, setOpenUserModal, showSuccess, showError }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [serverMsg, setServerMsg] = useState("");
@@ -46,12 +46,14 @@ const UsersPanel = ({ onTotalChange, openUserModal, setOpenUserModal }) => {
 
     try {
       if (editingUser) {
-        await api.put(`/usuarios/${editingUser.id}`, data);
-        setServerMsg("Usuario actualizado correctamente");
-      } else {
-        await api.post("/usuarios", data);
-        setServerMsg("Usuario creado correctamente");
-      }
+      await api.put(`/usuarios/${editingUser.id}`, data);
+      setServerMsg("Usuario actualizado correctamente");
+      showSuccess("Usuario actualizado correctamente");
+    } else {
+      await api.post("/usuarios", data);
+      setServerMsg("Usuario creado correctamente");
+      showSuccess("Usuario creado correctamente");
+    }
 
       reset();
       setEditingUser(null);
@@ -60,6 +62,7 @@ const UsersPanel = ({ onTotalChange, openUserModal, setOpenUserModal }) => {
     } catch (err) {
       console.error("Error guardando usuario:", err);
       setServerMsg("Error guardando usuario");
+      showError("Error guardando usuario");
     }
   };
 
@@ -86,7 +89,7 @@ const UsersPanel = ({ onTotalChange, openUserModal, setOpenUserModal }) => {
   // ===========================================================
   //   ELIMINAR
   // ===========================================================
- const handleDelete = async () => {
+const handleDelete = async () => {
   if (!userToDelete) return;
 
   try {
@@ -94,8 +97,12 @@ const UsersPanel = ({ onTotalChange, openUserModal, setOpenUserModal }) => {
     setShowDeleteModal(false);
     setUserToDelete(null);
     fetchUsers();
+
+    showSuccess("Usuario eliminado correctamente");
+
   } catch (err) {
     console.error("Error eliminando usuario:", err);
+    showError("Error al eliminar el usuario");
   }
 };
 

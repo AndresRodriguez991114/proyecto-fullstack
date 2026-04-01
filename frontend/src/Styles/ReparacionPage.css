@@ -135,12 +135,12 @@
   z-index: 9999;
 }
 
-.toast.success {
+.reparacion-page .toast.success {
   background: linear-gradient(135deg, #4caf50, #2e7d32);
   color: var(--text);
 }
 
-.toast.error {
+.reparacion-page .toast.error {
   background: linear-gradient(135deg, #f44336, #c62828);
   color: var(--text);
 }
