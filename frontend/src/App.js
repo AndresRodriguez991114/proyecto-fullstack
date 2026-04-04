@@ -6,7 +6,7 @@ import EquiposPage from "./components/EquiposPage";
 import ReportesPage from "./components/ReportesPage";
 import DiademasPage from "./components/DiademasPage";
 import ReparacionPage from "./components/ReparacionPage";
-import ClientesPage from "./components/ClientesPage";
+import EnviosPage from "./components/EnviosPage";
 import ConfiguracionPage from "./components/ConfiguracionPage";
 import InicioPage from "./components/InicioPage";
 import Dashboard from "./components/Dashboard";
@@ -24,7 +24,7 @@ function App() {
         <Route path="/equipos" element={<EquiposPage />} />
         <Route path="/diademas" element={<DiademasPage />} />
         <Route path="/reparacion" element={<ReparacionPage />} />
-        <Route path="/clientes" element={<ClientesPage />} />
+        <Route path="/Envios" element={<EnviosPage />} />
         <Route path="/configuracion" element={<ConfiguracionPage />} />
 
         <Route

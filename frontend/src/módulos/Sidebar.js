@@ -10,7 +10,7 @@ import {
   Users,
   Headphones,
   Wrench,
-  UserCircle,
+  Truck,
   Settings,
   LogOut
 } from "lucide-react";
@@ -105,14 +105,14 @@ const Sidebar = ({ user, menuOpen, setMenuOpen }) => {
         </NavLink>
 
         <NavLink
-          to="/clientes"
+          to="/Envios"
           className={({ isActive }) =>
             `menu-item ${isActive ? "active" : ""}`
           }
           onClick={() => setMenuOpen(false)}
         >
-          <UserCircle size={18} />
-          <span>Clientes</span>
+          <Truck size={18} />
+          <span>Envios</span>
         </NavLink>
 
         <NavLink

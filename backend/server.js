@@ -661,14 +661,13 @@ app.put("/api/equipos/:id/cerrar", auth, async (req, res) => {
 
     const tipo = estadoActual.rows[0].nombre; // Reparacion | Mantenimiento
 
-    // 2️⃣ Cambiar estado a Activo
+    // 2️⃣ Cambiar estado a Listo para envio
     const equipoResult = await pool.query(`
       UPDATE equipos
-      SET estado_id = (SELECT id FROM estados WHERE nombre = 'Activo')
+      SET estado_id = 5
       WHERE id = $1
       RETURNING *;
     `, [id]);
-
     const equipo = equipoResult.rows[0];
 
     // 3️⃣ Registrar historial
@@ -703,6 +702,36 @@ app.put("/api/equipos/:id/cerrar", auth, async (req, res) => {
   } catch (err) {
     await pool.query("ROLLBACK");
     console.error("❌ ERROR CERRANDO EQUIPO:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------------
+// 🟢 LISTAR EQUIPOS PARA ENVIO
+// -------------------------------------------------------------
+app.get("/api/equipos/listos-envio", auth, async (req, res) => {
+  try {
+    const r = await pool.query(`
+      SELECT 
+        e.id,
+        e.serial,
+        e.sn,
+        te.nombre AS tipo,
+        ma.nombre AS marca,
+        mo.nombre AS modelo,
+        es.nombre AS estado
+      FROM equipos e
+      JOIN estados es ON e.estado_id = es.id
+      LEFT JOIN tipos_de_equipos te ON e.tipo_id = te.id
+      LEFT JOIN marcas ma ON e.marca_id = ma.id
+      LEFT JOIN modelos mo ON e.modelo_id = mo.id
+      WHERE e.estado_id = 5
+      ORDER BY e.id DESC
+    `);
+
+    res.json(r.rows);
+  } catch (err) {
+    console.error("❌ Error en /equipos/listos-envio:", err);
     res.status(500).json({ error: err.message });
   }
 });

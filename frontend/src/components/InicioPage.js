@@ -13,7 +13,7 @@ const InicioPage = () => {
     const [stats, setStats] = useState({
         equipos: "-",
         reparaciones: "-",
-        clientes: 0,
+        Envios: "-",
         usuarios: "-"
     });
 
@@ -54,8 +54,15 @@ useEffect(() => {
         reparaciones: totalReparaciones
       })); 
       
-      // 🔹 En cuanto me confirmes las rutas reales de clientes
-      //     también las conecto igual de fácil.
+      // 🔹 `Rutas de envios
+ // 🔹 Obtener equipos listos para envío
+    const resEnvios = await api.get("/equipos/listos-envio");
+    const enviosTotal = Array.isArray(resEnvios.data) ? resEnvios.data.length : 0;
+
+    setStats(prev => ({
+      ...prev,
+      Envios: enviosTotal
+    }));
 
     } catch (err) {
       console.error("Error cargando estadísticas:", err);
@@ -93,8 +100,8 @@ useEffect(() => {
           </div>
 
           <div className="stat-card">
-            <h2>{stats.clientes}</h2>
-            <p>Clientes</p>
+            <h2>{stats.Envios}</h2>
+            <p>Envios</p>
           </div>
 
           <div className="stat-card">

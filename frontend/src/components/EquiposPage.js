@@ -89,7 +89,6 @@ const estadosFiltro = obtenerOpciones(equipos, "estado");
   const [usuarios, setUsuarios] = useState([]);
   const [departamentos, setDepartamentos] = useState([]);
   const [estados, setEstados] = useState([]);
-
   const [showModal, setShowModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [equipoEditando, setEquipoEditando] = useState(null);
@@ -528,6 +527,7 @@ const validarFormulario = () => {
                       {/* 👁️ VER DETALLE */}
                       <button
                         className="btn-small btn-view"
+                        title="Ver Detalle"
                         onClick={() => { console.log("CLICK: Ver detalle", e.id); abrirDetalle(e); }}
                       >
                         <i>
@@ -538,7 +538,10 @@ const validarFormulario = () => {
                         </i>
                       </button>
 
-                      <button className="btn-small btn-edit" onClick={() => editarEquipo(e)}>
+                      <button 
+                      className="btn-small btn-edit" 
+                      title="Editar Equipo"
+                      onClick={() => editarEquipo(e)}>
                         <i>
                           <svg width="16" height="16" fill="currentColor">
                             <path d="M12.854.854a.5.5 0 0 0-.708 0L10.5 2.5l2 2L14.146 
@@ -548,7 +551,10 @@ const validarFormulario = () => {
                         </i>
                       </button>
                     {user?.rol === "administrador" && (
-                      <button className="btn-small btn-delete" onClick={() => confirmarEliminarEquipo(e)}>
+                      <button 
+                      className="btn-small btn-delete" 
+                      title="Eliminar"
+                      onClick={() => confirmarEliminarEquipo(e)}>
                         <i>
                           <svg width="16" height="16" fill="currentColor">
                             <path d="M5.5 5.5a.5.5 0 0 1 .5.5v6a.5.5 
@@ -751,7 +757,6 @@ const validarFormulario = () => {
 
                 <button
                   className="btn-link-historial"
-                  title="Ver historial"
                   onClick={() => verHistorial(equipoDetalle)}
                 >
                   <i>

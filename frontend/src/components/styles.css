@@ -20,6 +20,8 @@
 
   --logout-bg: #ff5b6b;
   --logout-text: #fff;
+
+  --textarea-border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 [data-theme="dark"] {
@@ -41,6 +43,8 @@
 
   --logout-bg: #ff5b6b;
   --logout-text: #fff;
+
+   --textarea-border: 1px solid rgba(255,255,255,0.1);
 }
 
 /* =========================================================

@@ -237,7 +237,7 @@
 }
 
 .equipos-btn-save:hover {
-  transform: translateY(-2px);
+  transform: scale(1.05);
 }
 
 .equipos-btn-close {
@@ -250,6 +250,7 @@
 }
 
 .equipos-btn-close:hover {
+  transform: scale(1.05);
   background: rgba(255,255,255,0.2);
 }
 
@@ -292,7 +293,7 @@
 .equipos-modal textarea {
   background: rgba(255,255,255,0.04);
   color: #8f8e8e;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: var(--textarea-border);
   border-radius: 10px;
   padding: 12px;
 }

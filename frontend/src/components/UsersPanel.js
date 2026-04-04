@@ -138,10 +138,11 @@ const handleDelete = async () => {
                     <td>
 
                       {/* ================================
-                          BOTÓN EDITAR (TU SVG ORIGINAL)
+                          BOTÓN EDITAR
                           ================================ */}
                       <button
                         className="btn-small btn-edit"
+                        title="Editar"
                         onClick={() => editarUsuario(u)}
                       >
                         <i>
@@ -159,6 +160,7 @@ const handleDelete = async () => {
                       {u.rol !== "administrador" && (
                         <button
                           className="btn-small btn-delete"
+                          title="Eliminar"
                           onClick={() => confirmarEliminar(u)}
                         >
                           <i>
