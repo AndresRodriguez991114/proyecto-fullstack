@@ -755,6 +755,61 @@ app.get("/api/equipos/listos-envio", auth, async (req, res) => {
 });
 
 // -------------------------------------------------------------
+// 🟢 LISTAR EQUIPOS PARA ENVIO MASIVO
+// -------------------------------------------------------------
+app.put("/api/equipos/enviar-masivo", auth, async (req, res) => {
+  const { ids, comentario } = req.body;
+  const usuario_id = req.user.id;
+
+  if (!ids || ids.length === 0) {
+    return res.status(400).json({ error: "No hay equipos seleccionados" });
+  }
+
+  try {
+    await pool.query("BEGIN");
+
+    for (const id of ids) {
+      // 1️⃣ actualizar estado
+      const result = await pool.query(`
+        UPDATE equipos
+        SET estado_id = 1
+        WHERE id = $1
+        RETURNING *;
+      `, [id]);
+
+      const equipo = result.rows[0];
+
+      // 2️⃣ historial
+      await pool.query(`
+        INSERT INTO historial (
+          equipo_id,
+          usuario_id,
+          accion,
+          comentario,
+          estado_final_id
+        )
+        VALUES ($1, $2, $3, $4, $5)
+      `, [
+        id,
+        usuario_id,
+        "ENVÍO MASIVO",
+        comentario || "Envío masivo realizado",
+        equipo.estado_id
+      ]);
+    }
+
+    await pool.query("COMMIT");
+
+    res.json({ msg: "Envío masivo exitoso" });
+
+  } catch (err) {
+    await pool.query("ROLLBACK");
+    console.error("❌ Error envío masivo:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------------
 // 🟢 CERRAR EQUIPO PARA ENVÍO
 // -------------------------------------------------------------
 app.put("/api/equipos/:id/enviar", auth, async (req, res) => {
