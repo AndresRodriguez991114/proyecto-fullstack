@@ -737,30 +737,68 @@ app.get("/api/equipos/listos-envio", auth, async (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 🟢 CERRAR EQUIPOS PARA ENVIO
+// 🟢 CERRAR EQUIPO PARA ENVÍO
 // -------------------------------------------------------------
 app.put("/api/equipos/:id/enviar", auth, async (req, res) => {
   const { id } = req.params;
+  const { comentario } = req.body; // opcional
+  const usuario_id = req.user.id;
 
   try {
-    const result = await pool.query(`
+    await pool.query("BEGIN");
+
+    // 1️⃣ Obtener estado actual ANTES de cambiarlo
+    const estadoActual = await pool.query(`
+      SELECT es.nombre, es.id
+      FROM equipos e
+      JOIN estados es ON e.estado_id = es.id
+      WHERE e.id = $1
+    `, [id]);
+
+    if (estadoActual.rows.length === 0) {
+      await pool.query("ROLLBACK");
+      return res.status(404).json({ error: "Equipo no encontrado" });
+    }
+
+    const estadoNombre = estadoActual.rows[0].nombre; // por ejemplo "Listo para envio"
+
+    // 2️⃣ Cambiar estado a Activo (id = 1)
+    const equipoResult = await pool.query(`
       UPDATE equipos
       SET estado_id = 1
       WHERE id = $1
       RETURNING *;
     `, [id]);
+    const equipo = equipoResult.rows[0];
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Equipo no encontrado" });
-    }
+    // 3️⃣ Registrar historial
+    await pool.query(`
+      INSERT INTO historial (
+        equipo_id,
+        usuario_id,
+        accion,
+        comentario,
+        estado_final_id
+      )
+      VALUES ($1, $2, $3, $4, $5)
+    `, [
+      id,
+      usuario_id,
+      `ENVÍO FINALIZADO (${estadoNombre.toUpperCase()})`,
+      comentario || "Equipo enviado y activado",
+      equipo.estado_id
+    ]);
+
+    await pool.query("COMMIT");
 
     res.json({
-      msg: "Equipo enviado correctamente",
-      equipo: result.rows[0]
+      msg: `Equipo enviado y activado correctamente`,
+      equipo
     });
 
   } catch (err) {
-    console.error("❌ Error enviando equipo:", err);
+    await pool.query("ROLLBACK");
+    console.error("❌ ERROR ENVIANDO EQUIPO:", err);
     res.status(500).json({ error: err.message });
   }
 });
