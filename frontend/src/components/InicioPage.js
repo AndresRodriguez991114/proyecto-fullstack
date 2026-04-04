@@ -54,8 +54,8 @@ useEffect(() => {
         reparaciones: totalReparaciones
       })); 
       
-      // 🔹 `Rutas de envios
- // 🔹 Obtener equipos listos para envío
+     // 🔹 `Rutas de envios
+     // 🔹 Obtener equipos listos para envío
     const resEnvios = await api.get("/equipos/listos-envio");
     const enviosTotal = Array.isArray(resEnvios.data) ? resEnvios.data.length : 0;
 
@@ -129,11 +129,11 @@ useEffect(() => {
               <span>🛠️</span>
               <p>Reparaciones</p>
             </div>
-
-            <div className="atajo-card" onClick={() => window.location.href = "/reportes"}>
-              <span>📊</span>
-              <p>Reportes</p>
+            <div className="atajo-card" onClick={() => window.location.href = "/Envios"}>
+              <span>🚚</span>
+              <p>Envios</p>
             </div>
+            
           </div>
         </section>
 

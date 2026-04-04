@@ -13,7 +13,9 @@ const InicioPage = () => {
     const [stats, setStats] = useState({
         equipos: "-",
         reparaciones: "-",
+        Envios: "-",
         Diademas: 0
+        
     });
 
   // Obtener datos desde el backend
@@ -42,6 +44,16 @@ useEffect(() => {
         ...prev,
         reparaciones: totalReparaciones
       })); 
+
+     // 🔹 `Rutas de envios
+     // 🔹 Obtener equipos listos para envío
+    const resEnvios = await api.get("/equipos/listos-envio");
+    const enviosTotal = Array.isArray(resEnvios.data) ? resEnvios.data.length : 0;
+    
+    setStats(prev => ({
+      ...prev,
+      Envios: enviosTotal
+    }));
 
     } catch (err) {
       console.error("Error cargando estadísticas:", err);
@@ -79,6 +91,11 @@ useEffect(() => {
           </div>
 
           <div className="stat-card">
+            <h2>{stats.Envios}</h2>
+            <p>Envios</p>
+          </div>
+
+          <div className="stat-card">
             <h2>{stats.Diademas}</h2>
             <p>Diademas</p>
           </div>
@@ -103,6 +120,13 @@ useEffect(() => {
               <span>🎧</span>
               <p>Diademas</p>
             </div>
+
+            
+            <div className="atajo-card" onClick={() => window.location.href = "/Envios"}>
+              <span>🚚</span>
+              <p>Envios</p>
+            </div>
+
           </div>
         </section>
 
