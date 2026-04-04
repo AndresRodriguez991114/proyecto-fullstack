@@ -27,6 +27,9 @@ const EnviosPage = () => {
   const [modalCerrar, setModalCerrar] = useState(false);
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
 
+  // 🆕 selección múltiple
+  const [seleccionados, setSeleccionados] = useState([]);
+
   const [formCerrar, setFormCerrar] = useState({
     comentario: ""
   });
@@ -107,7 +110,26 @@ const estadosFiltro = obtenerOpciones(equipos, "estado");
   };
 
   /* ============================
-     🚚 CERRAR PROCESO (ENVÍO)
+     🆕 SELECCIÓN
+  ============================ */
+  const toggleSeleccion = (id) => {
+    setSeleccionados(prev =>
+      prev.includes(id)
+        ? prev.filter(e => e !== id)
+        : [...prev, id]
+    );
+  };
+
+  const seleccionarTodos = () => {
+    if (seleccionados.length === equiposFiltrados.length) {
+      setSeleccionados([]);
+    } else {
+      setSeleccionados(equiposFiltrados.map(e => e.id));
+    }
+  };
+
+  /* ============================
+     🚚 ENVÍO INDIVIDUAL
   ============================ */
   const cerrarProceso = async () => {
     try {
@@ -117,16 +139,35 @@ const estadosFiltro = obtenerOpciones(equipos, "estado");
 
       setModalCerrar(false);
       setEquipoSeleccionado(null);
-      setFormCerrar({
-        acciones: "",
-        diagnostico: "",
-        comentario: ""
-      });
+      setSeleccionados([]);
+      setFormCerrar({ comentario: "" });
 
       cargarEquipos();
     } catch (err) {
       console.error("Error cerrando proceso:", err);
       alert("Error al cerrar el proceso");
+    }
+  };
+
+  /* ============================
+     🚀 ENVÍO MASIVO
+  ============================ */
+  const envioMasivo = async () => {
+    try {
+      for (let id of seleccionados) {
+        await api.put(`/equipos/${id}/enviar`, {
+          comentario: formCerrar.comentario
+        });
+      }
+
+      setModalCerrar(false);
+      setSeleccionados([]);
+      setFormCerrar({ comentario: "" });
+
+      cargarEquipos();
+    } catch (err) {
+      console.error("Error en envío masivo:", err);
+      alert("Error en envío masivo");
     }
   };
 
@@ -156,9 +197,20 @@ const estadosFiltro = obtenerOpciones(equipos, "estado");
                 setFiltros({ ...filtros, search: e.target.value })
               }
             />
+            {/* 🆕 BOTÓN MASIVO */}
+              {seleccionados.length > 0 && (
+              <button
+                className="btn-gold btn-envio-masivo"
+                onClick={() => setModalCerrar(true)}
+              >
+                Enviar ({seleccionados.length})
+              </button>
+            )}
           </div>
 
           <div className="toolbar-right">
+
+
             <button
               className="btn-filter"
               onClick={() => setMostrarFiltro(!mostrarFiltro)}
@@ -267,6 +319,16 @@ const estadosFiltro = obtenerOpciones(equipos, "estado");
             <table className="tabla-admin">
               <thead>
                 <tr>
+                  <th>
+                    <input
+                      type="checkbox"
+                      onChange={seleccionarTodos}
+                      checked={
+                        seleccionados.length === equiposFiltrados.length &&
+                        equiposFiltrados.length > 0
+                      }
+                    />
+                  </th>
                   <th>ID</th>
                   <th>Serial</th>
                   <th>S/N</th>
@@ -281,6 +343,13 @@ const estadosFiltro = obtenerOpciones(equipos, "estado");
               <tbody>
                 {equiposFiltrados.map(e => (
                   <tr key={e.id}>
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={seleccionados.includes(e.id)}
+                        onChange={() => toggleSeleccion(e.id)}
+                      />
+                    </td>
                     <td>{e.id}</td>
                     <td>{e.serial}</td>
                     <td>{e.sn}</td>
@@ -314,7 +383,7 @@ const estadosFiltro = obtenerOpciones(equipos, "estado");
             <div className="envio-modal" onClick={(e) => e.stopPropagation()}>
 
               <div className="envio-icon">
-                <svg viewBox="0 0 24 24">
+                <svg viewBox="0 0 24 24" style={{ transform: 'rotate(140deg)' }}>
                   <path d="M2 12l19-9-5 9 5 9-19-9z"/>
                 </svg>
               </div>
@@ -335,7 +404,12 @@ const estadosFiltro = obtenerOpciones(equipos, "estado");
               />
 
               <div className="envio-actions">
-                <button className="btn-gold" onClick={cerrarProceso}>
+                <button
+                  className="btn-gold"
+                  onClick={() =>
+                    equipoSeleccionado ? cerrarProceso() : envioMasivo()
+                  }
+                >
                   Confirmar
                 </button>
 

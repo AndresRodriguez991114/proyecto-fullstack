@@ -343,6 +343,12 @@
   margin-bottom: 20px;
 }
 
+.toolbar-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 /* IZQUIERDA */
 .toolbar-left input {
   width: 280px;
@@ -489,4 +495,8 @@
 .full-width {
   width: 100%;
   margin-top: 25px;
+}
+
+.btn-envio-masivo {
+  width: fit-content;
 }
