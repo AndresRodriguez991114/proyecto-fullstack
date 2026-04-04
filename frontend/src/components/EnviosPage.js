@@ -54,7 +54,6 @@ const EnviosPage = () => {
      🔍 FILTROS
   ============================ */
   const equiposFiltrados = equipos.filter(e => {
-    console.log(e)
     const texto = filtros.search.toLowerCase();
 
     return (
