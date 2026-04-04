@@ -737,6 +737,35 @@ app.get("/api/equipos/listos-envio", auth, async (req, res) => {
 });
 
 // -------------------------------------------------------------
+// 🟢 CERRAR EQUIPOS PARA ENVIO
+// -------------------------------------------------------------
+app.put("/api/equipos/:id/enviar", auth, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(`
+      UPDATE equipos
+      SET estado_id = 1
+      WHERE id = $1
+      RETURNING *;
+    `, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Equipo no encontrado" });
+    }
+
+    res.json({
+      msg: "Equipo enviado correctamente",
+      equipo: result.rows[0]
+    });
+
+  } catch (err) {
+    console.error("❌ Error enviando equipo:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------------
 //                     🟢    LISTAR ESTADOS
 // -------------------------------------------------------------
 

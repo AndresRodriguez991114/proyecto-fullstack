@@ -102,7 +102,7 @@ const estadosFiltro = obtenerOpciones(equipos, "estado");
   ============================ */
   const cerrarProceso = async () => {
     try {
-      await api.put(`/equipos/${equipoSeleccionado.id}/cerrar`, {
+      await api.put(`/equipos/${equipoSeleccionado.id}/enviar`, {
         ...formCerrar
       });
 
