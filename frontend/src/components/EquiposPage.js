@@ -328,7 +328,7 @@ const eliminarEquipo = async () => {
     console.error("Error eliminando equipo:", err);
     alert(
       err.response?.data?.error ||
-      "No se pudo eliminar el equipo"
+      "Error Historial activo"
     );
   }
 };

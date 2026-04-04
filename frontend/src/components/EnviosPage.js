@@ -54,6 +54,7 @@ const EnviosPage = () => {
      🔍 FILTROS
   ============================ */
   const equiposFiltrados = equipos.filter(e => {
+    console.log(e)
     const texto = filtros.search.toLowerCase();
 
     return (
@@ -67,11 +68,20 @@ const EnviosPage = () => {
         e.estado?.toLowerCase().includes(texto) ||
         e.usuario_nombre?.toLowerCase().includes(texto)
       ) &&
-        (!filtros.usuario_nombre || e.usuario_nombre === filtros.usuario_nombre) &&
-        (!filtros.departamento || e.departamento === filtros.departamento) &&
-        (!filtros.tipo || e.tipo === filtros.tipo) &&
-        (!filtros.marca || e.marca === filtros.marca) &&
-        (!filtros.estado || e.estado === filtros.estado)
+      (!filtros.usuario_nombre || 
+        e.usuario_nombre?.toLowerCase() === filtros.usuario_nombre.toLowerCase()) &&
+
+      (!filtros.departamento || 
+        e.departamento?.toLowerCase() === filtros.departamento.toLowerCase()) &&
+
+      (!filtros.tipo || 
+        e.tipo?.toLowerCase() === filtros.tipo.toLowerCase()) &&
+
+      (!filtros.marca || 
+        e.marca?.toLowerCase() === filtros.marca.toLowerCase()) &&
+
+      (!filtros.estado || 
+        e.estado?.toLowerCase() === filtros.estado.toLowerCase())
     );
   });
 
@@ -231,7 +241,7 @@ const estadosFiltro = obtenerOpciones(equipos, "estado");
                 </select>
 
                 <div className="filtro-actions">
-                  <button onClick={() => { cargarEquipos(); setMostrarFiltro(false);}}
+                  <button onClick={() => {setMostrarFiltro(false);}}
                     > Aplicar
                   </button>
                   

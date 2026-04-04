@@ -720,11 +720,17 @@ app.get("/api/equipos/listos-envio", auth, async (req, res) => {
         ma.nombre AS marca,
         mo.nombre AS modelo,
         es.nombre AS estado
+        d.nombre AS departamento,
+        u.nombre AS usuario_nombre
+
       FROM equipos e
       JOIN estados es ON e.estado_id = es.id
       LEFT JOIN tipos_de_equipos te ON e.tipo_id = te.id
       LEFT JOIN marcas ma ON e.marca_id = ma.id
       LEFT JOIN modelos mo ON e.modelo_id = mo.id
+      LEFT JOIN departamentos d ON e.departamento_id = d.id
+      LEFT JOIN usuarios u ON e.usuario_asignado = u.id
+      
       WHERE e.estado_id = 5
       ORDER BY e.id DESC
     `);
