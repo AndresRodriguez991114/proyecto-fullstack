@@ -784,7 +784,7 @@ app.put("/api/equipos/:id/enviar", auth, async (req, res) => {
     `, [
       id,
       usuario_id,
-      `ENVÍO FINALIZADO (${estadoNombre.toUpperCase()})`,
+      `ENVÍO FINALIZADO`,
       comentario || "Equipo enviado y activado",
       equipo.estado_id
     ]);
