@@ -20,7 +20,7 @@ const ReparacionPage = () => {
   const [mostrarLista, setMostrarLista] = useState(true);
   const [equipoHistorial, setEquipoHistorial] = useState([]);
   const [modalHistorialOpen, setModalHistorialOpen] = useState(false);
-
+  const estadosPermitidos = ["Mantenimiento", "Reparacion"];
 
   const verHistorial = async (equipo) => {
     try {
@@ -146,7 +146,23 @@ const finalizarReparacion = async () => {
     const cargarEstados = async () => {
       try {
         const res = await api.get("/estados");
+
         setEstados(res.data);
+
+        // Buscar estado según el tipo (sin tilde)
+        const estadoInicial = res.data.find(
+          (est) =>
+            est.nombre.toLowerCase() ===
+            form.tipo.toLowerCase().replace("ó", "o")
+        );
+
+        if (estadoInicial) {
+          setForm((prev) => ({
+            ...prev,
+            estadoFinalId: estadoInicial.id,
+          }));
+        }
+
       } catch (err) {
         console.error("Error cargando estados", err);
       }
@@ -154,7 +170,7 @@ const finalizarReparacion = async () => {
 
     cargarEstados();
     cargarEquiposEnProceso();
-  }, []);
+  }, [form.tipo]);
 
   const guardarReparacion = async (e) => {
     e.preventDefault();
@@ -399,7 +415,7 @@ const finalizarReparacion = async () => {
                         <th>Usuario</th>
                         <th>Diagnóstico</th>
                         <th>Acciones</th>
-                        <th>Estado final</th>
+                        <th>Estado</th>
                         <th>Comentario</th>
                       </tr>
                     </thead>
@@ -451,10 +467,28 @@ const finalizarReparacion = async () => {
             <h3>Registrar reparación / mantenimiento</h3>
 
             <div className="form-grid">
-              <select
-                value={form.tipo}
-                onChange={(e) => setForm({ ...form, tipo: e.target.value })}
-              >
+            <select
+              value={form.tipo}
+              onChange={(e) => {
+                const tipoSeleccionado = e.target.value;
+
+                const normalizar = (texto) =>
+                  texto
+                    .toLowerCase()
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, ""); // quita tildes
+
+                const estadoEncontrado = estados.find(
+                  (est) => normalizar(est.nombre) === normalizar(tipoSeleccionado)
+                );
+
+                setForm({
+                  ...form,
+                  tipo: tipoSeleccionado,
+                  estadoFinalId: estadoEncontrado ? estadoEncontrado.id : "",
+                });
+              }}
+            >
                 <option>Reparación</option>
                 <option>Mantenimiento</option>
               </select>
@@ -490,13 +524,15 @@ const finalizarReparacion = async () => {
               }
               required
             >
-              <option value="">Estado final</option>
+              <option value="">Estado</option>
 
-              {estados.map((e) => (
-                <option key={e.id} value={e.id}>
-                  {e.nombre}
-                </option>
-              ))}
+              {estados
+                .filter((e) => estadosPermitidos.includes(e.nombre))
+                .map((e) => (
+                  <option key={e.id} value={e.id}>
+                    {e.nombre}
+                  </option>
+                ))}
             </select>
             </div>
 
