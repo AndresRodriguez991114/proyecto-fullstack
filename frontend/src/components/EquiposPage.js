@@ -110,12 +110,8 @@ const estadosFiltro = obtenerOpciones(equipos, "estado");
     proveedor: "",
     observaciones: "",
   }); 
-    const marcasFiltradas = marcas.filter(
-    (m) => m.tipo_id === Number(nuevoEquipo.tipo_id)
-    );
     const modelosFiltrados = modelos.filter(
-      (mo) => mo.marca_id === Number(nuevoEquipo.marca_id)
-    );
+    modelo => modelo.marca_id === Number(nuevoEquipo.marca_id));
 
     const cargarEquipos = useCallback(async () => {
       try {
@@ -642,8 +638,10 @@ const validarFormulario = () => {
                   }
                 >
                   <option value="">Seleccione Marca</option>
-                  {marcasFiltradas.map(m => (
-                    <option key={m.id} value={m.id}>{m.nombre}</option>
+                  {marcas.map(m => (
+                    <option key={m.id} value={m.id}>
+                      {m.nombre}
+                      </option>
                   ))}
                 </select>
               </div>
