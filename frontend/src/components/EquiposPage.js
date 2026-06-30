@@ -110,6 +110,13 @@ const estadosFiltro = obtenerOpciones(equipos, "estado");
     proveedor: "",
     observaciones: "",
   }); 
+    const marcasFiltradas = marcas.filter(
+    (m) => m.tipo_id === Number(nuevoEquipo.tipo_id)
+    );
+    const modelosFiltrados = modelos.filter(
+      (mo) => mo.marca_id === Number(nuevoEquipo.marca_id)
+    );
+
     const cargarEquipos = useCallback(async () => {
       try {
         setLoading(true);
@@ -608,7 +615,14 @@ const validarFormulario = () => {
               <div className="form-row">
                 <select
                   value={nuevoEquipo.tipo_id}
-                  onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, tipo_id: e.target.value })}
+                  onChange={(e) =>
+                    setNuevoEquipo({
+                      ...nuevoEquipo,
+                      tipo_id: e.target.value,
+                      marca_id: "",
+                      modelo_id: ""
+                    })
+                  }
                 >
                   <option value="">Seleccione Tipo</option>
                   {tipos.map(t => (
@@ -618,10 +632,17 @@ const validarFormulario = () => {
 
                 <select
                   value={nuevoEquipo.marca_id}
-                  onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, marca_id: e.target.value })}
+                  disabled={!nuevoEquipo.tipo_id}
+                  onChange={(e) =>
+                    setNuevoEquipo({
+                      ...nuevoEquipo,
+                      marca_id: e.target.value,
+                      modelo_id: ""
+                    })
+                  }
                 >
                   <option value="">Seleccione Marca</option>
-                  {marcas.map(m => (
+                  {marcasFiltradas.map(m => (
                     <option key={m.id} value={m.id}>{m.nombre}</option>
                   ))}
                 </select>
@@ -630,10 +651,16 @@ const validarFormulario = () => {
               <div className="form-row">
                 <select
                   value={nuevoEquipo.modelo_id}
-                  onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, modelo_id: e.target.value })}
+                  disabled={!nuevoEquipo.marca_id}
+                  onChange={(e) =>
+                    setNuevoEquipo({
+                      ...nuevoEquipo,
+                      modelo_id: e.target.value
+                    })
+                  }
                 >
                   <option value="">Seleccione Modelo</option>
-                  {modelos.map(mo => (
+                  {modelosFiltrados.map(mo => (
                     <option key={mo.id} value={mo.id}>{mo.nombre}</option>
                   ))}
                 </select>
