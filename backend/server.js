@@ -545,15 +545,17 @@ app.get("/api/marcas", auth, async (req, res) => {
 app.get("/api/modelos", auth, async (req, res) => {
   try {
     const r = await pool.query(`
-      SELECT 
-        id, 
-        nombre 
+      SELECT
+        id,
+        nombre,
         marca_id,
         tipo_id
-      FROM modelos 
-      ORDER BY id ASC
+      FROM modelos
+      ORDER BY nombre ASC
     `);
+
     res.json(r.rows);
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
