@@ -90,15 +90,6 @@
     color:var(--text);
 }
 
-.config-input:focus,
-.config-select:focus{
-
-    border-color:#4f7cff;
-
-    box-shadow:0 0 0 3px rgba(79,124,255,.15);
-
-}
-
 /* ===========================
    BOTONES
 =========================== */
@@ -160,6 +151,7 @@
 .config-icon-btn{
 
     width:36px;
+    color: #cab724;
     height:36px;
     border-radius:10px;
     border:none;
@@ -174,7 +166,7 @@
 
 .config-icon-btn:hover{
 
-    background:#e8efff;
+   background: var(--btn-hover-warning);
 
 }
 
@@ -271,7 +263,7 @@
 .config-shortcut:hover{
 
     background:var(--card-bg);
-    border-color:#4f7cff;
+    border-color:var(--border-color);
     transform:translateX(4px);
 
 }

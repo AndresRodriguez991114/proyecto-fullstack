@@ -15,6 +15,7 @@
 
   --input-bg: rgba(255,255,255,0.9);
   --input-border: rgba(0,0,0,0.15);
+  --border-color:#8f55ff;
 
   --toggle-bg: #eef2ff;
 
@@ -31,13 +32,14 @@
   --sidebar-bg: linear-gradient(180deg,#0f0520,#2b0b3a);
   --sidebar-text: #fff;
 
-  --main-bg: linear-gradient(180deg,#10061e,#130720);
+  --main-bg: radial-gradient(circle at top right,#24143c 0%,#180d2a 45%,#12071d 100%);
 
   --card-bg: rgba(31, 21, 44); 
   --card-border: rgba(255,255,255,0.06);
 
   --input-bg: rgba(0,0,0,0.25);
   --input-border: rgba(255,255,255,0.08);
+  --border-color:#5e2fb8;
 
   --toggle-bg:  rgba(0,0,0,0.25);
 

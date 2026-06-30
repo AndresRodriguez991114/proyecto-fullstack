@@ -3,6 +3,7 @@ import Sidebar from "../módulos/Sidebar";
 import Header from "../módulos/Header";
 import api from "../api";
 import "../Styles/EquiposPage.css";
+import { Pencil, Trash2 } from "lucide-react";
 
 
 const EquiposPage = () => {
@@ -545,33 +546,14 @@ const validarFormulario = () => {
                       className="btn-small btn-edit" 
                       title="Editar Equipo"
                       onClick={() => editarEquipo(e)}>
-                        <i>
-                          <svg width="16" height="16" fill="currentColor">
-                            <path d="M12.854.854a.5.5 0 0 0-.708 0L10.5 2.5l2 2L14.146 
-                            2.854a.5.5 0 0 0 0-.708l-1.292-1.292zM10 3l-8 
-                            8V13h2l8-8-2-2z" />
-                          </svg>
-                        </i>
+                      <Pencil size={16} />
                       </button>
                     {user?.rol === "administrador" && (
                       <button 
                       className="btn-small btn-delete" 
                       title="Eliminar"
                       onClick={() => confirmarEliminarEquipo(e)}>
-                        <i>
-                          <svg width="16" height="16" fill="currentColor">
-                            <path d="M5.5 5.5a.5.5 0 0 1 .5.5v6a.5.5 
-                            0 0 1-1 0v-6a.5.5 0 0 1 .5-.5zm5 
-                            0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 
-                            0v-6a.5.5 0 0 1 .5-.5z" />
-                            <path d="M14.5 3a1 1 0 0 1-1 
-                            1H13v9a2 2 0 0 1-2 
-                            2H5a2 2 0 0 1-2-2V4h-.5a1 1 
-                            0 0 1 0-2h3.1a2 2 0 0 1 
-                            1.9-1.5h2a2 2 0 0 1 1.9 
-                            1.5h3.1a1 1 0 0 1 1 1z" />
-                          </svg>
-                        </i>
+                        <Trash2 size={16} />
                       </button>
                     )}
 
