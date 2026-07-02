@@ -76,12 +76,12 @@
   text-align: left;
   padding: 14px;
   font-weight: 600;
-  border-bottom: 1px solid #2c3446;
+  border-bottom: 1px solid #2c3446b6;
 }
 
 .tabla-admin td {
   padding: 12px;  
-  border-bottom: 1px solid #242b39;
+  border-bottom: 1px solid #242b396c;
 }
 
 .btn-crear {

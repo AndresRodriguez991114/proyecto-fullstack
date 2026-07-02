@@ -3,6 +3,7 @@ import Sidebar from "../módulos/Sidebar";
 import Header from "../módulos/Header";
 import api from "../api";
 import "../Styles/EquiposPage.css";
+import { Pencil, Trash2 } from "lucide-react";
 
 
 const EquiposPage = () => {
@@ -110,6 +111,9 @@ const estadosFiltro = obtenerOpciones(equipos, "estado");
     proveedor: "",
     observaciones: "",
   }); 
+    const modelosFiltrados = modelos.filter(
+    modelo => modelo.marca_id === Number(nuevoEquipo.marca_id));
+
     const cargarEquipos = useCallback(async () => {
       try {
         setLoading(true);
@@ -542,33 +546,14 @@ const validarFormulario = () => {
                       className="btn-small btn-edit" 
                       title="Editar Equipo"
                       onClick={() => editarEquipo(e)}>
-                        <i>
-                          <svg width="16" height="16" fill="currentColor">
-                            <path d="M12.854.854a.5.5 0 0 0-.708 0L10.5 2.5l2 2L14.146 
-                            2.854a.5.5 0 0 0 0-.708l-1.292-1.292zM10 3l-8 
-                            8V13h2l8-8-2-2z" />
-                          </svg>
-                        </i>
+                      <Pencil size={16} />
                       </button>
                     {user?.rol === "administrador" && (
                       <button 
                       className="btn-small btn-delete" 
                       title="Eliminar"
                       onClick={() => confirmarEliminarEquipo(e)}>
-                        <i>
-                          <svg width="16" height="16" fill="currentColor">
-                            <path d="M5.5 5.5a.5.5 0 0 1 .5.5v6a.5.5 
-                            0 0 1-1 0v-6a.5.5 0 0 1 .5-.5zm5 
-                            0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 
-                            0v-6a.5.5 0 0 1 .5-.5z" />
-                            <path d="M14.5 3a1 1 0 0 1-1 
-                            1H13v9a2 2 0 0 1-2 
-                            2H5a2 2 0 0 1-2-2V4h-.5a1 1 
-                            0 0 1 0-2h3.1a2 2 0 0 1 
-                            1.9-1.5h2a2 2 0 0 1 1.9 
-                            1.5h3.1a1 1 0 0 1 1 1z" />
-                          </svg>
-                        </i>
+                        <Trash2 size={16} />
                       </button>
                     )}
 
@@ -608,7 +593,14 @@ const validarFormulario = () => {
               <div className="form-row">
                 <select
                   value={nuevoEquipo.tipo_id}
-                  onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, tipo_id: e.target.value })}
+                  onChange={(e) =>
+                    setNuevoEquipo({
+                      ...nuevoEquipo,
+                      tipo_id: e.target.value,
+                      marca_id: "",
+                      modelo_id: ""
+                    })
+                  }
                 >
                   <option value="">Seleccione Tipo</option>
                   {tipos.map(t => (
@@ -618,11 +610,20 @@ const validarFormulario = () => {
 
                 <select
                   value={nuevoEquipo.marca_id}
-                  onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, marca_id: e.target.value })}
+                  disabled={!nuevoEquipo.tipo_id}
+                  onChange={(e) =>
+                    setNuevoEquipo({
+                      ...nuevoEquipo,
+                      marca_id: e.target.value,
+                      modelo_id: ""
+                    })
+                  }
                 >
                   <option value="">Seleccione Marca</option>
                   {marcas.map(m => (
-                    <option key={m.id} value={m.id}>{m.nombre}</option>
+                    <option key={m.id} value={m.id}>
+                      {m.nombre}
+                      </option>
                   ))}
                 </select>
               </div>
@@ -630,10 +631,16 @@ const validarFormulario = () => {
               <div className="form-row">
                 <select
                   value={nuevoEquipo.modelo_id}
-                  onChange={(e) => setNuevoEquipo({ ...nuevoEquipo, modelo_id: e.target.value })}
+                  disabled={!nuevoEquipo.marca_id}
+                  onChange={(e) =>
+                    setNuevoEquipo({
+                      ...nuevoEquipo,
+                      modelo_id: e.target.value
+                    })
+                  }
                 >
                   <option value="">Seleccione Modelo</option>
-                  {modelos.map(mo => (
+                  {modelosFiltrados.map(mo => (
                     <option key={mo.id} value={mo.id}>{mo.nombre}</option>
                   ))}
                 </select>
