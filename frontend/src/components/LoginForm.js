@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import api from "../api";
 import "../Styles/LoginForm.css";
 import { FaEye, FaEyeSlash, FaEnvelope } from "react-icons/fa";
-import Logo from "../images/Logo.png";
+import Logo from "../images/Logo.webp";
 
 const LoginForm = () => {
   const navigate = useNavigate();
