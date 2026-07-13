@@ -583,6 +583,68 @@ app.post("/api/marcas", auth, async (req, res) => {
     });
   }
 });
+
+// -------------------------------------------------------------
+//     🟢 EDITAR MARCAS
+// -------------------------------------------------------------
+app.put("/api/marcas/:id", auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre } = req.body;
+
+    if (!nombre || !nombre.trim()) {
+      return res.status(400).json({
+        error: "El nombre de la marca es obligatorio."
+      });
+    }
+
+    // Verificar que exista
+    const marca = await pool.query(
+      "SELECT * FROM marcas WHERE id = $1",
+      [id]
+    );
+
+    if (marca.rows.length === 0) {
+      return res.status(404).json({
+        error: "La marca no existe."
+      });
+    }
+
+    // Verificar duplicados (excepto la misma marca)
+    const existe = await pool.query(
+      `SELECT id
+       FROM marcas
+       WHERE LOWER(nombre) = LOWER($1)
+       AND id <> $2`,
+      [nombre.trim(), id]
+    );
+
+    if (existe.rows.length > 0) {
+      return res.status(409).json({
+        error: "Ya existe una marca con ese nombre."
+      });
+    }
+
+    const actualizada = await pool.query(
+      `UPDATE marcas
+       SET nombre = $1
+       WHERE id = $2
+       RETURNING *`,
+      [nombre.trim(), id]
+    );
+
+    res.json({
+      mensaje: "Marca actualizada correctamente.",
+      marca: actualizada.rows[0]
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: "Error al actualizar la marca."
+    });
+  }
+});
 // -------------------------------------------------------------
 //     🟢 LISTAR MODELOS
 // -------------------------------------------------------------
