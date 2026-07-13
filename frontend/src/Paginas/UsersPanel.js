@@ -304,18 +304,6 @@ const handleDelete = async () => {
         marginTop: "26px"
       }}>
         
-        {/* Botón ELIMINAR */}
-        <button
-          className="modal-save"
-          onClick={handleDelete}
-          style={{
-            background: "#ff4a4a",
-            fontWeight: "600"
-          }}
-        >
-          Eliminar
-        </button>
-
         {/* Botón CANCELAR */}
         <button
           className="modal-save"
@@ -329,6 +317,19 @@ const handleDelete = async () => {
         >
           Cancelar
         </button>
+
+        {/* Botón ELIMINAR */}
+        <button
+          className="modal-save"
+          onClick={handleDelete}
+          style={{
+            background: "#ff4a4a",
+            fontWeight: "600"
+          }}
+        >
+          Eliminar
+        </button>
+
       </div>
     </div>
   </div>
