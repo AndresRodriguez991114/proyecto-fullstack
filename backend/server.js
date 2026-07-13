@@ -540,6 +540,50 @@ app.get("/api/marcas", auth, async (req, res) => {
 });
 
 // -------------------------------------------------------------
+//     🟢 CREAR MARCAS
+// -------------------------------------------------------------
+app.post("/api/marcas", auth, async (req, res) => {
+  try {
+    const { nombre } = req.body;
+
+    if (!nombre || !nombre.trim()) {
+      return res.status(400).json({
+        error: "El nombre de la marca es obligatorio."
+      });
+    }
+
+    // Verificar si ya existe
+    const existe = await pool.query(
+      "SELECT id FROM marcas WHERE LOWER(nombre) = LOWER($1)",
+      [nombre.trim()]
+    );
+
+    if (existe.rows.length > 0) {
+      return res.status(409).json({
+        error: "La marca ya existe."
+      });
+    }
+
+    const nuevaMarca = await pool.query(
+      `INSERT INTO marcas (nombre)
+       VALUES ($1)
+       RETURNING *`,
+      [nombre.trim()]
+    );
+
+    res.status(201).json({
+      mensaje: "Marca creada correctamente.",
+      marca: nuevaMarca.rows[0]
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: "Error al crear la marca."
+    });
+  }
+});
+// -------------------------------------------------------------
 //     🟢 LISTAR MODELOS
 // -------------------------------------------------------------
 app.get("/api/modelos", auth, async (req, res) => {
