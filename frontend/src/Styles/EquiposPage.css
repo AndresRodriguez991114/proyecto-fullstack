@@ -224,6 +224,11 @@
   color: var(--text);
   width: 100%;
 }
+.equipos-modal select option{
+    background: var(--input-Select);
+    color:var(--text);
+}
+ 
    
 .equipos-btn-save {
   padding: 12px;
@@ -515,8 +520,12 @@
 }
 
 .tabla-select select{
-    padding:7px 12px;
-    border-radius:8px;
+    background: var(--card-bg); 
+    color: var(--text);
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    outline: none;
 }
 
 .paginacion{

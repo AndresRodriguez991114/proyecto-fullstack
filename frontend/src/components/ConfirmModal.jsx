@@ -53,9 +53,12 @@ const ConfirmModal = ({
                 >
 
                     <button
-                        className="config-btn"
+                        className="config-boton"
                         style={{
-                            background: "#6b7280"
+                                        background: "var(--input-bg)",
+                                        color: "var(--text)",
+                                        border: "1px solid var(--input-border)",
+                                        fontWeight: "600"
                         }}
                         onClick={onCancel}
                     >
@@ -63,7 +66,7 @@ const ConfirmModal = ({
                     </button>
 
                     <button
-                        className="config-btn config-btn-danger"
+                        className="config-boton config-boton-danger"
                         onClick={onConfirm}
                     >
                         {confirmText}
