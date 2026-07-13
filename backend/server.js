@@ -645,6 +645,56 @@ app.put("/api/marcas/:id", auth, async (req, res) => {
     });
   }
 });
+
+// -------------------------------------------------------------
+//     🟢 ELIMINAR MARCAS
+// -------------------------------------------------------------
+app.delete("/api/marcas/:id", auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Verificar que la marca exista
+    const marca = await pool.query(
+      "SELECT id FROM marcas WHERE id = $1",
+      [id]
+    );
+
+    if (marca.rows.length === 0) {
+      return res.status(404).json({
+        error: "La marca no existe."
+      });
+    }
+
+    // Verificar si tiene modelos asociados
+    const modelos = await pool.query(
+      "SELECT id FROM modelos WHERE marca_id = $1 LIMIT 1",
+      [id]
+    );
+
+    if (modelos.rows.length > 0) {
+      return res.status(409).json({
+        error: "No se puede eliminar la marca porque tiene modelos asociados."
+      });
+    }
+
+    await pool.query(
+      "DELETE FROM marcas WHERE id = $1",
+      [id]
+    );
+
+    res.json({
+      mensaje: "Marca eliminada correctamente."
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: "Error al eliminar la marca."
+    });
+  }
+});
+
 // -------------------------------------------------------------
 //     🟢 LISTAR MODELOS
 // -------------------------------------------------------------
