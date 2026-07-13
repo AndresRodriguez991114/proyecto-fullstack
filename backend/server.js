@@ -718,6 +718,244 @@ app.get("/api/modelos", auth, async (req, res) => {
 });
 
 // -------------------------------------------------------------
+//     🟢 CREAR MODELO
+// -------------------------------------------------------------
+app.post("/api/modelos", auth, async (req, res) => {
+  try {
+    const { nombre, marca_id, tipo_id } = req.body;
+
+    if (!nombre || !nombre.trim()) {
+      return res.status(400).json({
+        error: "El nombre del modelo es obligatorio."
+      });
+    }
+
+    if (!marca_id) {
+      return res.status(400).json({
+        error: "Debe seleccionar una marca."
+      });
+    }
+
+    if (!tipo_id) {
+      return res.status(400).json({
+        error: "Debe seleccionar un tipo de equipo."
+      });
+    }
+
+    // Verificar que exista la marca
+    const marca = await pool.query(
+      "SELECT id FROM marcas WHERE id = $1",
+      [marca_id]
+    );
+
+    if (marca.rows.length === 0) {
+      return res.status(404).json({
+        error: "La marca seleccionada no existe."
+      });
+    }
+
+    // Verificar que exista el tipo
+    const tipo = await pool.query(
+      "SELECT id FROM tipos_de_equipos WHERE id = $1",
+      [tipo_id]
+    );
+
+    if (tipo.rows.length === 0) {
+      return res.status(404).json({
+        error: "El tipo de equipo no existe."
+      });
+    }
+
+    // Evitar duplicados para la misma marca y tipo
+    const existe = await pool.query(
+      `SELECT id
+       FROM modelos
+       WHERE LOWER(nombre) = LOWER($1)
+         AND marca_id = $2
+         AND tipo_id = $3`,
+      [nombre.trim(), marca_id, tipo_id]
+    );
+
+    if (existe.rows.length > 0) {
+      return res.status(409).json({
+        error: "Ese modelo ya existe para esa marca y tipo."
+      });
+    }
+
+    const nuevo = await pool.query(
+      `INSERT INTO modelos (nombre, marca_id, tipo_id)
+       VALUES ($1,$2,$3)
+       RETURNING *`,
+      [nombre.trim(), marca_id, tipo_id]
+    );
+
+    res.status(201).json({
+      mensaje: "Modelo creado correctamente.",
+      modelo: nuevo.rows[0]
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: "Error al crear el modelo."
+    });
+  }
+});
+
+// -------------------------------------------------------------
+//     🟢 ACTUALIZAR MODELO
+// -------------------------------------------------------------
+app.put("/api/modelos/:id", auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre, marca_id, tipo_id } = req.body;
+
+    if (!nombre || !nombre.trim()) {
+      return res.status(400).json({
+        error: "El nombre del modelo es obligatorio."
+      });
+    }
+
+    if (!marca_id) {
+      return res.status(400).json({
+        error: "Debe seleccionar una marca."
+      });
+    }
+
+    if (!tipo_id) {
+      return res.status(400).json({
+        error: "Debe seleccionar un tipo de equipo."
+      });
+    }
+
+    // Verificar que exista el modelo
+    const modelo = await pool.query(
+      "SELECT id FROM modelos WHERE id = $1",
+      [id]
+    );
+
+    if (modelo.rows.length === 0) {
+      return res.status(404).json({
+        error: "El modelo no existe."
+      });
+    }
+
+    // Verificar que exista la marca
+    const marca = await pool.query(
+      "SELECT id FROM marcas WHERE id = $1",
+      [marca_id]
+    );
+
+    if (marca.rows.length === 0) {
+      return res.status(404).json({
+        error: "La marca seleccionada no existe."
+      });
+    }
+
+    // Verificar que exista el tipo
+    const tipo = await pool.query(
+      "SELECT id FROM tipos_de_equipos WHERE id = $1",
+      [tipo_id]
+    );
+
+    if (tipo.rows.length === 0) {
+      return res.status(404).json({
+        error: "El tipo de equipo no existe."
+      });
+    }
+
+    // Verificar duplicados
+    const existe = await pool.query(
+      `SELECT id
+       FROM modelos
+       WHERE LOWER(nombre) = LOWER($1)
+         AND marca_id = $2
+         AND tipo_id = $3
+         AND id <> $4`,
+      [nombre.trim(), marca_id, tipo_id, id]
+    );
+
+    if (existe.rows.length > 0) {
+      return res.status(409).json({
+        error: "Ya existe un modelo con ese nombre para esa marca y tipo."
+      });
+    }
+
+    const actualizado = await pool.query(
+      `UPDATE modelos
+       SET nombre = $1,
+           marca_id = $2,
+           tipo_id = $3
+       WHERE id = $4
+       RETURNING *`,
+      [nombre.trim(), marca_id, tipo_id, id]
+    );
+
+    res.json({
+      mensaje: "Modelo actualizado correctamente.",
+      modelo: actualizado.rows[0]
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: "Error al actualizar el modelo."
+    });
+  }
+});
+
+// -------------------------------------------------------------
+//     🟢 ELIMINAR MODELO
+// -------------------------------------------------------------
+app.delete("/api/modelos/:id", auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Verificar que exista
+    const modelo = await pool.query(
+      "SELECT id FROM modelos WHERE id = $1",
+      [id]
+    );
+
+    if (modelo.rows.length === 0) {
+      return res.status(404).json({
+        error: "El modelo no existe."
+      });
+    }
+
+    // Verificar si está siendo utilizado por algún equipo
+    const equipos = await pool.query(
+      "SELECT id FROM equipos WHERE modelo_id = $1 LIMIT 1",
+      [id]
+    );
+
+    if (equipos.rows.length > 0) {
+      return res.status(409).json({
+        error: "No se puede eliminar el modelo porque está asociado a uno o más equipos."
+      });
+    }
+
+    await pool.query(
+      "DELETE FROM modelos WHERE id = $1",
+      [id]
+    );
+
+    res.json({
+      mensaje: "Modelo eliminado correctamente."
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: "Error al eliminar el modelo."
+    });
+  }
+});
+
+// -------------------------------------------------------------
 //     🟢 LISTAR DEPARTAMENTOS
 // -------------------------------------------------------------
 app.get("/api/departamentos", auth, async (req, res) => {
@@ -726,6 +964,166 @@ app.get("/api/departamentos", auth, async (req, res) => {
     res.json(r.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------------
+//     🟢 CREAR DEPARTAMENTO
+// -------------------------------------------------------------
+app.post("/api/departamentos", auth, async (req, res) => {
+  try {
+    const { nombre } = req.body;
+
+    if (!nombre || !nombre.trim()) {
+      return res.status(400).json({
+        error: "El nombre del departamento es obligatorio."
+      });
+    }
+
+    // Verificar duplicados
+    const existe = await pool.query(
+      `SELECT id
+       FROM departamentos
+       WHERE LOWER(nombre) = LOWER($1)`,
+      [nombre.trim()]
+    );
+
+    if (existe.rows.length > 0) {
+      return res.status(409).json({
+        error: "El departamento ya existe."
+      });
+    }
+
+    const nuevo = await pool.query(
+      `INSERT INTO departamentos (nombre)
+       VALUES ($1)
+       RETURNING *`,
+      [nombre.trim()]
+    );
+
+    res.status(201).json({
+      mensaje: "Departamento creado correctamente.",
+      departamento: nuevo.rows[0]
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: "Error al crear el departamento."
+    });
+  }
+});
+
+// -------------------------------------------------------------
+//     🟢 ACTUALIZAR DEPARTAMENTO
+// -------------------------------------------------------------
+app.put("/api/departamentos/:id", auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre } = req.body;
+
+    if (!nombre || !nombre.trim()) {
+      return res.status(400).json({
+        error: "El nombre del departamento es obligatorio."
+      });
+    }
+
+    // Verificar que exista
+    const departamento = await pool.query(
+      "SELECT id FROM departamentos WHERE id = $1",
+      [id]
+    );
+
+    if (departamento.rows.length === 0) {
+      return res.status(404).json({
+        error: "El departamento no existe."
+      });
+    }
+
+    // Verificar duplicados
+    const existe = await pool.query(
+      `SELECT id
+       FROM departamentos
+       WHERE LOWER(nombre) = LOWER($1)
+       AND id <> $2`,
+      [nombre.trim(), id]
+    );
+
+    if (existe.rows.length > 0) {
+      return res.status(409).json({
+        error: "Ya existe un departamento con ese nombre."
+      });
+    }
+
+    const actualizado = await pool.query(
+      `UPDATE departamentos
+       SET nombre = $1
+       WHERE id = $2
+       RETURNING *`,
+      [nombre.trim(), id]
+    );
+
+    res.json({
+      mensaje: "Departamento actualizado correctamente.",
+      departamento: actualizado.rows[0]
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: "Error al actualizar el departamento."
+    });
+  }
+});
+
+// -------------------------------------------------------------
+//     🟢 ELIMINAR DEPARTAMENTO
+// -------------------------------------------------------------
+app.delete("/api/departamentos/:id", auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Verificar que exista
+    const departamento = await pool.query(
+      "SELECT id FROM departamentos WHERE id = $1",
+      [id]
+    );
+
+    if (departamento.rows.length === 0) {
+      return res.status(404).json({
+        error: "El departamento no existe."
+      });
+    }
+
+    // Verificar si está siendo utilizado por equipos
+    const equipos = await pool.query(
+      "SELECT id FROM equipos WHERE departamento_id = $1 LIMIT 1",
+      [id]
+    );
+
+    if (equipos.rows.length > 0) {
+      return res.status(409).json({
+        error: "No se puede eliminar el departamento porque está asignado a uno o más equipos."
+      });
+    }
+
+    await pool.query(
+      "DELETE FROM departamentos WHERE id = $1",
+      [id]
+    );
+
+    res.json({
+      mensaje: "Departamento eliminado correctamente."
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: "Error al eliminar el departamento."
+    });
   }
 });
 
