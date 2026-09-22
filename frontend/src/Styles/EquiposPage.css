@@ -224,6 +224,11 @@
   color: var(--text);
   width: 100%;
 }
+.equipos-modal select option{
+    background: var(--input-Select);
+    color:var(--text);
+}
+ 
    
 .equipos-btn-save {
   padding: 12px;
@@ -499,4 +504,48 @@
 
 .btn-envio-masivo {
   width: fit-content;
+}
+
+.tabla-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.tabla-select{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.tabla-select select{
+    background: var(--card-bg); 
+    color: var(--text);
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    outline: none;
+}
+
+.paginacion{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:20px;
+    margin-top:20px;
+}
+
+.paginacion button{
+    padding:8px 16px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background: linear-gradient(90deg,#5e2fb8,#8f55ff);
+    color:white;
+}
+
+.paginacion button:disabled{
+    opacity:.5;
+    cursor:not-allowed;
 }

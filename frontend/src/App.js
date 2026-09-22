@@ -1,15 +1,15 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LoginForm from "./components/LoginForm";
-import UsuariosPage from "./components/UsuariosPage";
-import ProtectedRoute from "./components/ProtectedRoute";
-import EquiposPage from "./components/EquiposPage";
-import ReportesPage from "./components/ReportesPage";
-import DiademasPage from "./components/DiademasPage";
-import ReparacionPage from "./components/ReparacionPage";
-import EnviosPage from "./components/EnviosPage";
-import ConfiguracionPage from "./components/ConfiguracionPage";
-import InicioPage from "./components/InicioPage";
-import Dashboard from "./components/Dashboard";
+import LoginForm from "./Paginas/LoginForm";
+import UsuariosPage from "./Paginas/UsuariosPage";
+import ProtectedRoute from "./Paginas/ProtectedRoute";
+import EquiposPage from "./Paginas/EquiposPage";
+import ReportesPage from "./Paginas/ReportesPage";
+import DiademasPage from "./Paginas/DiademasPage";
+import ReparacionPage from "./Paginas/ReparacionPage";
+import EnviosPage from "./Paginas/EnviosPage";
+import ConfiguracionPage from "./Paginas/ConfiguracionPage";
+import InicioPage from "./Paginas/InicioPage";
+import Dashboard from "./Paginas/Dashboard";
 
 
 function App() {

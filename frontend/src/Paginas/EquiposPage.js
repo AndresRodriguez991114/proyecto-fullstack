@@ -15,6 +15,8 @@ const EquiposPage = () => {
   const [formError, setFormError] = useState("");
   const [equipos, setEquipos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [registrosPorPagina, setRegistrosPorPagina] = useState(10);
   
   const [equipoHistorial, setEquipoHistorial] = useState([]);
   const [modalHistorialOpen, setModalHistorialOpen] = useState(false);
@@ -45,6 +47,7 @@ const EquiposPage = () => {
   });
 
 const equiposFiltrados = equipos.filter(e => {
+
   const textoBusqueda = filtros.search.toLowerCase();
 
   const coincideBusqueda =
@@ -67,6 +70,26 @@ const equiposFiltrados = equipos.filter(e => {
     (!filtros.estado || e.estado === filtros.estado)
   );
 });
+
+  const indiceUltimo =
+    registrosPorPagina === "all"
+      ? equiposFiltrados.length
+      : paginaActual * registrosPorPagina;
+
+  const indicePrimero =
+    registrosPorPagina === "all"
+      ? 0
+      : indiceUltimo - registrosPorPagina;
+
+  const equiposPaginados =
+    registrosPorPagina === "all"
+      ? equiposFiltrados
+      : equiposFiltrados.slice(indicePrimero, indiceUltimo);
+
+  const totalPaginas =
+    registrosPorPagina === "all"
+      ? 1
+      : Math.ceil(equiposFiltrados.length / registrosPorPagina);
 
 
 // 🔽 SOLO PARA FILTROS
@@ -503,68 +526,126 @@ const validarFormulario = () => {
           {loading ? (
             <p className="cargando">Cargando equipos...</p>
           ) : (
-            <table className="tabla-admin">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Serial</th>
-                  <th>S/N</th>
-                  <th>Tipo</th>
-                  <th>Marca</th>
-                  <th>Modelo</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
+            <>
+              {/* HEADER DE LA TABLA (CONTROLES Y MÉTRICAS) */}
+              <div className="tabla-header">
+                <div className="tabla-info">
+                  Mostrando {equiposPaginados.length} de {equiposFiltrados.length} equipos
+                </div>
 
-              <tbody>
-                {equiposFiltrados.map((e) => (
-                  <tr key={e.id}>
-                    <td>{e.id}</td>
-                    <td>{e.serial}</td>
-                    <td>{e.sn}</td>
-                    <td>{e.tipo}</td>
-                    <td>{e.marca}</td>
-                    <td>{e.modelo}</td>
-                    <td>{e.estado}</td>
-                    <td>
-                      {/* 👁️ VER DETALLE */}
-                      <button
-                        className="btn-small btn-view"
-                        title="Ver Detalle"
-                        onClick={() => { console.log("CLICK: Ver detalle", e.id); abrirDetalle(e); }}
-                      >
-                        <i>
-                          <svg width="16" height="16" fill="currentColor">
-                            <path d="M8 3.5c-4 0-7 4-7 4s3 4 7 4 7-4 7-4-3-4-7-4zm0 6.5a2.5 2.5 0 1 1 0-5 
-                            2.5 2.5 0 0 1 0 5z" />
+                <div className="tabla-select">
+                  <span>Mostrar</span>
+                  <select
+                    value={registrosPorPagina}
+                    onChange={(e) => {
+                      const valor =
+                        e.target.value === "all"
+                          ? "all"
+                          : Number(e.target.value);
+
+                      setRegistrosPorPagina(valor);
+                      setPaginaActual(1);
+                    }}
+                  >
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                    <option value="all">Todos</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* TABLA DE ADMINISTRACIÓN */}
+              <table className="tabla-admin">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Serial</th>
+                    <th>S/N</th>
+                    <th>Tipo</th>
+                    <th>Marca</th>
+                    <th>Modelo</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {equiposPaginados.map((e) => (
+                    <tr key={e.id}>
+                      <td>{e.id}</td>
+                      <td>{e.serial}</td>
+                      <td>{e.sn}</td>
+                      <td>{e.tipo}</td>
+                      <td>{e.marca}</td>
+                      <td>{e.modelo}</td>
+                      <td>{e.estado}</td>
+                      <td>
+                        {/* 👁️ VER DETALLE */}
+                        <button
+                          className="btn-small btn-view"
+                          title="Ver Detalle"
+                          aria-label="Ver detalle del equipo"
+                          onClick={() => { console.log("CLICK: Ver detalle", e.id); abrirDetalle(e); }}
+                        >
+                          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                            <path d="M0 8s3-5.5 8-5.5s8 5.5 8 5.5s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
                           </svg>
-                        </i>
-                      </button>
+                        </button>
 
-                      <button 
-                      className="btn-small btn-edit" 
-                      title="Editar Equipo"
-                      onClick={() => editarEquipo(e)}>
-                      <Pencil size={16} />
-                      </button>
-                    {user?.rol === "administrador" && (
-                      <button 
-                      className="btn-small btn-delete" 
-                      title="Eliminar"
-                      onClick={() => confirmarEliminarEquipo(e)}>
-                        <Trash2 size={16} />
-                      </button>
-                    )}
+                        {/* ✏️ EDITAR EQUIPO */}
+                        <button 
+                          className="btn-small btn-edit" 
+                          title="Editar Equipo"
+                          aria-label="Editar equipo"
+                          onClick={() => editarEquipo(e)}
+                        >
+                          <Pencil size={16} />
+                        </button>
+                        
+                        {/* 🗑️ ELIMINAR EQUIPO */}
+                        {user?.rol === "administrador" && (
+                          <button 
+                            className="btn-small btn-delete" 
+                            title="Eliminar"
+                            aria-label="Eliminar equipo"
+                            onClick={() => confirmarEliminarEquipo(e)}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+{/* SISTEMA DE PAGINACIÓN */}
+              {registrosPorPagina !== "all" && totalPaginas > 1 && (
+                <div className="paginacion">
+                  <button
+                    onClick={() => setPaginaActual(p => p - 1)}
+                    disabled={paginaActual === 1}
+                  >
+                    Anterior
+                  </button>
 
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </section>
+                  <span>
+                    Página {paginaActual} de {totalPaginas}
+                  </span>
 
+                  <button
+                    onClick={() => setPaginaActual(p => p + 1)}
+                    disabled={paginaActual === totalPaginas}
+                  >
+                    Siguiente
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </section>
+        
         {/* ========================= */}
         {/* MODAL CREAR EQUIPO       */}
         {/* ========================= */}
