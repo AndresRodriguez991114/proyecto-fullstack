@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../módulos/Sidebar";
 import Header from "../módulos/Header";
 import "../Styles/InicioPage.css";
 import api from "../api"; 
 
 const InicioPage = () => {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const raw = localStorage.getItem("user");
   const user = raw ? JSON.parse(raw) : null;
@@ -115,25 +117,24 @@ useEffect(() => {
           <h2>Accesos rápidos</h2>
 
           <div className="atajos-grid">
-            <div className="atajo-card" onClick={() => window.location.href = "/equipos"}>
+            <div className="atajo-card" onClick={() => navigate("/equipos")}>
               <span>🖥️</span>
               <p>Equipos</p>
             </div>
 
-            <div className="atajo-card" onClick={() => window.location.href = "/usuarios"}>
+            <div className="atajo-card" onClick={() => navigate("/usuarios")}>
               <span>👥</span>
               <p>Usuarios</p>
             </div>
 
-            <div className="atajo-card" onClick={() => window.location.href = "/reparacion"}>
+            <div className="atajo-card" onClick={() => navigate("/reparacion")}>
               <span>🛠️</span>
               <p>Reparaciones</p>
             </div>
-            <div className="atajo-card" onClick={() => window.location.href = "/Envios"}>
+            <div className="atajo-card" onClick={() => navigate("/envios")}>
               <span>🚚</span>
-              <p>Envios</p>
+              <p>Envíos</p>
             </div>
-            
           </div>
         </section>
 

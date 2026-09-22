@@ -11,27 +11,26 @@ import ConfiguracionPage from "./Paginas/ConfiguracionPage";
 import InicioPage from "./Paginas/InicioPage";
 import Dashboard from "./Paginas/Dashboard";
 
-
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LoginForm />} />
 
-        <Route path="/AdminDashboard" element={<div>Usuario normal: dashboard</div>} />
-        
-        <Route path="/Dashboard" element={<Dashboard />} />
+        <Route path="/adminDashboard" element={<div>Usuario normal: dashboard</div>} />
+
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/equipos" element={<EquiposPage />} />
         <Route path="/diademas" element={<DiademasPage />} />
         <Route path="/reparacion" element={<ReparacionPage />} />
-        <Route path="/Envios" element={<EnviosPage />} />
+        <Route path="/envios" element={<EnviosPage />} />
         <Route path="/configuracion" element={<ConfiguracionPage />} />
 
         <Route
           path="/inicio"
           element={
             <ProtectedRoute>
-              <InicioPage/>
+              <InicioPage />
             </ProtectedRoute>
           }
         />
@@ -39,7 +38,7 @@ function App() {
           path="/usuarios"
           element={
             <ProtectedRoute>
-              <UsuariosPage/>
+              <UsuariosPage />
             </ProtectedRoute>
           }
         />

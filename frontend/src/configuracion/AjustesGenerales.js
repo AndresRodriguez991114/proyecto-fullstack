@@ -3,7 +3,7 @@ import { Settings, Save } from "lucide-react";
 
 const AjustesGenerales = () => {
   return (
-    <div className="config-card">
+    <div className="config-card" id="ajustes-generales">
 
       <div className="config-card-header">
         <Settings size={24} />

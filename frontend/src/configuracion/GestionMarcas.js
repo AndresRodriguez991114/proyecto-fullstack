@@ -126,6 +126,8 @@ const GestionMarcas = () => {
                 <div className="config-list">
                     {loading ? (
                         <p>Cargando marcas...</p>
+                    ) : marcas.length === 0 ? (
+                        <p className="config-empty">No hay marcas registradas.</p>
                     ) : (
                         marcas.map((item) => (
                             <div className="config-item" key={item.id}>
@@ -148,6 +150,8 @@ const GestionMarcas = () => {
                                 <div className="config-actions">
                                     <button
                                         className="config-icon-btn"
+                                        title={editando === item.id ? "Guardar marca" : "Editar marca"}
+                                        aria-label={editando === item.id ? "Guardar marca" : "Editar marca"}
                                         onClick={() => {
                                             if (editando === item.id) {
                                                 guardarEdicion();
@@ -161,6 +165,8 @@ const GestionMarcas = () => {
 
                                     <button
                                         className="config-icon-btn delete"
+                                        title="Eliminar marca"
+                                        aria-label="Eliminar marca"
                                         onClick={() => {
                                             setMarcaEliminar(item);
                                             setModalEliminar(true);
@@ -189,6 +195,7 @@ const GestionMarcas = () => {
 
                     <button
                         className="config-btn"
+                        disabled={!marca.trim()}
                         onClick={guardarMarca}
                     >
                         <Plus size={18} />

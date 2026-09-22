@@ -17,13 +17,12 @@ import {
 
 const Sidebar = ({ user, menuOpen, setMenuOpen }) => {
   const navigate = useNavigate();
+  const isAdmin = user?.rol === "administrador" || user?.rol === "admin";
 
   return (
     <aside className={`admin-sidebar ${menuOpen ? "open" : ""}`}>
-      
-      {/* LOGO */}
       <Link
-        to={user?.rol === "administrador" ? "/Inicio" : "/Dashboard"}
+        to={isAdmin ? "/inicio" : "/dashboard"}
         className="brand"
         onClick={() => setMenuOpen(false)}
       >
@@ -31,14 +30,10 @@ const Sidebar = ({ user, menuOpen, setMenuOpen }) => {
         <h3>Cloud + Inventory</h3>
       </Link>
 
-      {/* MENÚ */}
       <nav className="admin-nav">
-
         <NavLink
-          to={user?.rol === "administrador" ? "/Inicio" : "/Dashboard"}
-          className={({ isActive }) =>
-            `menu-item ${isActive ? "active" : ""}`
-          }
+          to={isAdmin ? "/inicio" : "/dashboard"}
+          className={({ isActive }) => `menu-item ${isActive ? "active" : ""}`}
           onClick={() => setMenuOpen(false)}
         >
           <Home size={18} />
@@ -56,7 +51,7 @@ const Sidebar = ({ user, menuOpen, setMenuOpen }) => {
           <span>Equipos</span>
         </NavLink>
 
-        {user?.rol === "administrador" && (
+        {isAdmin && (
           <>
             <NavLink
               to="/reportes"
@@ -105,14 +100,14 @@ const Sidebar = ({ user, menuOpen, setMenuOpen }) => {
         </NavLink>
 
         <NavLink
-          to="/Envios"
+          to="/envios"
           className={({ isActive }) =>
             `menu-item ${isActive ? "active" : ""}`
           }
           onClick={() => setMenuOpen(false)}
         >
           <Truck size={18} />
-          <span>Envios</span>
+          <span>Envíos</span>
         </NavLink>
 
         <NavLink
@@ -128,13 +123,13 @@ const Sidebar = ({ user, menuOpen, setMenuOpen }) => {
 
       </nav>
 
-      {/* FOOTER */}
       <div className="sidebar-footer">
         <small>{user?.nombre || user?.email || "Usuario"}</small>
 
         <button
           className="btn-logout"
           onClick={() => {
+            localStorage.removeItem("token");
             localStorage.removeItem("user");
             navigate("/");
           }}

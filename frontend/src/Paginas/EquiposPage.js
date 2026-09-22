@@ -199,7 +199,7 @@ const estadosFiltro = obtenerOpciones(equipos, "estado");
         const params = new URLSearchParams(filtros).toString();
 
         const response = await fetch(
-          `https://proyecto-fullstack-nfai.onrender.com/api/reportes/equipos?formato=${formato}&${params}`,
+          `${api.defaults.baseURL}/reportes/equipos?formato=${formato}&${params}`,
           {
             headers: {
               Authorization: `Bearer ${token}`

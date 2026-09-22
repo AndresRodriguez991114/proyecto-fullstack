@@ -1,20 +1,20 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 
-/**
- * Protege rutas que solo pueden ver usuarios con rol 'admin'.
- * Comprueba localStorage.user (lo guardas al login).
- */
 const ProtectedRoute = ({ children }) => {
   const raw = localStorage.getItem("user");
   if (!raw) return <Navigate to="/" replace />;
 
   try {
     const user = JSON.parse(raw);
-    if (user?.rol === "administrador" || user?.role === "administrador" || user?.tipo === "Administrador") {
+    const role = user?.rol || user?.role || user?.tipo;
+    const allowedRoles = ["administrador", "admin", "Administrador", "ADMIN"];
+
+    if (allowedRoles.includes(role)) {
       return children;
     }
-    return <Navigate to="/" replace />;
+
+    return <Navigate to="/dashboard" replace />;
   } catch (err) {
     return <Navigate to="/" replace />;
   }

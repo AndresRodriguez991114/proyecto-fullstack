@@ -81,9 +81,10 @@ const LoginForm = () => {
         localStorage.setItem("user", JSON.stringify(response.data.user));
       }
 
-      // Redirección según rol
-      if (response.data?.user?.rol === "administrador") navigate("/inicio");
-      else navigate("/Dashboard");
+      const userRole = response.data?.user?.rol;
+      const isAdmin = userRole === "administrador" || userRole === "admin";
+
+      navigate(isAdmin ? "/inicio" : "/dashboard");
 
       reset();
     } catch (error) {

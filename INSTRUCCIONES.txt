@@ -1,0 +1,178 @@
+﻿╔═══════════════════════════════════════════════════════════════════════╗
+║        INSTRUCCIONES PARA USAR EL SISTEMA DE REPORTES                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+ARCHIVOS CLAVE CREADOS/MODIFICADOS:
+───────────────────────────────────────────────────────────────────────
+
+📂 FRONTEND:
+   • frontend/src/Paginas/ReportesPage.js - Página principal de reportes
+   • frontend/src/Styles/ReportesPage.css - Estilos mejorados
+
+📂 BACKEND:
+   • backend/utils/generarExcel.js - Generador de archivos Excel
+   • backend/utils/generarPDF.js - Generador de archivos PDF
+   • backend/package.json - Dependencias actualizadas
+
+📂 DOCUMENTACIÓN (en raíz del proyecto):
+   • README_REPORTES.md - Guía rápida de inicio
+   • REPORTES_MEJORAS.md - Resumen de cambios
+   • GUIA_PRUEBA_REPORTES.md - Instrucciones de prueba
+   • TECH_REPORTES.md - Documentación técnica completa
+
+
+PASOS PARA EMPEZAR:
+───────────────────────────────────────────────────────────────────────
+
+1️⃣  INSTALAR DEPENDENCIAS:
+    • Abre una terminal en la carpeta 'backend'
+    • Ejecuta: npm install
+    • Espera a que terminen de instalar exceljs y pdfkit
+
+2️⃣  INICIAR EL BACKEND:
+    • En la terminal del backend, ejecuta: npm start
+    • Deberías ver el mensaje: "Server running on port..."
+
+3️⃣  INICIAR EL FRONTEND (en otra terminal):
+    • Abre otra terminal en la carpeta 'frontend'
+    • Ejecuta: npm start
+    • La aplicación se abrirá automáticamente
+
+4️⃣  ACCEDER A REPORTES:
+    • Una vez en la aplicación, inicia sesión
+    • En el menú lateral, haz clic en "Reportes"
+    • Verás 3 tipos de reportes disponibles
+
+
+CÓMO USAR LOS REPORTES:
+───────────────────────────────────────────────────────────────────────
+
+REPORTE GENERAL:
+   → Muestra el estado consolidado de todos los equipos
+   → Botón "Excel": Descarga en formato Excel profesional
+   → Botón "PDF": Descarga en formato PDF profesional
+
+MANTENIMIENTOS:
+   → Histórico completo de mantenimientos realizados
+   → Incluye: Serial, Usuario, Fecha, Comentarios, Diagnóstico
+   → Disponible en Excel y PDF
+
+REPARACIONES:
+   → Histórico completo de reparaciones realizadas
+   → Mismo contenido que mantenimientos
+   → Disponible en Excel y PDF
+
+EQUIPOS (Bonus en la página de Equipos):
+   → Exporta el listado actual de equipos
+   → Respeta los filtros que hayas aplicado
+   → Disponible en Excel y PDF
+
+
+CARACTERÍSTICAS DE LOS ARCHIVOS DESCARGADOS:
+───────────────────────────────────────────────────────────────────────
+
+EXCEL (.xlsx):
+   ✓ Encabezados en azul con texto blanco
+   ✓ Filas alternadas en gris para mejor legibilidad
+   ✓ Fila de encabezado congelada (se queda visible al scroll)
+   ✓ Columnas con ancho automático
+   ✓ Título y fecha de generación al inicio
+   ✓ Total de registros al final
+   ✓ Nombre del archivo incluye la fecha: Reporte_General_2025-09-21.xlsx
+
+PDF (.pdf):
+   ✓ Formato A4 profesional
+   ✓ Título centrado y formateado
+   ✓ Fecha y hora de generación visible
+   ✓ Tabla con separadores profesionales
+   ✓ Encabezados en negrita
+   ✓ Filas con colores alternos
+   ✓ Información de total de registros
+   ✓ Pie de página con créditos
+
+
+INFORMACIÓN TÉCNICA:
+───────────────────────────────────────────────────────────────────────
+
+Las nuevas librerías instaladas son:
+   • exceljs (v4.4.0) - Para generar archivos Excel
+   • pdfkit (v0.17.2) - Para generar archivos PDF
+
+Todos los reportes requieren autenticación JWT.
+Los datos se obtienen en tiempo real de la base de datos PostgreSQL.
+
+
+SOLUCIÓN DE PROBLEMAS:
+───────────────────────────────────────────────────────────────────────
+
+❌ "Error al generar el reporte"
+   ✓ Verifica que hayas iniciado sesión correctamente
+   ✓ Revisa que el backend esté ejecutándose
+   ✓ Abre la consola del navegador (F12) para ver errores
+
+❌ "El archivo no se descarga"
+   ✓ Verifica la configuración de descargas del navegador
+   ✓ Intenta desactivar el bloqueador de anuncios temporalmente
+
+❌ "El Excel/PDF está vacío"
+   ✓ Verifica que haya datos en la base de datos
+   ✓ Revisa los logs del backend
+
+❌ Error 401 "No autorizado"
+   ✓ Tu token JWT ha expirado
+   ✓ Cierra sesión y vuelve a iniciar sesión
+
+
+PRÓXIMOS PASOS SUGERIDOS:
+───────────────────────────────────────────────────────────────────────
+
+1. Probar todos los reportes con datos reales
+2. Verificar que el formato Excel y PDF es el deseado
+3. Si necesitas cambios de formato, edita:
+   - backend/utils/generarExcel.js (para Excel)
+   - backend/utils/generarPDF.js (para PDF)
+4. Para agregar nuevos tipos de reportes, sigue el patrón en:
+   - backend/routes/reportes.routes.js
+
+
+DOCUMENTACIÓN DISPONIBLE:
+───────────────────────────────────────────────────────────────────────
+
+Lee estos archivos para más información:
+
+1. README_REPORTES.md
+   - Resumen rápido
+   - Checklist de verificación
+   - Quick start
+
+2. REPORTES_MEJORAS.md
+   - Lista detallada de cambios
+   - Cambios en frontend, backend y estilos
+   - Información de seguridad
+
+3. GUIA_PRUEBA_REPORTES.md
+   - Pasos detallados para probar
+   - Verificación de contenido
+   - Solución de problemas específicos
+
+4. TECH_REPORTES.md
+   - Arquitectura del sistema
+   - Endpoints de API
+   - Estructura de base de datos
+   - Información de seguridad
+   - Troubleshooting técnico
+
+
+¿NECESITAS AYUDA?
+───────────────────────────────────────────────────────────────────────
+
+Consulta la documentación o verifica:
+1. Los logs del backend
+2. La consola del navegador (F12 → Console)
+3. El archivo TECH_REPORTES.md en la sección de troubleshooting
+
+
+════════════════════════════════════════════════════════════════════════
+Fecha: 2025-09-21
+Estado: ✅ Sistema completo y listo para usar
+════════════════════════════════════════════════════════════════════════
