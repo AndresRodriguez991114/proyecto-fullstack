@@ -171,7 +171,14 @@ const LoginForm = () => {
             className={`btn-login ${formReady ? "active" : "disabled"}`}
             disabled={!formReady || !isValid || !isDirty || isSubmitting}
           >
-            {isSubmitting ? "Iniciando..." : "Login"}
+            {isSubmitting ? (
+              <span className="btn-content">
+                <span className="spinner" aria-label="Cargando" />
+                Iniciando sesión...
+              </span>
+            ) : (
+              "Login"
+            )}
           </button>
 
           {errorMessage && <p className="server-error">{errorMessage}</p>}

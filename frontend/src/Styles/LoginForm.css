@@ -94,7 +94,7 @@
 .btn-login {
   width: 100%;
   margin-top: 25px;
-  padding: 12px;
+  padding: 12px 16px;
   background: linear-gradient(90deg, #44126b, #8e3fba);
   color: white;
   border: none;
@@ -102,16 +102,42 @@
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  transition: 0.3s;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  box-shadow: 0 10px 20px rgba(68, 18, 107, 0.3);
 }
 
 .btn-login:disabled {
-  opacity: 0.4;
+  opacity: 0.75;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .btn-login:hover:not(:disabled) {
-  transform: scale(1.03);
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 14px 24px rgba(68, 18, 107, 0.35);
+}
+
+.btn-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 /* LOGO */
 .logo-container {
