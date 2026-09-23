@@ -48,16 +48,25 @@ const isAllowedOrigin = (origin) => {
 // --- CONEXIÓN A POSTGRES ---
 const pool = new Pool({
   host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
+  port: Number(process.env.DB_PORT || 5432),
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
   ssl: { rejectUnauthorized: false },
-  connectionTimeoutMillis: 5000,
-  keepAlive: true
+  max: 10,
+  idleTimeoutMillis: 20000,
+  connectionTimeoutMillis: 8000,
+  statement_timeout: 10000,
+  keepAlive: true,
+  keepAliveInitialDelayMillis: 1000
+});
+
+pool.on("error", (err) => {
+  console.error("❌ Error inesperado del pool de PostgreSQL:", err.message);
 });
 
 const app = express();
+app.disable("x-powered-by");
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -67,18 +76,25 @@ app.use(
         callback(new Error("Origin not allowed by CORS"));
       }
     },
-    credentials: true
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 app.use("/api/reportes", reportesRoutes);
 
 
 // -------------------------------------------------------------
 //              🟢 HEALTH CHECK (SIN AUTENTICACIÓN)
 // -------------------------------------------------------------
-app.get("/health", (req, res) => {
-  res.status(200).send("OK");
+app.get("/health", async (req, res) => {
+  try {
+    await pool.query("SELECT 1");
+    res.status(200).json({ ok: true, db: "connected" });
+  } catch (err) {
+    res.status(503).json({ ok: false, db: "disconnected", error: err.message });
+  }
 });
 
 app.get("/api/db-check", async (req, res) => {

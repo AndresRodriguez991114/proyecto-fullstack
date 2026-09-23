@@ -24,39 +24,29 @@ const InicioPage = () => {
 useEffect(() => {
   const fetchStats = async () => {
     try {
-              // 🔹 Obtener equipos existentes
-      const resEquipos = await api.get("/equipos"); // O "/api/equipos" según tu configuración
+      const [resEquipos, resEstados, resEnvios] = await Promise.all([
+        api.get("/equipos"),
+        api.get("/equipos/resumen-estados"),
+        api.get("/equipos/listos-envio")
+      ]);
+
       const equiposTotal = Array.isArray(resEquipos.data) ? resEquipos.data.length : 0;
 
-      setStats(prev => ({
-        ...prev,
-        equipos: equiposTotal
-      }));
-      
-      // 🔹 Obtener reparaciones y mantenimientos activos
-      const resEstados = await api.get("/equipos/resumen-estados");
       let totalReparaciones = 0;
       if (Array.isArray(resEstados.data)) {
-        resEstados.data.forEach(e => {
-          totalReparaciones += e.total;
+        resEstados.data.forEach((e) => {
+          totalReparaciones += Number(e.total) || 0;
         });
       }
 
-      setStats(prev => ({
-        ...prev,
-        reparaciones: totalReparaciones
-      })); 
+      const enviosTotal = Array.isArray(resEnvios.data) ? resEnvios.data.length : 0;
 
-     // 🔹 `Rutas de envios
-     // 🔹 Obtener equipos listos para envío
-    const resEnvios = await api.get("/equipos/listos-envio");
-    const enviosTotal = Array.isArray(resEnvios.data) ? resEnvios.data.length : 0;
-    
-    setStats(prev => ({
-      ...prev,
-      Envios: enviosTotal
-    }));
-
+      setStats({
+        equipos: equiposTotal,
+        reparaciones: totalReparaciones,
+        Envios: enviosTotal,
+        Diademas: 0
+      });
     } catch (err) {
       console.error("Error cargando estadísticas:", err);
     }

@@ -19,6 +19,7 @@ const LoginForm = () => {
 
   const [rememberMe, setRememberMe] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
     // 👁 estado para mostrar/ocultar contraseña
   const [showPassword, setShowPassword] = useState(false);
@@ -48,6 +49,7 @@ const LoginForm = () => {
   // -------------------------------
   const onSubmit = async (formData) => {
     setErrorMessage("");
+    setIsSubmitting(true);
 
     // Normalizar email antes de enviar (nuevo)
     const emailNormalized = formData.email.trim().toLowerCase();
@@ -96,6 +98,8 @@ const LoginForm = () => {
       } else {
         setErrorMessage("Error de conexión con el servidor");
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -165,9 +169,9 @@ const LoginForm = () => {
           <button
             type="submit"
             className={`btn-login ${formReady ? "active" : "disabled"}`}
-            disabled={!formReady || !isValid || !isDirty}
+            disabled={!formReady || !isValid || !isDirty || isSubmitting}
           >
-            Login
+            {isSubmitting ? "Iniciando..." : "Login"}
           </button>
 
           {errorMessage && <p className="server-error">{errorMessage}</p>}
